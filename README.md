@@ -76,5 +76,5 @@ The current admin, inquiry, download-gate and analytics features use a local JSO
 GitHub SSH remote:
 
 ```txt
-git@github.com:shagaofeng-rgb/flameprimes.com.git
+git@github.com:shagaofeng-rgb/grimmfirepump.com.git
 ```
