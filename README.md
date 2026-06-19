@@ -44,14 +44,13 @@ Recommended settings:
 
 The project includes `vercel.json` with the same commands.
 
-## Important Production Note
+## Production Notes
 
-The current admin, inquiry, download-gate and analytics features use a local JSON preview store. On Vercel this falls back to `/tmp`, which is suitable only for functional preview. Before final production launch, connect:
-
-- Supabase Postgres for persistent inquiries, downloads and analytics events
-- Supabase Auth for `/admin`
-- Supabase Storage or Vercel Blob for media and PDF files
-- Resend for inquiry email notification
+- Lead data uses Neon Postgres on Vercel when `POSTGRES_URL` or `DATABASE_URL` is present.
+- Local development falls back to `data/runtime/*.json` when database env vars are unavailable.
+- `/admin` is password protected with `ADMIN_PASSWORD` and a signed `ADMIN_SESSION_SECRET` cookie.
+- PDF downloads, inquiry forms and CTA analytics are wired into the same lead data layer.
+- Email notification can be added with Resend if immediate inbox alerts are required.
 
 ## Key Routes
 

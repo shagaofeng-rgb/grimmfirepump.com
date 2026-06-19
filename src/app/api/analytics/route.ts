@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { isAdminAuthenticated } from "@/lib/admin-auth";
 import { appendStore, createId, readStore } from "@/lib/local-store";
 
 const eventSchema = z.object({
@@ -10,6 +11,9 @@ const eventSchema = z.object({
 });
 
 export async function GET() {
+  if (!(await isAdminAuthenticated())) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
   const events = await readStore<Array<{ event: string; createdAt: string }>>("analytics-events.json", []);
   const counts = events.reduce<Record<string, number>>((acc, item) => {
     acc[item.event] = (acc[item.event] || 0) + 1;

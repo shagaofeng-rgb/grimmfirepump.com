@@ -20,7 +20,7 @@ export default async function AdminDashboardPage() {
       <p className="text-sm font-black uppercase tracking-[0.14em] text-orange-300">Dashboard</p>
       <h1 className="mt-3 text-4xl font-black text-white">Lead generation control center</h1>
       <p className="mt-4 max-w-3xl leading-7 text-slate-400">
-        This local dashboard proves the operating model: inquiries, gated downloads and CTA events are captured before connecting Supabase, Resend and PostHog.
+        Inquiries, gated downloads and CTA events are captured from the live website and stored in the production lead database.
       </p>
       <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {cards.map(([label, value, href]) => (

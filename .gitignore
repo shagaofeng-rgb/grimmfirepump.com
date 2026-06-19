@@ -14,3 +14,4 @@ qa-*.png
 preview-*.png
 *.log
 .DS_Store
+.env*

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { isAdminAuthenticated } from "@/lib/admin-auth";
 import { appendStore, createId, readStore } from "@/lib/local-store";
 import { scoreLead } from "@/lib/lead-scoring";
 
@@ -19,6 +20,9 @@ const inquirySchema = z.object({
 });
 
 export async function GET() {
+  if (!(await isAdminAuthenticated())) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
   const inquiries = await readStore("inquiries.json", []);
   return NextResponse.json({ inquiries });
 }

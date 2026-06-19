@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@neondatabase/serverless": "^1.1.0",
     "@tailwindcss/postcss": "^4.1.17",
     "clsx": "^2.1.1",
     "framer-motion": "^12.23.25",

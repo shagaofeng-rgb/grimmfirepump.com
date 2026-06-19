@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { isAdminAuthenticated } from "@/lib/admin-auth";
 import { appendStore, createId, readStore } from "@/lib/local-store";
 
 const downloadLeadSchema = z.object({
@@ -13,6 +14,9 @@ const downloadLeadSchema = z.object({
 });
 
 export async function GET() {
+  if (!(await isAdminAuthenticated())) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
   const leads = await readStore("download-leads.json", []);
   return NextResponse.json({ leads });
 }
