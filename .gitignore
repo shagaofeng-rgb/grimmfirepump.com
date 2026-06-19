@@ -1,0 +1,16 @@
+node_modules
+.next
+.vercel
+out
+dist
+build
+
+.env
+.env*.local
+
+data/runtime/*.json
+tmp
+qa-*.png
+preview-*.png
+*.log
+.DS_Store
