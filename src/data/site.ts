@@ -51,7 +51,7 @@ export const company = {
   name: "Flame Primes Fire Pump Systems",
   legalName: "Grimm Water Treatment (Zhejiang) Co.,Ltd.",
   shortName: "Flame Primes",
-  website: "https://www.flameprimes.com",
+  website: "https://grimmfirepump.com",
   email: "jackcheng@flameprimes.com",
   phone: "+86-15215721057",
   whatsapp: "8615215721057",
