@@ -7,7 +7,7 @@ import { AnalyticsListener } from "@/components/analytics-listener";
 export const metadata: Metadata = {
   metadataBase: new URL(company.website),
   title: {
-    default: "Flame Primes | UL Fire Pump Systems for Global Projects",
+    default: "Flame Primes | Fire Pump Systems for Global Projects",
     template: "%s | Flame Primes",
   },
   description:

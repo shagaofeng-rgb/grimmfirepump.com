@@ -5,9 +5,9 @@ import { SectionHeading } from "@/components/section-heading";
 const complianceItems = [
   {
     icon: ShieldCheck,
-    title: "UL / NFPA20 purchasing path",
-    text: "A dedicated page explains package scope, driver options, controller evidence and quotation inputs.",
-    href: "/products/ul-fire-pump-systems",
+    title: "Project documentation path",
+    text: "Catalogs, pump data, curves, certificates and testing evidence are organized for buyer review.",
+    href: "/downloads",
   },
   {
     icon: Wrench,
@@ -33,9 +33,9 @@ export function ComplianceSection() {
   return (
     <section className="section bg-white">
       <SectionHeading
-        eyebrow="Compliance & Buyer Evidence"
-        title="Make the technical proof visible before the inquiry."
-        text="The rebuilt site separates sales content from engineering evidence, so buyers can quickly check standards, testing, downloads and technical guidance."
+        eyebrow="Technical Evidence"
+        title="Make testing, documents and selection guidance visible before the inquiry."
+        text="The rebuilt site separates sales content from engineering evidence, so buyers can quickly check testing capability, downloads and technical guidance."
       />
       <div className="container-shell grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {complianceItems.map((item) => (

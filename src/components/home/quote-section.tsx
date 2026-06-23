@@ -58,7 +58,6 @@ export function QuoteSection() {
           <label className="grid gap-2 text-sm font-bold text-slate-700">Country <input name="country" className="min-h-12 rounded-md border border-slate-300 px-3" /></label>
           <label className="grid gap-2 text-sm font-bold text-slate-700">Product Interest
             <select name="product" className="min-h-12 rounded-md border border-slate-300 px-3">
-              <option>UL Fire Pump System</option>
               <option>EDJ Fire Pump System</option>
               <option>Diesel Fire Pump Set</option>
               <option>Electric Fire Pump Set</option>
@@ -70,7 +69,7 @@ export function QuoteSection() {
           <label className="grid gap-2 text-sm font-bold text-slate-700">Head / Pressure <input name="head" className="min-h-12 rounded-md border border-slate-300 px-3" placeholder="e.g. 10 bar" /></label>
           <label className="grid gap-2 text-sm font-bold text-slate-700 md:col-span-2">Certification Needed
             <select name="certification" className="min-h-12 rounded-md border border-slate-300 px-3">
-              <option>UL / FM / NFPA20 related</option>
+              <option>Project document package</option>
               <option>CE documentation</option>
               <option>Factory test report</option>
               <option>Not sure yet</option>

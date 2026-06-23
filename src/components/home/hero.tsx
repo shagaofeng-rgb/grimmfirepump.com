@@ -7,7 +7,7 @@ export function Hero() {
       <div>
         <p className="eyebrow mb-4">Flame Primes Fire Pump Systems</p>
         <h1 className="max-w-3xl text-[40px] font-black leading-[1.04] tracking-normal text-[var(--navy-950)] md:text-[58px]">
-          UL / NFPA20 Ready Fire Pump Packages for Global Projects
+          Fire Pump Packages for Global Projects
         </h1>
         <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-600">
           Factory-built diesel, electric and jockey fire pump packages with technical data, testing evidence, downloads
@@ -19,9 +19,6 @@ export function Hero() {
           </Link>
           <Link className="button button-secondary" href="/downloads">
             Download Catalog
-          </Link>
-          <Link className="button button-secondary" href="/products/ul-fire-pump-systems">
-            UL Systems
           </Link>
         </div>
         <dl className="mt-8 hidden max-w-2xl grid-cols-3 gap-4 md:grid">

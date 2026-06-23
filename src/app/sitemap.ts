@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { applications, company, posts, products } from "@/data/site";
+import { applications, company, knowledgePosts, posts, products } from "@/data/site";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
@@ -7,7 +7,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "",
     "/about",
     "/products",
-    "/products/ul-fire-pump-systems",
     "/applications",
     "/projects",
     "/factory",
@@ -20,7 +19,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...products.map((item) => `/products/${item.slug}`),
     ...applications.map((item) => `/applications/${item.slug}`),
     ...posts.map((item) => `/blog/${item.slug}`),
-    ...posts.map((item) => `/knowledge/${item.slug}`),
+    ...knowledgePosts.map((item) => `/knowledge/${item.slug}`),
   ].map((path) => ({
     url: `${company.website}${path}`,
     lastModified: now,

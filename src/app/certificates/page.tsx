@@ -6,9 +6,9 @@ import { certificates } from "@/data/site";
 export default function CertificatesPage() {
   return (
     <SimplePage
-      eyebrow="Certificates & Compliance"
+      eyebrow="Certificates & Documents"
       title="Documents, standards and certificate evidence organized for buyer review."
-      text="This page is prepared for CE, ISO, test reports, patents and future UL / FM / NFPA20 related documentation, with downloadable packs available through the download center."
+      text="This page is prepared for CE, quality documents, test reports, patents and project review materials, with downloadable packs available through the download center."
     >
       <section className="section">
         <div className="container-shell grid gap-5 md:grid-cols-2 xl:grid-cols-4">
@@ -23,12 +23,12 @@ export default function CertificatesPage() {
           ))}
         </div>
         <div className="container-shell mt-10 rounded-lg bg-[var(--grey-50)] p-8">
-          <h2 className="text-2xl font-black text-[var(--navy-950)]">Need UL / FM / NFPA20 related documents?</h2>
+          <h2 className="text-2xl font-black text-[var(--navy-950)]">Need project review documents?</h2>
           <p className="mt-3 max-w-3xl leading-7 text-slate-600">
             Send the required flow, head, driver type, country and project standard. Flame Primes will confirm the available
             documentation package and quotation path for your project.
           </p>
-          <Link className="button button-primary mt-6" href="/contact">Ask for Compliance Support</Link>
+          <Link className="button button-primary mt-6" href="/contact">Ask for Document Support</Link>
         </div>
       </section>
     </SimplePage>

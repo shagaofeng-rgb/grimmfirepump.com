@@ -57,7 +57,6 @@ The project includes `vercel.json` with the same commands.
 - `/`
 - `/about`
 - `/products`
-- `/products/ul-fire-pump-systems`
 - `/products/[slug]`
 - `/applications`
 - `/projects`

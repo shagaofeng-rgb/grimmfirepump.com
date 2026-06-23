@@ -4,8 +4,8 @@ import { company, footerColumns } from "@/data/site";
 
 export function Footer() {
   const footerLinks: Record<string, string> = {
-    "UL Fire Pump Systems": "/products/ul-fire-pump-systems",
     "EDJ Fire Pump System": "/products/edj-fire-pump-set",
+    "Electric Fire Pump": "/products/2-electric-plus-jockey-pump-set",
     "Diesel Fire Pump": "/products/diesel-engine-fire-pump",
     "Jockey Pump": "/products/vertical-stainless-steel-multistage-pump-jockey-pump",
     "Factory Strength": "/factory",

@@ -1,6 +1,6 @@
 export function TrustStrip() {
   const items = [
-    ["NFPA20-oriented configuration", "Project-ready package design"],
+    ["Project-ready configuration", "Packaged pump system design"],
     ["Testing reports and certificates", "Quality documentation available"],
     ["Export support", "English catalog and fast response"],
   ];
