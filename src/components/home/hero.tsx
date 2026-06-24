@@ -1,11 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
+import { company } from "@/data/site";
 
 export function Hero() {
   return (
     <section className="container-shell grid items-center gap-12 py-14 md:py-20 lg:min-h-[690px] lg:grid-cols-[0.9fr_1.1fr]">
       <div>
-        <p className="eyebrow mb-4">Flame Primes Fire Pump Systems</p>
+        <p className="eyebrow mb-4">{company.name}</p>
         <h1 className="max-w-3xl text-[40px] font-black leading-[1.04] tracking-normal text-[var(--navy-950)] md:text-[58px]">
           Fire Pump Packages for Global Projects
         </h1>
@@ -37,7 +38,7 @@ export function Hero() {
       <div className="industrial-shadow relative min-h-[340px] overflow-hidden rounded-lg bg-[var(--navy-900)] md:min-h-[500px]">
         <Image
           src="/assets/applications/hero-edj.webp"
-          alt="Flame Primes EDJ fire fighting pump system installed in a pump room"
+          alt={`${company.shortName} EDJ fire fighting pump system installed in a pump room`}
           fill
           priority
           className="object-cover"

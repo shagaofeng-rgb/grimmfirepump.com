@@ -12,10 +12,10 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/92 backdrop-blur-xl">
       <div className="mx-auto flex h-[76px] max-w-[1280px] items-center justify-between gap-6 px-6">
-        <Link href="/" className="flex min-w-[220px] items-center gap-3" aria-label="Flame Primes Fire Pump home">
-          <Image src="/assets/images/logo.png" alt="Flame Primes logo" width={42} height={42} className="object-contain" />
+        <Link href="/" className="flex min-w-[220px] items-center gap-3" aria-label={`${company.shortName} Fire Pump home`}>
+          <Image src="/assets/images/logo.png" alt={`${company.shortName} logo`} width={42} height={42} className="object-contain" />
           <span className="flex flex-col leading-none">
-            <strong className="text-base tracking-[0.04em] text-[var(--navy-900)]">FLAME PRIMES</strong>
+            <strong className="text-base tracking-[0.04em] text-[var(--navy-900)]">{company.shortName}</strong>
             <small className="mt-1 text-xs text-slate-500">Fire Pump Systems</small>
           </span>
         </Link>

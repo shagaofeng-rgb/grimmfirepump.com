@@ -7,11 +7,11 @@ import { AnalyticsListener } from "@/components/analytics-listener";
 export const metadata: Metadata = {
   metadataBase: new URL(company.website),
   title: {
-    default: "Flame Primes | Fire Pump Systems for Global Projects",
-    template: "%s | Flame Primes",
+    default: "GRIMM PUMP | Fire Pump Systems for Global Projects",
+    template: "%s | GRIMM PUMP",
   },
   description:
-    "Flame Primes supplies fire pump systems, diesel fire pumps, electric fire pumps, jockey pumps and packaged pump solutions for global fire protection projects.",
+    "GRIMM PUMP supplies fire pump systems, diesel fire pumps, electric fire pumps, jockey pumps and packaged pump solutions for global fire protection projects.",
   alternates: {
     canonical: "/",
     languages: {
@@ -24,10 +24,10 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: "Flame Primes Fire Pump Systems",
+    title: "GRIMM PUMP Fire Pump Systems",
     description: "Factory-built fire pump systems for industrial, commercial and infrastructure projects worldwide.",
     url: company.website,
-    siteName: "Flame Primes",
+    siteName: "GRIMM PUMP",
     images: [{ url: "/assets/applications/hero-edj.webp", width: 1200, height: 900 }],
     locale: "en_US",
     type: "website",

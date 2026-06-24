@@ -48,9 +48,9 @@ function oneLine(value: string) {
 }
 
 export const company = {
-  name: "Flame Primes Fire Pump Systems",
+  name: "GRIMM PUMP Fire Pump Systems",
   legalName: "Grimm Water Treatment (Zhejiang) Co.,Ltd.",
-  shortName: "Flame Primes",
+  shortName: "GRIMM PUMP",
   website: "https://grimmfirepump.com",
   email: "jackcheng@flameprimes.com",
   phone: "+86-15215721057",

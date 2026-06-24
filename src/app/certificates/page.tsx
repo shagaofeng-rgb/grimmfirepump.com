@@ -25,7 +25,7 @@ export default function CertificatesPage() {
         <div className="container-shell mt-10 rounded-lg bg-[var(--grey-50)] p-8">
           <h2 className="text-2xl font-black text-[var(--navy-950)]">Need project review documents?</h2>
           <p className="mt-3 max-w-3xl leading-7 text-slate-600">
-            Send the required flow, head, driver type, country and project standard. Flame Primes will confirm the available
+            Send the required flow, head, driver type, country and project standard. GRIMM PUMP will confirm the available
             documentation package and quotation path for your project.
           </p>
           <Link className="button button-primary mt-6" href="/contact">Ask for Document Support</Link>

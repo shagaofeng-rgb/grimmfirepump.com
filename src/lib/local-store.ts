@@ -3,7 +3,7 @@ import path from "path";
 import { neon } from "@neondatabase/serverless";
 
 const runtimeDir = process.env.VERCEL
-  ? path.join("/tmp", "flameprimes-runtime")
+  ? path.join("/tmp", "grimm-pump-runtime")
   : path.join(process.cwd(), "data", "runtime");
 
 let schemaReady: Promise<void> | null = null;

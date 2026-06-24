@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { company } from "@/data/site";
 
 const adminNav = [
   { label: "Dashboard", href: "/admin" },
@@ -14,7 +15,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100">
       <aside className="fixed inset-y-0 left-0 hidden w-64 border-r border-white/10 bg-slate-950 p-6 lg:block">
-        <Link href="/admin" className="text-xl font-black tracking-[0.04em] text-white">FLAME PRIMES</Link>
+        <Link href="/admin" className="text-xl font-black tracking-[0.04em] text-white">{company.shortName}</Link>
         <p className="mt-2 text-xs font-bold uppercase tracking-[0.14em] text-slate-500">Production Admin</p>
         <nav className="mt-8 grid gap-2">
           {adminNav.map((item) => (

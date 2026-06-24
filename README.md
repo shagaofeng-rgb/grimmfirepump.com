@@ -1,6 +1,6 @@
-# Flame Primes Fire Pump Website
+# GRIMM PUMP Fire Pump Website
 
-Next.js 15 App Router website for Flame Primes, an international B2B fire pump and fire pump systems website.
+Next.js 15 App Router website for GRIMM PUMP, an international B2B fire pump and fire pump systems website.
 
 ## Stack
 

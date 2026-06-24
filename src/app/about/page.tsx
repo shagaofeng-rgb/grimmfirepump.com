@@ -6,15 +6,14 @@ const proofPoints = [
   "Fire pump, water supply, sewage and irrigation product lines inherited from the existing website.",
   "Focus on complete EDJ, diesel + jockey and electric + jockey fire pump package requirements.",
   "Factory evidence, testing documents, downloads and project cases are separated into dedicated pages.",
-  "Brand contact information is unified around Flame Primes while keeping the legal manufacturing company visible.",
 ];
 
 export default function AboutPage() {
   return (
     <SimplePage
-      eyebrow="About Flame Primes"
+      eyebrow="About GRIMM PUMP"
       title="A clearer international brand for technical fire pump buyers."
-      text="The rebuilt website positions Flame Primes as the export-facing fire pump systems brand of Grimm Water Treatment, with a stronger structure for trust, SEO and inquiries."
+      text="The rebuilt website positions GRIMM PUMP as the export-facing fire pump systems brand of Grimm Water Treatment, with a stronger structure for trust, SEO and inquiries."
     >
       <section className="section">
         <div className="container-shell grid gap-10 lg:grid-cols-[0.9fr_1.1fr]">

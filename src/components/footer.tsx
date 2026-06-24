@@ -24,9 +24,9 @@ export function Footer() {
       <div className="mx-auto grid max-w-[1200px] gap-10 md:grid-cols-[1.35fr_repeat(3,1fr)]">
         <div>
           <Link href="/" className="mb-5 flex items-center gap-3">
-            <Image src="/assets/images/logo.png" alt="Flame Primes logo" width={42} height={42} className="invert" />
+            <Image src="/assets/images/logo.png" alt={`${company.shortName} logo`} width={42} height={42} className="invert" />
             <span className="flex flex-col leading-none">
-              <strong className="text-base tracking-[0.04em] text-white">FLAME PRIMES</strong>
+              <strong className="text-base tracking-[0.04em] text-white">{company.shortName}</strong>
               <small className="mt-1 text-xs text-slate-400">Fire Pump Systems</small>
             </span>
           </Link>
