@@ -55,7 +55,7 @@ export const company = {
   email: "jackcheng@flameprimes.com",
   phone: "+86-15215721057",
   whatsapp: "8615215721057",
-  whatsappUrl: "https://wa.me/message/BAOYAXABBLMKF1",
+  whatsappUrl: "https://wa.me/message/JV3PVHGQYO5SB1",
   facebookUrl: "https://www.facebook.com/profile.php?id=61587114525850",
   address: "No.2, Weilong Road, Nianli Town, Qujiang District, Quzhou City, Zhejiang Province",
 };
@@ -325,7 +325,7 @@ export const downloads = [
   },
   {
     title: "Project Submittal Pack",
-    text: "Suggested package for EPC buyers: datasheet, drawing placeholder, certificate list and testing evidence.",
+    text: "Suggested package for EPC buyers: datasheet, general arrangement drawing, certificate list and testing evidence.",
     file: "/assets/downloads/grimm-fire-pump-catalog.pdf",
   },
 ];
