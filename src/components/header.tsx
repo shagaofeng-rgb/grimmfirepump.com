@@ -144,6 +144,7 @@ function ProductMegaMenu({ open }: { open: boolean }) {
                       alt={group.title}
                       fill
                       className="object-contain p-3 transition duration-300 group-hover/card:scale-[1.04]"
+                      loading="eager"
                       sizes="220px"
                     />
                   </figure>
@@ -182,7 +183,7 @@ function MobileProductMenu({ closeMenu }: { closeMenu: () => void }) {
         <section key={group.title} className="rounded-md border border-slate-100 bg-white p-3">
           <Link className="flex items-center gap-3" href={group.href} onClick={closeMenu}>
             <span className="relative h-14 w-16 shrink-0 overflow-hidden rounded bg-slate-50">
-              <Image src={group.image} alt={group.title} fill className="object-contain p-1.5" sizes="64px" />
+              <Image src={group.image} alt={group.title} fill className="object-contain p-1.5" loading="eager" sizes="64px" />
             </span>
             <span>
               <strong className="block text-sm text-[var(--navy-950)]">{group.title}</strong>
