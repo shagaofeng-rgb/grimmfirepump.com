@@ -32,6 +32,11 @@ export const metadata: Metadata = {
     locale: "en_US",
     type: "website",
   },
+  icons: {
+    icon: "/assets/images/logo.png",
+    shortcut: "/assets/images/logo.png",
+    apple: "/assets/images/logo.png",
+  },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {

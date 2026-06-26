@@ -36,20 +36,7 @@ async function ensureRuntimeDir() {
   await fs.mkdir(runtimeDir, { recursive: true });
 }
 
-export async function readStore<T>(fileName: string, fallback: T): Promise<T> {
-  const sql = getSql();
-  if (sql) {
-    await ensureSchema();
-    const rows = await sql`
-      SELECT payload
-      FROM lead_store
-      WHERE store_name = ${fileName}
-      ORDER BY created_at DESC
-      LIMIT 1000
-    `;
-    return rows.map((row) => row.payload) as T;
-  }
-
+async function readLocalStore<T>(fileName: string, fallback: T): Promise<T> {
   await ensureRuntimeDir();
   const filePath = path.join(runtimeDir, fileName);
   try {
@@ -61,23 +48,52 @@ export async function readStore<T>(fileName: string, fallback: T): Promise<T> {
   }
 }
 
-export async function appendStore<T extends { id: string; createdAt: string }>(fileName: string, item: T) {
-  const sql = getSql();
-  if (sql) {
-    await ensureSchema();
-    await sql`
-      INSERT INTO lead_store (store_name, id, created_at, payload)
-      VALUES (${fileName}, ${item.id}, ${item.createdAt}, ${JSON.stringify(item)}::jsonb)
-      ON CONFLICT (store_name, id)
-      DO UPDATE SET payload = EXCLUDED.payload, created_at = EXCLUDED.created_at
-    `;
-    return item;
-  }
-
-  const current = await readStore<T[]>(fileName, []);
+async function appendLocalStore<T extends { id: string; createdAt: string }>(fileName: string, item: T) {
+  const current = await readLocalStore<T[]>(fileName, []);
   current.unshift(item);
   await fs.writeFile(path.join(runtimeDir, fileName), JSON.stringify(current, null, 2));
   return item;
+}
+
+export async function readStore<T>(fileName: string, fallback: T): Promise<T> {
+  const sql = getSql();
+  if (sql) {
+    try {
+      await ensureSchema();
+      const rows = await sql`
+        SELECT payload
+        FROM lead_store
+        WHERE store_name = ${fileName}
+        ORDER BY created_at DESC
+        LIMIT 1000
+      `;
+      return rows.map((row) => row.payload) as T;
+    } catch (error) {
+      console.warn(`Database read failed for ${fileName}; using local runtime store.`, error);
+    }
+  }
+
+  return readLocalStore(fileName, fallback);
+}
+
+export async function appendStore<T extends { id: string; createdAt: string }>(fileName: string, item: T) {
+  const sql = getSql();
+  if (sql) {
+    try {
+      await ensureSchema();
+      await sql`
+        INSERT INTO lead_store (store_name, id, created_at, payload)
+        VALUES (${fileName}, ${item.id}, ${item.createdAt}, ${JSON.stringify(item)}::jsonb)
+        ON CONFLICT (store_name, id)
+        DO UPDATE SET payload = EXCLUDED.payload, created_at = EXCLUDED.created_at
+      `;
+      return item;
+    } catch (error) {
+      console.warn(`Database write failed for ${fileName}; using local runtime store.`, error);
+    }
+  }
+
+  return appendLocalStore(fileName, item);
 }
 
 export function createId(prefix: string) {

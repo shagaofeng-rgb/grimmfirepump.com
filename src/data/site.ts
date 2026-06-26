@@ -108,6 +108,79 @@ export const products = [...syncedContent.products]
     specs: product.specs.slice(0, 6).map(oneLine),
   }));
 
+function menuProduct(slug: string) {
+  const product = products.find((item) => item.slug === slug);
+
+  if (!product) {
+    return null;
+  }
+
+  return {
+    title: product.title,
+    href: `/products/${product.slug}`,
+    image: product.image,
+    summary: product.summary,
+  };
+}
+
+function menuProducts(slugs: string[]) {
+  return slugs.map(menuProduct).filter((item): item is NonNullable<ReturnType<typeof menuProduct>> => Boolean(item));
+}
+
+export const productMegaMenuGroups = [
+  {
+    title: "Fire Pump Series",
+    href: "/products",
+    description: "Complete fire pump packages, diesel sets, electric sets and jockey pump combinations.",
+    image: "/assets/synced/products/edj-fire-pump-set.jpg",
+    items: menuProducts([
+      "edj-fire-pump-set",
+      "diesel-engine-plus-jockey-pump-set",
+      "2-electric-plus-jockey-pump-set",
+      "diesel-engine-fire-pump",
+      "electric-horizontal-split-end-suction-pump",
+      "vertical-stainless-steel-multistage-pump-jockey-pump",
+    ]),
+  },
+  {
+    title: "Water Supply Series",
+    href: "/products",
+    description: "Booster and variable-frequency water supply equipment for building and utility projects.",
+    image: "/assets/synced/products/frequency-conversion-water-supply-equipment.jpg",
+    items: menuProducts([
+      "frequency-conversion-water-supply-equipment",
+      "horizontal-booster-pump-group",
+      "vertical-stainless-steel-multistage-pump-jockey-pump",
+    ]),
+  },
+  {
+    title: "Mobile Pump Truck",
+    href: "/products/diesel-engine-irrigation-pump-trailer-type",
+    description: "Trailer-mounted diesel pump solutions for emergency drainage, irrigation and temporary water transfer.",
+    image: "/assets/synced/products/diesel-engine-irrigation-pump-trailer-type.jpg",
+    items: menuProducts(["diesel-engine-irrigation-pump-trailer-type"]),
+  },
+  {
+    title: "Sewage Pump Series",
+    href: "/products",
+    description: "Submersible sewage pumps and integrated prefabricated pump stations for drainage projects.",
+    image: "/assets/synced/products/integrated-prefabricated-pump-station-frp.jpg",
+    items: menuProducts(["submersible-sewage-pump", "integrated-prefabricated-pump-station-frp"]),
+  },
+  {
+    title: "Pumps",
+    href: "/products",
+    description: "Core pump models for fire protection, pressure boosting and long-shaft installation conditions.",
+    image: "/assets/synced/products/electric-long-shaft-fire-pump.png",
+    items: menuProducts([
+      "electric-horizontal-split-end-suction-pump",
+      "electric-long-shaft-fire-pump",
+      "diesel-engine-long-shaft-fire-pump",
+      "vertical-stainless-steel-multistage-pump-jockey-pump",
+    ]),
+  },
+];
+
 export const applications = [
   {
     slug: "warehouse-fire-protection",
