@@ -12,6 +12,7 @@ import { productMegaMenuGroups, products } from "@/data/site";
 
 type ProductPageProps = { params: Promise<{ slug: string }> };
 type Product = (typeof products)[number];
+type DetailImage = { src: string; alt: string };
 
 const ignoredTableLabels = new Set(["Pump", "Model", "Capacity(GPM)", "Head(BAR)", "Power(KW)", "Material", "FQA:"]);
 
@@ -122,6 +123,36 @@ function relatedProducts(product: Product) {
   return [...sameCategory, ...fallback].slice(0, 6);
 }
 
+function getDetailImages(product: Product) {
+  const importedImages = "detailImages" in product && Array.isArray(product.detailImages) ? product.detailImages : [];
+  return importedImages.length ? importedImages : [{ src: product.image, alt: product.title }];
+}
+
+function ProductImageGrid({ images, title }: { images: DetailImage[]; title: string }) {
+  if (!images.length) return null;
+
+  return (
+    <div className="mt-8 grid gap-4 md:grid-cols-2">
+      {images.map((image, index) => (
+        <figure key={`${image.src}-${index}`} className="overflow-hidden rounded-lg border border-slate-200 bg-slate-50">
+          <div className="relative h-64">
+            <Image
+              src={image.src}
+              alt={image.alt || title}
+              fill
+              className="object-contain p-4"
+              sizes="(min-width: 1024px) 420px, 100vw"
+            />
+          </div>
+          <figcaption className="border-t border-slate-200 bg-white px-4 py-3 text-xs font-bold text-slate-500">
+            {index + 1 < 10 ? `0${index + 1}` : index + 1} · {title}
+          </figcaption>
+        </figure>
+      ))}
+    </div>
+  );
+}
+
 function RelatedProductCarousel({ title, items }: { title: string; items: Product[] }) {
   return (
     <div className="mt-8 min-w-0">
@@ -196,20 +227,17 @@ function ContentCard({
   eyebrow,
   title,
   children,
-  related,
 }: {
   id: string;
   eyebrow: string;
   title: string;
   children: ReactNode;
-  related: Product[];
 }) {
   return (
     <section id={id} className="min-w-0 scroll-mt-28 overflow-hidden rounded-lg border border-slate-200 bg-white p-6 shadow-[0_12px_40px_rgba(7,20,38,0.05)] md:p-8">
       <p className="eyebrow mb-3">{eyebrow}</p>
       <h2 className="text-2xl font-black text-[var(--navy-950)] md:text-3xl">{title}</h2>
       <div className="mt-6">{children}</div>
-      <RelatedProductCarousel title={`Related products`} items={related} />
     </section>
   );
 }
@@ -228,6 +256,9 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
   const structureItems = getStructureItems(product);
   const applicationItems = getApplicationItems(product);
   const related = relatedProducts(product);
+  const detailImages = getDetailImages(product);
+  const overviewImages = detailImages.slice(0, 3);
+  const structureImages = detailImages.slice(3, 8);
 
   return (
     <>
@@ -270,15 +301,16 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
               ))}
             </nav>
 
-            <ContentCard id="overview" eyebrow="Product Overview" title="Product overview" related={related}>
+            <ContentCard id="overview" eyebrow="Product Overview" title="Product overview">
               <div className="grid gap-4 text-base leading-8 text-slate-600">
                 {overviewLines.map((line) => (
                   <p key={line}>{line}</p>
                 ))}
               </div>
+              <ProductImageGrid images={overviewImages} title={`${product.title} overview image`} />
             </ContentCard>
 
-            <ContentCard id="structure" eyebrow="Product Structure" title="Main structure and package scope" related={related}>
+            <ContentCard id="structure" eyebrow="Product Structure" title="Main structure and package scope">
               <div className="grid gap-4 md:grid-cols-2">
                 {structureItems.map((item, index) => (
                   <div key={item} className="rounded-md bg-slate-50 p-5">
@@ -287,9 +319,10 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
                   </div>
                 ))}
               </div>
+              <ProductImageGrid images={structureImages.length ? structureImages : overviewImages} title={`${product.title} structure image`} />
             </ContentCard>
 
-            <ContentCard id="applications" eyebrow="Applications" title="Recommended project applications" related={related}>
+            <ContentCard id="applications" eyebrow="Applications" title="Recommended project applications">
               <div className="grid gap-4 md:grid-cols-2">
                 {applicationItems.map((item) => (
                   <div key={item} className="flex items-center gap-3 rounded-md border border-slate-200 p-4">
@@ -302,7 +335,7 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
               </div>
             </ContentCard>
 
-            <ContentCard id="technical-data" eyebrow="Technical Data" title="Specifications and selection data" related={related}>
+            <ContentCard id="technical-data" eyebrow="Technical Data" title="Specifications and selection data">
               <dl className="grid overflow-hidden rounded-lg border border-slate-200">
                 {technicalLines.map((line) => {
                   const spec = splitSpec(line);
@@ -314,6 +347,7 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
                   );
                 })}
               </dl>
+              <RelatedProductCarousel title="Related products" items={related} />
             </ContentCard>
 
             <section id="product-quote" className="scroll-mt-28 rounded-lg bg-[var(--navy-950)] p-6 md:p-8">
