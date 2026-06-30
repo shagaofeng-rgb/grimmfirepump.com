@@ -16,7 +16,6 @@ export function Footer() {
     "Knowledge Center": "/knowledge",
     "Fire Pump Selector": "/tools/fire-pump-selector",
     "Contact Sales": "/contact",
-    "Admin Dashboard": "/admin",
   };
 
   return (

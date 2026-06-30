@@ -16,6 +16,8 @@ import {
 } from "lucide-react";
 import syncedContent from "./synced-content.json";
 
+type SyncedNews = (typeof syncedContent.news)[number];
+
 const productPriority = [
   "edj-fire-pump-set",
   "diesel-engine-plus-jockey-pump-set",
@@ -45,6 +47,56 @@ const newsFallbackImages = [
 
 function oneLine(value: string) {
   return value.replace(/\s*\n\s*/g, " · ").replace(/\s+/g, " ").trim();
+}
+
+function trimMeta(value: string, maxLength = 180) {
+  const cleanValue = oneLine(value);
+
+  if (cleanValue.length <= maxLength) {
+    return cleanValue;
+  }
+
+  const trimmed = cleanValue.slice(0, maxLength - 1);
+  const lastSpace = trimmed.lastIndexOf(" ");
+  return `${trimmed.slice(0, lastSpace > 120 ? lastSpace : trimmed.length).replace(/[,. ]+$/, "")}.`;
+}
+
+function isUsefulNewsLine(line: string) {
+  const cleanLine = oneLine(line);
+  return (
+    cleanLine.length > 24 &&
+    !/^url:/i.test(cleanLine) &&
+    !/^keywords:?$/i.test(cleanLine) &&
+    !/^previous:/i.test(cleanLine) &&
+    !/^next:/i.test(cleanLine)
+  );
+}
+
+const newsTitleOverrides: Record<string, string> = {
+  "si-necesita-una-bomba-contra-incendios-o-no-sabe-c-mo-elegir-una-puede-ponerse-e":
+    "Need a Fire Pump Selection? GRIMM Can Help Design Your Pump Package",
+};
+
+const newsSummaryOverrides: Record<string, string> = {
+  "si-necesita-una-bomba-contra-incendios-o-no-sabe-c-mo-elegir-una-puede-ponerse-e":
+    "GRIMM helps overseas buyers select fire pump packages by flow, pressure, application, voltage and project conditions, then prepares quotation support.",
+  "trailer-type-fire-pump-truck-equipped-with-a-fire-monitor":
+    "Trailer-mounted fire pump trucks can support emergency water supply, temporary firefighting and drainage projects where mobility and fast deployment matter.",
+};
+
+function buildNewsSummary(post: SyncedNews) {
+  const override = newsSummaryOverrides[post.slug];
+  if (override) return trimMeta(override);
+
+  const currentText = oneLine(post.text);
+  if (currentText.length >= 70) return trimMeta(currentText);
+
+  const contentSummary = post.content.map(oneLine).filter(isUsefulNewsLine).slice(0, 2).join(" ");
+  const fallback = contentSummary
+    ? `${post.title}. ${contentSummary}`
+    : `${post.title} from GRIMM PUMP, covering fire pump selection, pump package configuration and engineering support for global project buyers.`;
+
+  return trimMeta(fallback);
 }
 
 export const company = {
@@ -334,8 +386,9 @@ export const posts = [...syncedContent.news]
   .sort((a, b) => Date.parse(b.date || "1970-01-01") - Date.parse(a.date || "1970-01-01"))
   .map((post, index) => ({
     ...post,
+    title: newsTitleOverrides[post.slug] || post.title,
     image: post.image || newsFallbackImages[index % newsFallbackImages.length],
-    text: oneLine(post.text),
+    text: buildNewsSummary(post),
   }));
 
 export const knowledgePosts = [
@@ -465,7 +518,7 @@ export const knowledgePosts = [
 export const footerColumns = [
   { title: "Products", items: ["EDJ Fire Pump System", "Diesel Fire Pump", "Electric Fire Pump", "Jockey Pump"] },
   { title: "Trust", items: ["Factory Strength", "Testing Capability", "Certificates", "Project Cases"] },
-  { title: "Resources", items: ["Download Catalog", "Knowledge Center", "Fire Pump Selector", "Admin Dashboard"] },
+  { title: "Resources", items: ["Download Catalog", "Knowledge Center", "Fire Pump Selector", "Contact Sales"] },
 ];
 
 export const toolIcons = { Wrench, Globe2, Mail, MapPinned };

@@ -8,7 +8,7 @@ import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { StickyCta } from "@/components/sticky-cta";
 import { ProductInquiryForm } from "@/components/product-inquiry-form";
-import { productMegaMenuGroups, products } from "@/data/site";
+import { company, productMegaMenuGroups, products } from "@/data/site";
 
 type ProductPageProps = { params: Promise<{ slug: string }> };
 type Product = (typeof products)[number];
@@ -24,11 +24,12 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
   const { slug } = await params;
   const product = products.find((item) => item.slug === slug);
   if (!product) return {};
+  const description = productMetaDescription(product);
   return {
     title: product.title,
-    description: product.summary,
+    description,
     alternates: { canonical: `/products/${product.slug}` },
-    openGraph: { title: product.title, description: product.summary, images: [product.image] },
+    openGraph: { title: product.title, description, images: [product.image] },
   };
 }
 
@@ -42,6 +43,29 @@ function cleanDetailLines(product: Product) {
 
 function uniqueLines(lines: string[]) {
   return Array.from(new Set(lines.map((line) => line.trim()).filter(Boolean)));
+}
+
+function trimMeta(value: string, maxLength = 180) {
+  const cleanValue = value.replace(/\s+/g, " ").trim();
+
+  if (cleanValue.length <= maxLength) {
+    return cleanValue;
+  }
+
+  const trimmed = cleanValue.slice(0, maxLength - 1);
+  const lastSpace = trimmed.lastIndexOf(" ");
+  return `${trimmed.slice(0, lastSpace > 120 ? lastSpace : trimmed.length).replace(/[,. ]+$/, "")}.`;
+}
+
+function productMetaDescription(product: Product) {
+  const detailSummary = product.detailLines
+    .map((line) => line.trim())
+    .filter((line) => line.length > 45 && !/^Q\d+:|^A\d+:/i.test(line))
+    .slice(0, 2)
+    .join(" ");
+  const combined = [product.description, detailSummary, product.specs.join(", ")].filter(Boolean).join(" ");
+
+  return trimMeta(combined || product.summary);
 }
 
 function splitSpec(line: string) {
@@ -259,9 +283,75 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
   const detailImages = getDetailImages(product);
   const overviewImages = detailImages.slice(0, 3);
   const structureImages = detailImages.slice(3, 8);
+  const productUrl = `${company.website}/products/${product.slug}`;
+  const metaDescription = productMetaDescription(product);
+  const productSchema = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.title,
+    image: Array.from(new Set([product.image, ...detailImages.map((image) => image.src)])).map((src) =>
+      src.startsWith("http") ? src : `${company.website}${src}`,
+    ),
+    description: metaDescription,
+    brand: {
+      "@type": "Brand",
+      name: company.shortName,
+    },
+    manufacturer: {
+      "@type": "Organization",
+      name: company.legalName,
+      url: company.website,
+    },
+    category: product.category,
+    url: productUrl,
+    additionalProperty: technicalLines.slice(0, 12).map((line) => {
+      const spec = splitSpec(line);
+      return {
+        "@type": "PropertyValue",
+        name: spec.label,
+        value: spec.value,
+      };
+    }),
+    offers: {
+      "@type": "Offer",
+      url: productUrl,
+      priceCurrency: "USD",
+      availability: "https://schema.org/InStock",
+      seller: {
+        "@type": "Organization",
+        name: company.name,
+      },
+    },
+  };
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: company.website,
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Products",
+        item: `${company.website}/products`,
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: product.title,
+        item: productUrl,
+      },
+    ],
+  };
 
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
       <Header />
       <main className="bg-[var(--grey-50)]">
         <section className="bg-white">

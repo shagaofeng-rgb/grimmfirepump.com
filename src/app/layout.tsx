@@ -12,17 +12,6 @@ export const metadata: Metadata = {
   },
   description:
     "GRIMM PUMP supplies fire pump systems, diesel fire pumps, electric fire pumps, jockey pumps and packaged pump solutions for global fire protection projects.",
-  alternates: {
-    canonical: "/",
-    languages: {
-      en: "/",
-      es: "/es",
-      ru: "/ru",
-      ar: "/ar",
-      fr: "/fr",
-      pt: "/pt",
-    },
-  },
   openGraph: {
     title: "GRIMM PUMP Fire Pump Systems",
     description: "Factory-built fire pump systems for industrial, commercial and infrastructure projects worldwide.",
@@ -49,6 +38,20 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
     email: company.email,
     telephone: company.phone,
     address: company.address,
+    sameAs: [company.facebookUrl],
+  };
+
+  const websiteSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: company.shortName,
+    url: company.website,
+    inLanguage: "en",
+    publisher: {
+      "@type": "Organization",
+      name: company.name,
+      url: company.website,
+    },
   };
 
   return (
@@ -59,6 +62,10 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
         />
       </body>
     </html>

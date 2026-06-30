@@ -1,6 +1,13 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { SimplePage } from "@/components/simple-page";
 import { company } from "@/data/site";
+
+export const metadata: Metadata = {
+  title: "About GRIMM PUMP",
+  description: "Learn about GRIMM PUMP, an export-facing fire pump and water system manufacturer serving EPC buyers and global project contractors.",
+  alternates: { canonical: "/about" },
+};
 
 const proofPoints = [
   "Fire pump, water supply, sewage and irrigation product lines inherited from the existing website.",

@@ -20,6 +20,12 @@ export async function generateMetadata({ params }: ApplicationPageProps): Promis
   return {
     title: `${application.title} Fire Protection`,
     description: `${application.keyword}: recommended pump configuration, project challenges and inquiry path.`,
+    alternates: { canonical: `/applications/${application.slug}` },
+    openGraph: {
+      title: `${application.title} Fire Protection`,
+      description: `${application.keyword}: recommended pump configuration, project challenges and inquiry path.`,
+      images: [application.image],
+    },
   };
 }
 

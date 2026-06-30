@@ -1,6 +1,13 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { SimplePage } from "@/components/simple-page";
+
+export const metadata: Metadata = {
+  title: "Fire Pump Testing Capability",
+  description: "Review fire pump testing, inspection, controller checks and documentation support before export shipment.",
+  alternates: { canonical: "/testing" },
+};
 
 const testingSteps = [
   "Pump assembly inspection before testing",

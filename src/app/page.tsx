@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { Hero } from "@/components/home/hero";
@@ -8,6 +9,13 @@ import { FactoryPreviewSection } from "@/components/home/factory-preview-section
 import { QuoteSection } from "@/components/home/quote-section";
 import { ComplianceSection } from "@/components/home/compliance-section";
 import { StickyCta } from "@/components/sticky-cta";
+
+export const metadata: Metadata = {
+  title: "GRIMM PUMP | Fire Pump Systems for Global Projects",
+  description:
+    "Factory-built fire pump packages, diesel fire pumps, electric fire pumps and water system products for global project buyers.",
+  alternates: { canonical: "/" },
+};
 
 export default function Home() {
   return (
