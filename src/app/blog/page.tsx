@@ -2,11 +2,12 @@ import type { Metadata } from "next";
 import { BlogSection } from "@/components/home/blog-section";
 import { SimplePage } from "@/components/simple-page";
 import { posts } from "@/data/site";
+import { localizedAlternates } from "@/lib/i18n";
 
 export const metadata: Metadata = {
   title: "Fire Pump News and Industry Updates",
   description: "Read GRIMM company news, fire pump delivery updates, industry trends and fire protection project insights.",
-  alternates: { canonical: "/blog" },
+  alternates: localizedAlternates("/blog"),
 };
 
 export default function BlogPage() {

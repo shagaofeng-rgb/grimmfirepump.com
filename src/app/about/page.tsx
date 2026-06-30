@@ -2,11 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { SimplePage } from "@/components/simple-page";
 import { company } from "@/data/site";
+import { localizedAlternates } from "@/lib/i18n";
 
 export const metadata: Metadata = {
   title: "About GRIMM PUMP",
   description: "Learn about GRIMM PUMP, an export-facing fire pump and water system manufacturer serving EPC buyers and global project contractors.",
-  alternates: { canonical: "/about" },
+  alternates: localizedAlternates("/about"),
 };
 
 const proofPoints = [

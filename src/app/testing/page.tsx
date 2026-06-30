@@ -2,11 +2,12 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { SimplePage } from "@/components/simple-page";
+import { localizedAlternates } from "@/lib/i18n";
 
 export const metadata: Metadata = {
   title: "Fire Pump Testing Capability",
   description: "Review fire pump testing, inspection, controller checks and documentation support before export shipment.",
-  alternates: { canonical: "/testing" },
+  alternates: localizedAlternates("/testing"),
 };
 
 const testingSteps = [

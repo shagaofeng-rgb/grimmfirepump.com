@@ -349,7 +349,7 @@ export const factoryImages = [
 
 export const certificates = [
   { src: "/assets/certificates/ce.png", title: "CE", note: "Machinery directive documentation" },
-  { src: "/assets/certificates/quality.png", title: "Quality", note: "Management system certificate" },
+  { src: "/assets/certificates/quality.webp", title: "Quality", note: "Management system certificate" },
   { src: "/assets/certificates/test-report.png", title: "Test Reports", note: "Pump testing report sample" },
   { src: "/assets/certificates/patent.png", title: "Patents", note: "Product innovation documents" },
 ];

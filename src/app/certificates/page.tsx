@@ -3,11 +3,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { SimplePage } from "@/components/simple-page";
 import { certificates } from "@/data/site";
+import { localizedAlternates } from "@/lib/i18n";
 
 export const metadata: Metadata = {
   title: "Fire Pump Certificates and Documents",
   description: "Review available GRIMM quality certificates, CE documents, test reports and project document packages for fire pump buyers.",
-  alternates: { canonical: "/certificates" },
+  alternates: localizedAlternates("/certificates"),
 };
 
 export default function CertificatesPage() {

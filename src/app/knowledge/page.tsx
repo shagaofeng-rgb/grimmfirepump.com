@@ -2,11 +2,12 @@ import type { Metadata } from "next";
 import { BlogSection } from "@/components/home/blog-section";
 import { SimplePage } from "@/components/simple-page";
 import { knowledgePosts } from "@/data/site";
+import { localizedAlternates } from "@/lib/i18n";
 
 export const metadata: Metadata = {
   title: "Fire Pump Knowledge Center",
   description: "Practical fire pump guides for selection, NFPA-style project planning, maintenance, warehouse, data center and industrial applications.",
-  alternates: { canonical: "/knowledge" },
+  alternates: localizedAlternates("/knowledge"),
 };
 
 export default function KnowledgePage() {

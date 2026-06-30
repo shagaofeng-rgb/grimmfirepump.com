@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import { EngineeringTools } from "@/components/home/engineering-tools";
 import { SimplePage } from "@/components/simple-page";
+import { localizedAlternates } from "@/lib/i18n";
 
 export const metadata: Metadata = {
   title: "Fire Pump Selector and Pump Power Calculator",
   description: "Use GRIMM fire pump selector and pump calculator to estimate flow, pressure, head and recommended fire pump configuration.",
-  alternates: { canonical: "/tools/fire-pump-selector" },
+  alternates: localizedAlternates("/tools/fire-pump-selector"),
 };
 
 export default function FirePumpSelectorPage() {

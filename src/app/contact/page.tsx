@@ -3,11 +3,12 @@ import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { StickyCta } from "@/components/sticky-cta";
 import { QuoteSection } from "@/components/home/quote-section";
+import { localizedAlternates } from "@/lib/i18n";
 
 export const metadata: Metadata = {
   title: "Contact GRIMM PUMP for Fire Pump Quotations",
   description: "Contact GRIMM PUMP by inquiry form, email or WhatsApp for fire pump selection, datasheets, catalog requests and project quotations.",
-  alternates: { canonical: "/contact" },
+  alternates: localizedAlternates("/contact"),
 };
 
 export default function ContactPage() {

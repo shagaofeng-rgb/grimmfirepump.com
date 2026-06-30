@@ -3,11 +3,12 @@ import { CertificateSection } from "@/components/home/certificate-section";
 import { FactorySection } from "@/components/home/factory-section";
 import { VideoSection } from "@/components/home/video-section";
 import { SimplePage } from "@/components/simple-page";
+import { localizedAlternates } from "@/lib/i18n";
 
 export const metadata: Metadata = {
   title: "Fire Pump Factory Capability",
   description: "See GRIMM pump manufacturing, assembly, testing, quality control, certificates and factory capability for export projects.",
-  alternates: { canonical: "/factory" },
+  alternates: localizedAlternates("/factory"),
 };
 
 export default function FactoryPage() {
