@@ -96,6 +96,49 @@ export async function appendStore<T extends { id: string; createdAt: string }>(f
   return appendLocalStore(fileName, item);
 }
 
+export async function writeStore<T extends { id: string; createdAt: string; updatedAt?: string }>(fileName: string, items: T[]) {
+  const sql = getSql();
+  if (sql) {
+    try {
+      await ensureSchema();
+      await sql`DELETE FROM lead_store WHERE store_name = ${fileName}`;
+      for (const item of items) {
+        await sql`
+          INSERT INTO lead_store (store_name, id, created_at, payload)
+          VALUES (${fileName}, ${item.id}, ${item.createdAt}, ${JSON.stringify(item)}::jsonb)
+          ON CONFLICT (store_name, id)
+          DO UPDATE SET payload = EXCLUDED.payload, created_at = EXCLUDED.created_at
+        `;
+      }
+      return items;
+    } catch (error) {
+      console.warn(`Database write failed for ${fileName}; using local runtime store.`, error);
+    }
+  }
+
+  await ensureRuntimeDir();
+  await fs.writeFile(path.join(runtimeDir, fileName), JSON.stringify(items, null, 2));
+  return items;
+}
+
+export async function upsertStore<T extends { id: string; createdAt: string; updatedAt?: string }>(fileName: string, item: T) {
+  const current = await readStore<T[]>(fileName, []);
+  const existingIndex = current.findIndex((record) => record.id === item.id);
+  const next = existingIndex >= 0 ? [...current] : [item, ...current];
+  if (existingIndex >= 0) {
+    next[existingIndex] = item;
+  }
+  await writeStore(fileName, next);
+  return item;
+}
+
+export async function deleteStoreItem<T extends { id: string; createdAt: string; updatedAt?: string }>(fileName: string, id: string) {
+  const current = await readStore<T[]>(fileName, []);
+  const next = current.filter((item) => item.id !== id);
+  await writeStore(fileName, next);
+  return { deleted: current.length - next.length };
+}
+
 export function createId(prefix: string) {
   return `${prefix}_${Date.now()}_${Math.random().toString(16).slice(2, 8)}`;
 }

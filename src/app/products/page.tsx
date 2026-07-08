@@ -9,6 +9,8 @@ export const metadata: Metadata = {
   alternates: localizedAlternates("/products"),
 };
 
+export const dynamic = "force-dynamic";
+
 export default function ProductsPage() {
   return (
     <SimplePage

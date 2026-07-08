@@ -1,5 +1,14 @@
-import { downloads, posts, products, projects } from "@/data/site";
 import { readStore } from "@/lib/local-store";
+import {
+  listAdminUsers,
+  listAuditLogs,
+  listCmsNews,
+  listCmsProducts,
+  listDownloadAssets,
+  listManagedPages,
+  listMediaFiles,
+  listProductCategories,
+} from "@/lib/admin-cms";
 
 export type InquiryRecord = {
   id: string;
@@ -16,6 +25,30 @@ export type InquiryRecord = {
   head?: string;
   certification?: string;
   message?: string;
+  sourcePage?: string;
+  sourceType?: string;
+  jobTitle?: string;
+  websiteUrl?: string;
+  customerType?: string;
+  projectType?: string;
+  application?: string;
+  voltage?: string;
+  frequency?: string;
+  quantity?: string;
+  purchaseTime?: string;
+  projectStage?: string;
+  oemOdm?: boolean;
+  privacyConsent?: boolean;
+  referrer?: string;
+  utmSource?: string;
+  utmMedium?: string;
+  utmCampaign?: string;
+  ip?: string;
+  userAgent?: string;
+  status?: string;
+  intent?: "A" | "B" | "C" | "unrated";
+  owner?: string;
+  notes?: string;
 };
 
 export type DownloadLeadRecord = {
@@ -37,10 +70,18 @@ export type AnalyticsEventRecord = {
 };
 
 export async function getAdminData() {
-  const [inquiries, downloadLeads, events] = await Promise.all([
+  const [inquiries, downloadLeads, events, cmsProducts, cmsNews, categories, media, cmsDownloads, pages, users, auditLogs] = await Promise.all([
     readStore<InquiryRecord[]>("inquiries.json", []),
     readStore<DownloadLeadRecord[]>("download-leads.json", []),
     readStore<AnalyticsEventRecord[]>("analytics-events.json", []),
+    listCmsProducts(),
+    listCmsNews(),
+    listProductCategories(),
+    listMediaFiles(),
+    listDownloadAssets(),
+    listManagedPages(),
+    listAdminUsers(),
+    listAuditLogs(),
   ]);
 
   const eventCounts = events.reduce<Record<string, number>>((acc, item) => {
@@ -53,11 +94,26 @@ export async function getAdminData() {
     downloadLeads,
     events,
     eventCounts,
+    cmsProducts,
+    cmsNews,
+    categories,
+    media,
+    cmsDownloads,
+    pages,
+    users,
+    auditLogs,
     totals: {
-      products: products.length,
-      downloads: downloads.length,
-      posts: posts.length,
-      projects: projects.length,
+      products: cmsProducts.length,
+      publishedProducts: cmsProducts.filter((item) => item.status === "published").length,
+      draftProducts: cmsProducts.filter((item) => item.status === "draft").length,
+      downloads: cmsDownloads.length,
+      posts: cmsNews.length,
+      publishedNews: cmsNews.filter((item) => item.status === "published").length,
+      categories: categories.length,
+      media: media.length,
+      pages: pages.length,
+      users: users.length,
+      auditLogs: auditLogs.length,
       inquiries: inquiries.length,
       downloadLeads: downloadLeads.length,
       events: events.length,

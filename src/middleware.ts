@@ -1,7 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 const ADMIN_COOKIE_NAME = "grimm_admin_session";
-const SESSION_TTL_MS = 1000 * 60 * 60 * 24 * 7;
 
 function bytesToHex(bytes: ArrayBuffer) {
   return [...new Uint8Array(bytes)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
@@ -18,13 +17,24 @@ async function sign(value: string, secret: string) {
   return bytesToHex(await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(value)));
 }
 
+function decodeBase64Url(value: string) {
+  const normalized = value.replace(/-/g, "+").replace(/_/g, "/");
+  const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, "=");
+  return atob(padded);
+}
+
 async function verifySession(session: string | undefined, secret: string) {
   if (!session) return false;
-  const [timestamp, signature] = session.split(".");
-  if (!timestamp || !signature) return false;
-  const createdAt = Number(timestamp);
-  if (!Number.isFinite(createdAt) || Date.now() - createdAt > SESSION_TTL_MS) return false;
-  return signature === await sign(timestamp, secret);
+  const [payload, signature] = session.split(".");
+  if (!payload || !signature) return false;
+  const expected = await sign(payload, secret);
+  if (signature !== expected) return false;
+  try {
+    const parsed = JSON.parse(decodeBase64Url(payload)) as { expiresAt?: number };
+    return Boolean(parsed.expiresAt && Date.now() <= parsed.expiresAt);
+  } catch {
+    return false;
+  }
 }
 
 export async function middleware(request: NextRequest) {
@@ -38,7 +48,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const secret = process.env.ADMIN_SESSION_SECRET || process.env.ADMIN_PASSWORD;
+  const secret = process.env.ADMIN_SESSION_SECRET || process.env.ADMIN_PASSWORD_HASH || process.env.ADMIN_PASSWORD;
   const isAuthed = secret
     ? await verifySession(request.cookies.get(ADMIN_COOKIE_NAME)?.value, secret)
     : false;

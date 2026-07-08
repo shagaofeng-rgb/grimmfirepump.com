@@ -8,21 +8,25 @@ import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { StickyCta } from "@/components/sticky-cta";
 import { ProductInquiryForm } from "@/components/product-inquiry-form";
-import { company, productMegaMenuGroups, products } from "@/data/site";
+import { company, productMegaMenuGroups } from "@/data/site";
+import { getPublicProduct, getPublicProducts, type PublicProduct } from "@/lib/public-cms";
 
 type ProductPageProps = { params: Promise<{ slug: string }> };
-type Product = (typeof products)[number];
+type Product = PublicProduct;
 type DetailImage = { src: string; alt: string };
 
 const ignoredTableLabels = new Set(["Pump", "Model", "Capacity(GPM)", "Head(BAR)", "Power(KW)", "Material", "FQA:"]);
 
+export const dynamic = "force-dynamic";
+
 export async function generateStaticParams() {
+  const products = await getPublicProducts();
   return products.map((product) => ({ slug: product.slug }));
 }
 
 export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const product = products.find((item) => item.slug === slug);
+  const product = await getPublicProduct(slug);
   if (!product) return {};
   const description = productMetaDescription(product);
   return {
@@ -141,7 +145,7 @@ function getApplicationItems(product: Product) {
   return ["Fire pump room", "Industrial plant", "Warehouse fire protection", "Commercial building and infrastructure projects"];
 }
 
-function relatedProducts(product: Product) {
+function relatedProducts(product: Product, products: Product[]) {
   const sameCategory = products.filter((item) => item.slug !== product.slug && item.category === product.category);
   const fallback = products.filter((item) => item.slug !== product.slug && !sameCategory.some((same) => same.slug === item.slug));
   return [...sameCategory, ...fallback].slice(0, 6);
@@ -268,6 +272,7 @@ function ContentCard({
 
 export default async function ProductDetailPage({ params }: ProductPageProps) {
   const { slug } = await params;
+  const products = await getPublicProducts();
   const product = products.find((item) => item.slug === slug);
   if (!product) notFound();
 
@@ -279,7 +284,7 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
   const technicalLines = uniqueLines([...product.specs, ...detailLines.filter((line) => line.includes(":"))]).slice(0, 20);
   const structureItems = getStructureItems(product);
   const applicationItems = getApplicationItems(product);
-  const related = relatedProducts(product);
+  const related = relatedProducts(product, products);
   const detailImages = getDetailImages(product);
   const overviewImages = detailImages.slice(0, 3);
   const structureImages = detailImages.slice(3, 8);

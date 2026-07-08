@@ -1,13 +1,14 @@
 import Image from "next/image";
 import Link from "next/link";
 import { SectionHeading } from "@/components/section-heading";
-import { products } from "@/data/site";
+import { getPublicProducts } from "@/lib/public-cms";
 
 type ProductSectionProps = {
   featuredOnly?: boolean;
 };
 
-export function ProductSection({ featuredOnly = false }: ProductSectionProps) {
+export async function ProductSection({ featuredOnly = false }: ProductSectionProps) {
+  const products = await getPublicProducts();
   const visibleProducts = featuredOnly ? products.slice(0, 3) : products;
 
   return (

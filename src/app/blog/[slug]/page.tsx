@@ -5,17 +5,20 @@ import type { Metadata } from "next";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { StickyCta } from "@/components/sticky-cta";
-import { posts } from "@/data/site";
+import { getPublicPost, getPublicPosts } from "@/lib/public-cms";
 
 type BlogDetailProps = { params: Promise<{ slug: string }> };
 
+export const dynamic = "force-dynamic";
+
 export async function generateStaticParams() {
+  const posts = await getPublicPosts();
   return posts.map((post) => ({ slug: post.slug }));
 }
 
 export async function generateMetadata({ params }: BlogDetailProps): Promise<Metadata> {
   const { slug } = await params;
-  const post = posts.find((item) => item.slug === slug);
+  const post = await getPublicPost(slug);
   if (!post) return {};
   return {
     title: post.title,
@@ -27,7 +30,7 @@ export async function generateMetadata({ params }: BlogDetailProps): Promise<Met
 
 export default async function BlogDetailPage({ params }: BlogDetailProps) {
   const { slug } = await params;
-  const post = posts.find((item) => item.slug === slug);
+  const post = await getPublicPost(slug);
   if (!post) notFound();
 
   return (

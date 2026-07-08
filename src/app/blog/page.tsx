@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { BlogSection } from "@/components/home/blog-section";
 import { SimplePage } from "@/components/simple-page";
-import { posts } from "@/data/site";
 import { localizedAlternates } from "@/lib/i18n";
+import { getPublicPosts } from "@/lib/public-cms";
 
 export const metadata: Metadata = {
   title: "Fire Pump News and Industry Updates",
@@ -10,7 +10,10 @@ export const metadata: Metadata = {
   alternates: localizedAlternates("/blog"),
 };
 
-export default function BlogPage() {
+export const dynamic = "force-dynamic";
+
+export default async function BlogPage() {
+  const posts = await getPublicPosts();
   return (
     <SimplePage
       eyebrow="News Center"
