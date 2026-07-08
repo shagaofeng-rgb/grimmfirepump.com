@@ -9,6 +9,7 @@ import { Footer } from "@/components/footer";
 import { StickyCta } from "@/components/sticky-cta";
 import { ProductInquiryForm } from "@/components/product-inquiry-form";
 import { company, productMegaMenuGroups } from "@/data/site";
+import { getRelatedNewsForProduct } from "@/lib/news-automation";
 import { getPublicProduct, getPublicProducts, type PublicProduct } from "@/lib/public-cms";
 
 type ProductPageProps = { params: Promise<{ slug: string }> };
@@ -272,7 +273,7 @@ function ContentCard({
 
 export default async function ProductDetailPage({ params }: ProductPageProps) {
   const { slug } = await params;
-  const products = await getPublicProducts();
+  const [products, relatedNews] = await Promise.all([getPublicProducts(), getRelatedNewsForProduct(slug, 3)]);
   const product = products.find((item) => item.slug === slug);
   if (!product) notFound();
 
@@ -444,6 +445,20 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
               </dl>
               <RelatedProductCarousel title="Related products" items={related} />
             </ContentCard>
+
+            {relatedNews.length ? (
+              <ContentCard id="related-news" eyebrow="Industry News" title="Related fire pump news and engineering context">
+                <div className="grid gap-4 md:grid-cols-3">
+                  {relatedNews.map((item) => (
+                    <Link key={item.id} href={`/news/${item.slug}`} className="rounded-md border border-slate-200 bg-slate-50 p-4 hover:bg-orange-50">
+                      <span className="text-xs font-black uppercase tracking-[0.1em] text-[var(--orange)]">{item.category}</span>
+                      <strong className="mt-2 block text-sm leading-6 text-[var(--navy-950)]">{item.title}</strong>
+                      <span className="mt-3 block text-xs font-bold text-slate-500">{(item.publishAt || item.sourcePublishedAt).slice(0, 10)}</span>
+                    </Link>
+                  ))}
+                </div>
+              </ContentCard>
+            ) : null}
 
             <section id="product-quote" className="scroll-mt-28 rounded-lg bg-[var(--navy-950)] p-6 md:p-8">
               <div className="grid gap-8 lg:grid-cols-[0.78fr_1.22fr]">

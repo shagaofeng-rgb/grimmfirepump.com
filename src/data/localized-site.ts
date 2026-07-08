@@ -82,6 +82,11 @@ const esPages = {
     title: "Catálogos, fichas técnicas y certificados.",
     text: "Solicite catálogos, tablas de modelos EDJ, guías de instalación y paquetes de presentación de proyecto.",
   },
+  "/news": {
+    eyebrow: "Noticias del sector",
+    title: "Noticias recientes sobre bombas contra incendios y protección contra incendios.",
+    text: "Actualizaciones públicas recientes con contexto técnico de GRIMM para compradores de proyectos.",
+  },
   "/blog": {
     eyebrow: "Noticias",
     title: "Noticias de la empresa y actualizaciones del sector.",
@@ -96,6 +101,11 @@ const esPages = {
     eyebrow: "Contacto",
     title: "Envíe su requisito de bomba contra incendios.",
     text: "Contacte con GRIMM PUMP por WhatsApp o email para selección de modelo, catálogo y cotización.",
+  },
+  "/search": {
+    eyebrow: "Buscar",
+    title: "Busque productos, noticias y artículos técnicos.",
+    text: "Encuentre bombas, aplicaciones, noticias y contenido de conocimiento de GRIMM PUMP.",
   },
   "/tools/fire-pump-selector": {
     eyebrow: "Herramientas",
@@ -150,6 +160,11 @@ const ruPages = {
     title: "Каталоги, технические листы и сертификаты.",
     text: "Запросите каталоги, таблицы моделей EDJ, инструкции по монтажу и проектные пакеты.",
   },
+  "/news": {
+    eyebrow: "Отраслевые новости",
+    title: "Свежие новости о пожарных насосах и противопожарной защите.",
+    text: "Недавние публичные новости с техническим контекстом GRIMM для проектных покупателей.",
+  },
   "/blog": {
     eyebrow: "Новости",
     title: "Новости компании и обновления отрасли пожарных насосов.",
@@ -164,6 +179,11 @@ const ruPages = {
     eyebrow: "Контакты",
     title: "Отправьте требования к пожарному насосу.",
     text: "Свяжитесь с GRIMM PUMP через WhatsApp или email для подбора модели, каталога и предложения.",
+  },
+  "/search": {
+    eyebrow: "Поиск",
+    title: "Ищите продукты, новости и технические статьи.",
+    text: "Найдите насосы, применения, новости и знания GRIMM PUMP.",
   },
   "/tools/fire-pump-selector": {
     eyebrow: "Инженерные инструменты",
@@ -218,6 +238,11 @@ const arPages = {
     title: "كتالوجات وبيانات فنية وشهادات.",
     text: "اطلب الكتالوجات وجداول نماذج EDJ وأدلة التركيب وحزم تقديم المشاريع مع بيانات فنية مناسبة للمراجعة.",
   },
+  "/news": {
+    eyebrow: "أخبار الصناعة",
+    title: "أخبار حديثة عن مضخات الحريق وأنظمة الحماية.",
+    text: "أخبار عامة حديثة مع سياق هندسي من GRIMM لمشتري المشاريع.",
+  },
   "/blog": {
     eyebrow: "الأخبار",
     title: "أخبار الشركة وتحديثات صناعة مضخات الحريق.",
@@ -232,6 +257,11 @@ const arPages = {
     eyebrow: "اتصل بنا",
     title: "أرسل متطلبات مضخة الحريق الخاصة بك.",
     text: "تواصل مع GRIMM PUMP عبر واتساب أو البريد الإلكتروني لاختيار النموذج والكتالوج وعرض السعر.",
+  },
+  "/search": {
+    eyebrow: "بحث",
+    title: "ابحث عن المنتجات والأخبار والمقالات الفنية.",
+    text: "اعثر على المضخات والتطبيقات والأخبار ومحتوى المعرفة من GRIMM PUMP.",
   },
   "/tools/fire-pump-selector": {
     eyebrow: "أدوات هندسية",
@@ -286,6 +316,11 @@ const frPages = {
     title: "Catalogues, fiches techniques et certificats.",
     text: "Demandez catalogues, tableaux EDJ, guides d'installation et dossiers de soumission.",
   },
+  "/news": {
+    eyebrow: "Actualités secteur",
+    title: "Actualités récentes sur les pompes incendie et la protection incendie.",
+    text: "Actualités publiques récentes enrichies par le contexte technique de GRIMM pour les acheteurs projet.",
+  },
   "/blog": {
     eyebrow: "Actualités",
     title: "Actualités de l'entreprise et du secteur incendie.",
@@ -300,6 +335,11 @@ const frPages = {
     eyebrow: "Contact",
     title: "Envoyez votre besoin de pompe incendie.",
     text: "Contactez GRIMM PUMP par WhatsApp ou email pour sélection, catalogue et devis.",
+  },
+  "/search": {
+    eyebrow: "Recherche",
+    title: "Recherchez produits, actualités et articles techniques.",
+    text: "Trouvez pompes, applications, actualités et contenus techniques de GRIMM PUMP.",
   },
   "/tools/fire-pump-selector": {
     eyebrow: "Outils",
@@ -354,6 +394,11 @@ const ptPages = {
     title: "Catálogos, fichas técnicas e certificados.",
     text: "Solicite catálogos, tabelas EDJ, guias de instalação e pacotes de submissão.",
   },
+  "/news": {
+    eyebrow: "Notícias do setor",
+    title: "Notícias recentes sobre bombas de incêndio e proteção contra incêndio.",
+    text: "Atualizações públicas recentes com contexto técnico da GRIMM para compradores de projetos.",
+  },
   "/blog": {
     eyebrow: "Notícias",
     title: "Notícias da empresa e atualizações do setor.",
@@ -368,6 +413,11 @@ const ptPages = {
     eyebrow: "Contato",
     title: "Envie seu requisito de bomba de incêndio.",
     text: "Fale com a GRIMM PUMP por WhatsApp ou email para seleção, catálogo e cotação.",
+  },
+  "/search": {
+    eyebrow: "Busca",
+    title: "Pesquise produtos, notícias e artigos técnicos.",
+    text: "Encontre bombas, aplicações, notícias e conteúdos técnicos da GRIMM PUMP.",
   },
   "/tools/fire-pump-selector": {
     eyebrow: "Ferramentas",
@@ -401,9 +451,11 @@ export const localizedSite: Record<LocalizedLocale, LocalizedContent> = {
       "/testing": "Pruebas",
       "/certificates": "Certificados",
       "/downloads": "Descargas",
+      "/news": "Noticias sector",
       "/blog": "Noticias",
       "/knowledge": "Guías",
       "/contact": "Contacto",
+      "/search": "Buscar",
       "/tools/fire-pump-selector": "Selector",
     },
     home: {
@@ -442,9 +494,11 @@ export const localizedSite: Record<LocalizedLocale, LocalizedContent> = {
       "/testing": "Испытания",
       "/certificates": "Сертификаты",
       "/downloads": "Загрузки",
+      "/news": "Отраслевые новости",
       "/blog": "Новости",
       "/knowledge": "База знаний",
       "/contact": "Контакты",
+      "/search": "Поиск",
       "/tools/fire-pump-selector": "Подбор",
     },
     home: {
@@ -483,9 +537,11 @@ export const localizedSite: Record<LocalizedLocale, LocalizedContent> = {
       "/testing": "الاختبار",
       "/certificates": "الشهادات",
       "/downloads": "التحميلات",
+      "/news": "أخبار الصناعة",
       "/blog": "الأخبار",
       "/knowledge": "المعرفة",
       "/contact": "اتصل بنا",
+      "/search": "بحث",
       "/tools/fire-pump-selector": "اختيار المضخة",
     },
     home: {
@@ -524,9 +580,11 @@ export const localizedSite: Record<LocalizedLocale, LocalizedContent> = {
       "/testing": "Essais",
       "/certificates": "Certificats",
       "/downloads": "Téléchargements",
+      "/news": "Actualités secteur",
       "/blog": "Actualités",
       "/knowledge": "Guides",
       "/contact": "Contact",
+      "/search": "Recherche",
       "/tools/fire-pump-selector": "Sélecteur",
     },
     home: {
@@ -565,9 +623,11 @@ export const localizedSite: Record<LocalizedLocale, LocalizedContent> = {
       "/testing": "Testes",
       "/certificates": "Certificados",
       "/downloads": "Downloads",
+      "/news": "Notícias setor",
       "/blog": "Notícias",
       "/knowledge": "Guias",
       "/contact": "Contato",
+      "/search": "Busca",
       "/tools/fire-pump-selector": "Seletor",
     },
     home: {

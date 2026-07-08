@@ -6,7 +6,9 @@
     "dev": "next dev -p 4174",
     "build": "next build",
     "start": "next start -p 4174",
-    "lint": "next lint"
+    "typecheck": "tsc --noEmit",
+    "lint": "tsc --noEmit",
+    "audit:site": "node scripts/site-self-audit.mjs"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",

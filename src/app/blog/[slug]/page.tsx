@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { StickyCta } from "@/components/sticky-cta";
+import { company } from "@/data/site";
 import { getPublicPost, getPublicPosts } from "@/lib/public-cms";
 
 type BlogDetailProps = { params: Promise<{ slug: string }> };
@@ -32,9 +33,28 @@ export default async function BlogDetailPage({ params }: BlogDetailProps) {
   const { slug } = await params;
   const post = await getPublicPost(slug);
   if (!post) notFound();
+  const url = `${company.website}/blog/${post.slug}`;
+  const imageUrl = post.image.startsWith("http") ? post.image : `${company.website}${post.image}`;
+  const blogSchema = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: post.title,
+    description: post.text,
+    image: [imageUrl],
+    datePublished: post.date,
+    dateModified: post.date,
+    author: { "@type": "Organization", name: company.shortName, url: company.website },
+    publisher: {
+      "@type": "Organization",
+      name: company.shortName,
+      logo: { "@type": "ImageObject", url: `${company.website}/assets/images/logo.png` },
+    },
+    mainEntityOfPage: { "@type": "WebPage", "@id": url },
+  };
 
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(blogSchema) }} />
       <Header />
       <main>
         <article className="container-shell max-w-4xl py-16 lg:py-20">

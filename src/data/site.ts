@@ -120,7 +120,9 @@ export const navItems = [
   { label: "Factory", href: "/factory" },
   { label: "Testing", href: "/testing" },
   { label: "Downloads", href: "/downloads" },
+  { label: "News", href: "/news" },
   { label: "Knowledge", href: "/knowledge" },
+  { label: "Search", href: "/search" },
 ];
 
 export const advantages = [
@@ -518,7 +520,7 @@ export const knowledgePosts = [
 export const footerColumns = [
   { title: "Products", items: ["EDJ Fire Pump System", "Diesel Fire Pump", "Electric Fire Pump", "Jockey Pump"] },
   { title: "Trust", items: ["Factory Strength", "Testing Capability", "Certificates", "Project Cases"] },
-  { title: "Resources", items: ["Download Catalog", "Knowledge Center", "Fire Pump Selector", "Contact Sales"] },
+  { title: "Resources", items: ["Download Catalog", "Industry News", "Knowledge Center", "Fire Pump Selector", "Contact Sales"] },
 ];
 
 export const toolIcons = { Wrench, Globe2, Mail, MapPinned };

@@ -158,3 +158,91 @@ CREATE TABLE IF NOT EXISTS audit_logs (
   after JSONB,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+-- Optional normalized schema for News automation.
+-- The running application currently stores these records in lead_store JSONB.
+-- These tables are the recommended migration target for larger data volume.
+
+CREATE TABLE IF NOT EXISTS news_sources (
+  id TEXT PRIMARY KEY,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  name TEXT NOT NULL,
+  url TEXT NOT NULL UNIQUE,
+  type TEXT NOT NULL DEFAULT 'rss',
+  enabled BOOLEAN NOT NULL DEFAULT TRUE,
+  language TEXT NOT NULL DEFAULT 'en',
+  last_fetched_at TIMESTAMPTZ,
+  last_status TEXT,
+  last_error TEXT
+);
+
+CREATE TABLE IF NOT EXISTS news_articles (
+  id TEXT PRIMARY KEY,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  status TEXT NOT NULL,
+  title TEXT NOT NULL,
+  slug TEXT NOT NULL UNIQUE,
+  summary TEXT NOT NULL,
+  body JSONB NOT NULL DEFAULT '[]',
+  category TEXT NOT NULL,
+  language TEXT NOT NULL DEFAULT 'en',
+  source_name TEXT NOT NULL,
+  source_url TEXT NOT NULL,
+  source_canonical_url TEXT NOT NULL,
+  source_title TEXT NOT NULL,
+  source_published_at TIMESTAMPTZ NOT NULL,
+  source_fetched_at TIMESTAMPTZ NOT NULL,
+  source_facts JSONB NOT NULL DEFAULT '[]',
+  source_fingerprint TEXT NOT NULL,
+  event_fingerprint TEXT NOT NULL,
+  content_hash TEXT NOT NULL,
+  related_products JSONB NOT NULL DEFAULT '[]',
+  cover_image_url TEXT NOT NULL,
+  cover_image_source_url TEXT NOT NULL,
+  cover_image_page_url TEXT NOT NULL,
+  cover_image_alt TEXT NOT NULL,
+  cover_image_hash TEXT NOT NULL,
+  cover_image_status TEXT NOT NULL,
+  seo_title TEXT NOT NULL,
+  seo_description TEXT NOT NULL,
+  geo_summary TEXT NOT NULL,
+  prompt_version TEXT NOT NULL,
+  generated_model TEXT NOT NULL,
+  publish_at TIMESTAMPTZ,
+  failure_reason TEXT,
+  retries INTEGER NOT NULL DEFAULT 0
+);
+
+CREATE INDEX IF NOT EXISTS idx_news_articles_status_publish ON news_articles (status, publish_at DESC);
+CREATE INDEX IF NOT EXISTS idx_news_articles_source_fp ON news_articles (source_fingerprint);
+CREATE INDEX IF NOT EXISTS idx_news_articles_event_fp ON news_articles (event_fingerprint);
+CREATE INDEX IF NOT EXISTS idx_news_articles_content_hash ON news_articles (content_hash);
+
+CREATE TABLE IF NOT EXISTS news_jobs (
+  id TEXT PRIMARY KEY,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  type TEXT NOT NULL,
+  status TEXT NOT NULL,
+  started_at TIMESTAMPTZ NOT NULL,
+  finished_at TIMESTAMPTZ,
+  message TEXT NOT NULL,
+  stats JSONB NOT NULL DEFAULT '{}'
+);
+
+CREATE TABLE IF NOT EXISTS news_publication_audits (
+  id TEXT PRIMARY KEY,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  date TEXT NOT NULL UNIQUE,
+  target INTEGER NOT NULL,
+  published INTEGER NOT NULL,
+  generated INTEGER NOT NULL,
+  duplicates INTEGER NOT NULL,
+  rejected INTEGER NOT NULL,
+  failed INTEGER NOT NULL,
+  status TEXT NOT NULL,
+  message TEXT NOT NULL
+);

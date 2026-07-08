@@ -13,6 +13,7 @@ export function Footer() {
     "Certificates": "/certificates",
     "Project Cases": "/projects",
     "Download Catalog": "/downloads",
+    "Industry News": "/news",
     "Knowledge Center": "/knowledge",
     "Fire Pump Selector": "/tools/fire-pump-selector",
     "Contact Sales": "/contact",

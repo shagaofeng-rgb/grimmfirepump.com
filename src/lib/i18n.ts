@@ -12,9 +12,11 @@ export const supportedLocalizedPaths = [
   "/testing",
   "/certificates",
   "/downloads",
+  "/news",
   "/blog",
   "/knowledge",
   "/contact",
+  "/search",
   "/tools/fire-pump-selector",
 ] as const;
 
