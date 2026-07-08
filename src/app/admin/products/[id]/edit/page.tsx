@@ -14,7 +14,7 @@ export default async function EditProductPage({ params }: EditProductPageProps) 
 
   return (
     <AdminShell>
-      <AdminPageHeader eyebrow="产品管理" title={`编辑产品：${product.title}`} description="修改会写入后台数据库，不会破坏现有前台 URL。" />
+      <AdminPageHeader eyebrow="产品管理" title={`编辑产品：${product.title}`} description="修改产品资料、图片、技术参数、发布状态和 SEO 信息。" />
       <div className="mt-8">
         <ProductForm product={product} categories={categories} />
       </div>

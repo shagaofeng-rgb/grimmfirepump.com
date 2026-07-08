@@ -9,7 +9,7 @@ export default async function SettingsPage() {
   const settings = await getSiteSettings();
   return (
     <AdminShell>
-      <AdminPageHeader eyebrow="系统设置" title="公司信息、SEO、统计和第三方集成设置" description="敏感 Secret 仍必须放在 Vercel 环境变量；这里仅保存公开配置和接入状态。" />
+      <AdminPageHeader eyebrow="系统设置" title="公司信息、SEO、统计和第三方集成设置" description="管理网站公开信息、统计代码、搜索验证和基础 SEO 配置。" />
       <form action={saveSettings} className="mt-8 grid gap-6">
         <input type="hidden" name="createdAt" value={settings.createdAt} />
         <section className="grid gap-4 rounded-lg border border-slate-200 bg-white p-6 shadow-sm md:grid-cols-2">

@@ -9,7 +9,7 @@ export default async function AdminDownloadsPage() {
   const { cmsDownloads, downloadLeads } = await getAdminData();
   return (
     <AdminShell>
-      <AdminPageHeader eyebrow="下载资料" title="目录、Datasheet、证书和项目提交文件" description="支持 gated download，客户填写信息后自动进入线索系统。" />
+      <AdminPageHeader eyebrow="下载资料" title="目录、Datasheet、证书和项目提交文件" description="管理可下载资料和下载表单线索。" />
       <div className="mt-8 grid gap-6 xl:grid-cols-[420px_1fr]">
         <form action={saveDownloadAsset} className="grid gap-4 rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
           <h2 className="text-xl font-black text-slate-950">新增下载资料</h2>
@@ -26,7 +26,7 @@ export default async function AdminDownloadsPage() {
         </form>
         <section className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
           <table className="w-full min-w-[820px] text-left text-sm">
-            <thead className="bg-slate-50 text-slate-600"><tr>{["资料", "分类", "语言/版本", "表单", "状态", "下载"].map((head) => <th key={head} className="px-4 py-3 font-black">{head}</th>)}</tr></thead>
+            <thead className="bg-slate-50 text-slate-600"><tr>{["资料", "分类", "语言/版本", "下载表单", "状态", "下载"].map((head) => <th key={head} className="px-4 py-3 font-black">{head}</th>)}</tr></thead>
             <tbody>
               {cmsDownloads.map((item) => (
                 <tr key={item.id} className="border-t border-slate-100">

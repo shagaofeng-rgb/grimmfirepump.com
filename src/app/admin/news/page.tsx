@@ -13,7 +13,7 @@ export default async function NewsPage() {
       <AdminPageHeader
         eyebrow="新闻管理"
         title="新闻、博客和行业知识内容"
-        description="支持草稿、发布、置顶、推荐、SEO、来源和历史编辑记录预留。"
+        description="管理新闻、博客、行业知识、SEO 信息、推荐和置顶状态。"
         action={<Link className="button button-primary" href="/admin/news/new">新增文章</Link>}
       />
       <div className="mt-8 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">

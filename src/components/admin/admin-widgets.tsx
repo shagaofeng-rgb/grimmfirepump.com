@@ -47,8 +47,36 @@ export function EmptyState({ text }: { text: string }) {
 }
 
 export function StatusPill({ value }: { value: string }) {
-  const color = value === "published" || value === "success" || value === "active" ? "bg-emerald-50 text-emerald-700" : value === "draft" ? "bg-slate-100 text-slate-600" : "bg-orange-50 text-orange-700";
-  return <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-black ${color}`}>{value}</span>;
+  const labels: Record<string, string> = {
+    published: "已发布",
+    success: "成功",
+    active: "启用",
+    draft: "草稿",
+    review: "审核中",
+    offline: "下架",
+    archived: "归档",
+    failed: "失败",
+    new: "新询盘",
+    pending: "待处理",
+    contacted: "已联系",
+    quoted: "已报价",
+    following: "跟进中",
+    negotiating: "洽谈中",
+    won: "已成交",
+    lost: "已丢单",
+    invalid: "无效",
+    spam: "垃圾",
+    configured: "已配置",
+    not_configured: "未接入",
+    connected: "已接入",
+  };
+  const color =
+    value === "published" || value === "success" || value === "active" || value === "configured" || value === "connected"
+      ? "bg-emerald-50 text-emerald-700"
+      : value === "draft" || value === "not_configured" || value === "offline"
+        ? "bg-slate-100 text-slate-600"
+        : "bg-orange-50 text-orange-700";
+  return <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-black ${color}`}>{labels[value] || value}</span>;
 }
 
 export function Field({ label, children }: { label: string; children: ReactNode }) {

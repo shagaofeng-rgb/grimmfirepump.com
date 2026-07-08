@@ -9,7 +9,7 @@ export default async function PagesPage() {
   const pages = await listManagedPages();
   return (
     <AdminShell>
-      <AdminPageHeader eyebrow="页面管理" title="组件化页面和可控区块" description="当前前台为组件化页面；后台只开放可控标题、内容、Banner、CTA 和 SEO，避免破坏页面结构。" />
+      <AdminPageHeader eyebrow="页面管理" title="网站页面和可控区块" description="管理页面标题、内容、Banner、CTA 和 SEO 信息。" />
       <div className="mt-8 grid gap-6 xl:grid-cols-[420px_1fr]">
         <form action={saveManagedPage} className="grid gap-4 rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
           <h2 className="text-xl font-black text-slate-950">新增页面记录</h2>

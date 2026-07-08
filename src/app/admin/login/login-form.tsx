@@ -32,7 +32,7 @@ export function LoginForm() {
             required
             autoComplete="current-password"
             className="min-h-12 w-full rounded-md border border-slate-300 px-3 pr-12"
-            placeholder="Enter password"
+            placeholder="请输入登录密码"
           />
           <button
             type="button"

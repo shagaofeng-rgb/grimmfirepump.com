@@ -27,7 +27,7 @@ export default async function AdminDashboardPage() {
       <AdminPageHeader
         eyebrow="数据概览"
         title="工业品外贸网站运营控制台"
-        description="集中查看产品、新闻、询盘、下载资料、访问事件、SEO 和待处理任务。第三方 GA4 / Search Console / Meta 数据未配置时不会伪造数据。"
+        description="集中查看产品、新闻、询盘、下载资料、访问事件、SEO 和待处理任务。"
         action={<Link className="button button-primary" href="/admin/leads">处理询盘</Link>}
       />
 
@@ -49,12 +49,12 @@ export default async function AdminDashboardPage() {
               <Link key={item.id} href="/admin/leads" className="rounded-md border border-slate-200 p-4 hover:bg-slate-50">
                 <div className="flex items-center justify-between gap-4">
                   <strong>{item.name}</strong>
-                  <span className="rounded-full bg-orange-50 px-2 py-1 text-xs font-black text-orange-700">Score {item.score}</span>
+                  <span className="rounded-full bg-orange-50 px-2 py-1 text-xs font-black text-orange-700">评分 {item.score}</span>
                 </div>
-                <p className="mt-2 text-sm text-slate-500">{item.product || "Product TBD"} · {item.country || "Country TBD"} · {item.email}</p>
+                <p className="mt-2 text-sm text-slate-500">{item.product || "未填写产品"} · {item.country || "未填写国家"} · {item.email}</p>
               </Link>
             ))}
-            {!data.inquiries.length ? <EmptyState text="暂无询盘。前台 Contact 和产品询价提交后会进入这里。" /> : null}
+            {!data.inquiries.length ? <EmptyState text="暂无询盘。" /> : null}
           </div>
         </AdminCard>
 
@@ -66,7 +66,7 @@ export default async function AdminDashboardPage() {
                 <span className="font-black text-orange-600">{count}</span>
               </div>
             ))}
-            {!topEvents.length ? <EmptyState text="暂无访问事件。前台页面访问和 CTA 点击会逐步记录。" /> : null}
+            {!topEvents.length ? <EmptyState text="暂无访问事件。" /> : null}
           </div>
         </AdminCard>
       </div>

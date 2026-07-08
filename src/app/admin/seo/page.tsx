@@ -12,16 +12,16 @@ export default async function SeoPage() {
   ];
   return (
     <AdminShell>
-      <AdminPageHeader eyebrow="SEO 管理" title="SEO、GEO 和搜索数据配置" description="管理默认 SEO、验证代码、GA4、GTM、Meta Pixel、Search Console 接入状态和页面审计。" />
+      <AdminPageHeader eyebrow="SEO 管理" title="SEO、GEO 和搜索数据配置" description="管理页面 SEO、搜索验证、统计代码和基础页面审计。" />
       <div className="mt-8 grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
         <AdminCard title="网站级 SEO 设置">
-          <div className="grid gap-3 text-sm">
+          <div className="grid gap-3 text-sm text-slate-600">
             <p><strong>Canonical 域名：</strong>{settings.website}</p>
-            <p><strong>GA4：</strong>{settings.ga4Id ? "已配置" : "未配置"}</p>
-            <p><strong>GTM：</strong>{settings.gtmId ? "已配置" : "未配置"}</p>
-            <p><strong>Meta Pixel：</strong>{settings.metaPixelId ? "已配置" : "未配置"}</p>
-            <p><strong>Google 验证：</strong>{settings.googleVerification ? "已配置" : "未配置"}</p>
-            <p><strong>Bing 验证：</strong>{settings.bingVerification ? "已配置" : "未配置"}</p>
+            <p className="flex items-center justify-between gap-4"><strong>GA4</strong><StatusPill value={settings.ga4Id ? "configured" : "not_configured"} /></p>
+            <p className="flex items-center justify-between gap-4"><strong>GTM</strong><StatusPill value={settings.gtmId ? "configured" : "not_configured"} /></p>
+            <p className="flex items-center justify-between gap-4"><strong>Meta Pixel</strong><StatusPill value={settings.metaPixelId ? "configured" : "not_configured"} /></p>
+            <p className="flex items-center justify-between gap-4"><strong>Google 验证</strong><StatusPill value={settings.googleVerification ? "configured" : "not_configured"} /></p>
+            <p className="flex items-center justify-between gap-4"><strong>Bing 验证</strong><StatusPill value={settings.bingVerification ? "configured" : "not_configured"} /></p>
           </div>
         </AdminCard>
         <AdminCard title="SEO 异常提醒">

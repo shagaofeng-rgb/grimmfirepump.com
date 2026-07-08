@@ -2,17 +2,17 @@ import { AdminShell } from "@/components/admin/admin-shell";
 import { AdminPageHeader, AdminCard, StatusPill } from "@/components/admin/admin-widgets";
 
 const forms = [
-  ["Contact Us", "contact", "前台联系表单", "active"],
-  ["Product Inquiry", "product-inquiry", "产品详情询价表单", "active"],
-  ["Download Gate", "download-gate", "目录下载表单", "active"],
-  ["OEM / ODM Application", "oem-odm", "OEM/ODM 合作申请预留", "draft"],
-  ["Facebook Lead Ads", "facebook-leads", "Meta Lead Ads Webhook 预留", "draft"],
+  ["Contact Us", "contact", "联系页面询盘", "active"],
+  ["Product Inquiry", "product-inquiry", "产品详情询价", "active"],
+  ["Download Gate", "download-gate", "资料下载线索", "active"],
+  ["OEM / ODM Application", "oem-odm", "OEM/ODM 合作申请", "active"],
+  ["广告线索", "ad-leads", "广告表单线索接入", "not_configured"],
 ];
 
 export default function FormsPage() {
   return (
     <AdminShell>
-      <AdminPageHeader eyebrow="表单管理" title="网站表单和第三方线索入口" description="所有前台询盘、资料下载、OEM/ODM 和 Facebook Lead Ads 入口统一进入线索系统。" />
+      <AdminPageHeader eyebrow="表单管理" title="网站表单和线索入口" description="管理网站询盘、资料下载、OEM/ODM 合作和广告线索来源。" />
       <div className="mt-8 grid gap-4 md:grid-cols-2">
         {forms.map(([name, key, desc, status]) => (
           <AdminCard key={key} title={name}>

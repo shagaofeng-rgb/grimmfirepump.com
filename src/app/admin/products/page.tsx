@@ -22,9 +22,9 @@ export default async function AdminProductsPage() {
           <input className="min-h-11 rounded-md border border-slate-300 px-3 text-sm" placeholder="搜索产品名称、型号、SKU..." />
           <select className="min-h-11 rounded-md border border-slate-300 px-3 text-sm">
             <option>全部状态</option>
-            <option>published</option>
-            <option>draft</option>
-            <option>offline</option>
+            <option value="published">已发布</option>
+            <option value="draft">草稿</option>
+            <option value="offline">下架</option>
           </select>
           <a className="button button-secondary min-h-11 text-sm" href="/api/admin/export?type=products">导出 CSV</a>
         </div>

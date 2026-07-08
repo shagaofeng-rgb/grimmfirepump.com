@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { ReactNode } from "react";
 import {
   BarChart3,
@@ -15,7 +16,6 @@ import {
   ScrollText,
   Search,
   Settings,
-  ShieldCheck,
   Users,
 } from "lucide-react";
 import { company } from "@/data/site";
@@ -58,10 +58,12 @@ export async function AdminShell({ children }: { children: ReactNode }) {
     <main className="min-h-screen bg-[#f4f7fb] text-slate-900">
       <aside className="fixed inset-y-0 left-0 hidden w-72 border-r border-slate-200 bg-[#071426] p-5 text-white lg:block">
         <Link href="/admin/dashboard" className="flex items-center gap-3 text-xl font-black tracking-[0.04em] text-white">
-          <span className="grid h-10 w-10 place-items-center rounded-md bg-orange-500 text-sm">G</span>
+          <span className="grid h-11 w-11 place-items-center rounded-md bg-white p-1.5">
+            <Image src="/assets/images/logo.png" alt={`${company.shortName} logo`} width={34} height={25} className="h-auto w-full object-contain" priority />
+          </span>
           <span>
             {company.shortName}
-            <small className="block text-xs font-bold tracking-normal text-slate-400">工业品网站管理后台</small>
+            <small className="block text-xs font-bold tracking-normal text-slate-400">网站运营后台</small>
           </span>
         </Link>
         <nav className="mt-7 grid max-h-[calc(100vh-150px)] gap-1 overflow-y-auto pr-1">
@@ -84,7 +86,7 @@ export async function AdminShell({ children }: { children: ReactNode }) {
         <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 px-5 py-4 backdrop-blur">
           <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4">
             <div className="min-w-0">
-              <p className="text-xs font-black uppercase tracking-[0.16em] text-orange-500">Admin Console</p>
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-orange-500">GRIMM PUMP</p>
               <p className="mt-1 text-sm text-slate-500">当前用户：{admin?.displayName || "Admin"} · {roleName(admin?.role)}</p>
             </div>
             <div className="flex min-w-0 flex-1 items-center justify-end gap-3">
@@ -112,10 +114,6 @@ export async function AdminShell({ children }: { children: ReactNode }) {
           </nav>
         </header>
         <div className="mx-auto max-w-7xl px-5 py-8 lg:px-8">
-          <div className="mb-6 flex items-center gap-2 text-sm font-bold text-slate-500">
-            <ShieldCheck size={16} className="text-emerald-600" />
-            所有后台页面已启用登录保护，写操作在服务端校验。
-          </div>
           {children}
         </div>
       </section>

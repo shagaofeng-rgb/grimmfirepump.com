@@ -11,7 +11,7 @@ export default async function LogsPage() {
   const [auditLogs, loginLogs] = await Promise.all([listAuditLogs(), readStore<LoginLog[]>("login-logs.json", [])]);
   return (
     <AdminShell>
-      <AdminPageHeader eyebrow="操作日志" title="登录日志和后台审计记录" description="记录登录、退出、产品/新闻/线索/媒体/SEO/设置修改。敏感字段不会明文写入日志。" />
+      <AdminPageHeader eyebrow="操作日志" title="登录日志和后台审计记录" description="记录登录、退出、产品、新闻、线索、媒体、SEO 和设置修改。" />
       <div className="mt-8 grid gap-6 xl:grid-cols-2">
         <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
           <h2 className="text-xl font-black text-slate-950">登录日志</h2>

@@ -1,6 +1,7 @@
 import { AdminShell } from "@/components/admin/admin-shell";
-import { AdminPageHeader, AdminCard, StatCard } from "@/components/admin/admin-widgets";
+import { AdminPageHeader, AdminCard, StatCard, StatusPill } from "@/components/admin/admin-widgets";
 import { getAdminData } from "@/lib/admin-data";
+import { getSiteSettings } from "@/lib/admin-cms";
 
 export const dynamic = "force-dynamic";
 
@@ -13,7 +14,7 @@ function countBy<T extends Record<string, unknown>>(items: T[], key: keyof T) {
 }
 
 export default async function AdminAnalyticsPage() {
-  const { events, eventCounts, inquiries } = await getAdminData();
+  const [{ events, eventCounts, inquiries }, settings] = await Promise.all([getAdminData(), getSiteSettings()]);
   const pageViews = events.filter((item) => item.event === "page_view");
   const conversions = events.filter((item) => ["inquiry_submit", "download_click", "whatsapp_click"].includes(item.event));
   const topPages = Object.entries(countBy(events, "path")).sort((a, b) => b[1] - a[1]).slice(0, 10);
@@ -21,7 +22,7 @@ export default async function AdminAnalyticsPage() {
 
   return (
     <AdminShell>
-      <AdminPageHeader eyebrow="访问分析" title="网站自有事件和转化分析" description="GA4、Search Console、Meta Pixel 未配置时显示未配置状态；本页展示网站自有事件，不伪造第三方数据。" />
+      <AdminPageHeader eyebrow="访问分析" title="网站访问与转化分析" description="展示网站已记录的访问事件、转化事件、热门页面和询盘来源。" />
       <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <StatCard label="总事件" value={events.length} />
         <StatCard label="页面访问" value={pageViews.length} />
@@ -38,11 +39,12 @@ export default async function AdminAnalyticsPage() {
         <AdminCard title="询盘来源分布">
           <div className="grid gap-3">{sourceDistribution.map(([source, count]) => <div key={source} className="flex justify-between gap-4 rounded-md bg-slate-50 p-3 text-sm"><span className="break-all">{source}</span><strong>{count}</strong></div>)}</div>
         </AdminCard>
-        <AdminCard title="第三方同步状态">
+        <AdminCard title="统计工具接入状态">
           <div className="grid gap-3 text-sm text-slate-600">
-            <p>GA4 API：未配置凭证时不显示真实第三方数据。</p>
-            <p>Google Search Console：已预留设置字段和 SEO 页面。</p>
-            <p>Meta Lead Ads：已预留 Webhook 接口 `/api/integrations/meta-leads`。</p>
+            <p className="flex items-center justify-between gap-4"><strong>GA4</strong><StatusPill value={settings.ga4Id ? "configured" : "not_configured"} /></p>
+            <p className="flex items-center justify-between gap-4"><strong>Google Tag Manager</strong><StatusPill value={settings.gtmId ? "configured" : "not_configured"} /></p>
+            <p className="flex items-center justify-between gap-4"><strong>Meta Pixel</strong><StatusPill value={settings.metaPixelId ? "configured" : "not_configured"} /></p>
+            <p className="flex items-center justify-between gap-4"><strong>Google Search Console</strong><StatusPill value={settings.googleVerification ? "configured" : "not_configured"} /></p>
           </div>
         </AdminCard>
       </div>

@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import Image from "next/image";
 import { isAdminAuthenticated, isAdminConfigured } from "@/lib/admin-auth";
 import { LoginForm } from "./login-form";
 
@@ -15,14 +16,17 @@ export default async function AdminLoginPage() {
   return (
     <main className="grid min-h-screen place-items-center bg-slate-950 px-6 py-16">
       <section className="w-full max-w-md">
-        <p className="text-sm font-black uppercase tracking-[0.16em] text-orange-300">GRIMM 管理后台</p>
-        <h1 className="mt-4 text-4xl font-black leading-tight text-white">登录管理询盘、产品和内容。</h1>
-        <p className="mt-4 leading-7 text-slate-400">
-          默认后台语言为中文。账号、密码和第三方密钥均来自服务端环境变量，不会暴露在前端代码中。
-        </p>
+        <div className="flex items-center gap-3">
+          <span className="grid h-12 w-12 place-items-center rounded-md bg-white p-1.5">
+            <Image src="/assets/images/logo.png" alt="GRIMM PUMP logo" width={40} height={29} className="h-auto w-full object-contain" priority />
+          </span>
+          <p className="text-sm font-black uppercase tracking-[0.16em] text-orange-300">GRIMM 管理后台</p>
+        </div>
+        <h1 className="mt-5 text-4xl font-black leading-tight text-white">登录网站运营后台</h1>
+        <p className="mt-4 leading-7 text-slate-400">管理产品、新闻、询盘、下载资料和网站运营数据。</p>
         {!isAdminConfigured() ? (
           <div className="mt-8 rounded-lg border border-orange-300/30 bg-orange-300/10 p-4 text-sm leading-6 text-orange-100">
-            尚未配置 ADMIN_PASSWORD_HASH 或 ADMIN_PASSWORD。请先在 Vercel 环境变量中配置管理员密码。
+            管理员登录尚未启用，请联系网站管理员完成账号配置。
           </div>
         ) : null}
         <LoginForm />
