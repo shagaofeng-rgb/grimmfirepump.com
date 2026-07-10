@@ -24,9 +24,23 @@ export async function ProductSection({ featuredOnly = false }: ProductSectionPro
       />
       <div className="container-shell grid gap-5 md:grid-cols-2 xl:grid-cols-3">
         {visibleProducts.map((product) => (
-          <article key={product.slug} className="product-card card flex min-h-[430px] flex-col overflow-hidden">
+          <article
+            key={product.slug}
+            className="product-card card group relative flex min-h-[430px] flex-col overflow-hidden transition hover:-translate-y-1 hover:shadow-xl"
+          >
+            <Link
+              href={`/products/${product.slug}`}
+              className="absolute inset-0 z-10"
+              aria-label={`View details for ${product.title}`}
+            />
             <figure className="product-card-media relative grid h-[205px] place-items-center bg-gradient-to-b from-white to-slate-100 p-5">
-              <Image src={product.image} alt={product.title} fill className="object-contain p-5" sizes="(min-width: 1280px) 30vw, 50vw" />
+              <Image
+                src={product.image}
+                alt={product.title}
+                fill
+                className="object-contain p-5 transition duration-300 group-hover:scale-[1.03]"
+                sizes="(min-width: 1280px) 30vw, 50vw"
+              />
             </figure>
             <div className="product-card-body flex flex-1 flex-col p-5">
               <p className="mb-2 text-xs font-black uppercase tracking-[0.12em] text-[var(--orange)]">{product.category}</p>
@@ -39,9 +53,9 @@ export async function ProductSection({ featuredOnly = false }: ProductSectionPro
                   </li>
                 ))}
               </ul>
-              <Link className="button button-secondary mt-5 min-h-11" href={`/products/${product.slug}`}>
+              <span className="button button-secondary mt-5 min-h-11">
                 View Details
-              </Link>
+              </span>
             </div>
           </article>
         ))}
