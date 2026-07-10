@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { createPasswordHash, getConfiguredAdminUser, getCurrentAdmin, type AdminCredential, verifyAdminPassword } from "@/lib/admin-auth";
@@ -24,6 +24,7 @@ import {
 } from "@/lib/admin-cms";
 import { createId, deleteStoreItem, readStore, upsertStore, writeStore } from "@/lib/local-store";
 import type { InquiryRecord } from "@/lib/admin-data";
+import { markSitemapDirty } from "@/lib/sitemap-dirty";
 
 const statusSchema = z.enum(["draft", "review", "published", "offline", "archived"]);
 
@@ -50,6 +51,13 @@ async function actor() {
 
 async function audit(action: string, target: string, result: "success" | "failed" = "success") {
   await logAudit({ actor: await actor(), action, target, result });
+}
+
+async function refreshSitemap(reason: string) {
+  await markSitemapDirty(reason);
+  revalidateTag("sitemap-data");
+  revalidatePath("/sitemap.xml");
+  revalidatePath("/sitemaps/[file]", "page");
 }
 
 const categorySchema = z.object({
@@ -101,6 +109,7 @@ export async function saveCategory(formData: FormData) {
   await cmsStore.upsertCategory(item);
   await audit("save_category", item.id);
   revalidatePath("/admin/product-categories");
+  await refreshSitemap("category_saved");
 }
 
 export async function deleteCategory(formData: FormData) {
@@ -110,9 +119,11 @@ export async function deleteCategory(formData: FormData) {
     await audit("delete_category_blocked", id, "failed");
     redirect("/admin/product-categories?error=category-in-use");
   }
-  await cmsStore.deleteCategory(id);
+  const category = (await listProductCategories()).find((item) => item.id === id);
+  if (category) await cmsStore.upsertCategory({ ...category, enabled: false, indexable: false, updatedAt: new Date().toISOString() });
   await audit("delete_category", id);
   revalidatePath("/admin/product-categories");
+  await refreshSitemap("category_archived");
 }
 
 export async function saveProduct(formData: FormData) {
@@ -169,23 +180,27 @@ export async function saveProduct(formData: FormData) {
   };
   z.object({ title: z.string().min(2), slug: z.string().min(2) }).parse(item);
   await cmsStore.upsertProduct(item);
+  revalidateTag("cms-products");
   await audit("save_product", item.id);
   revalidatePath("/admin/products");
   revalidatePath("/");
   revalidatePath("/products");
   revalidatePath(`/products/${item.slug}`);
-  revalidatePath("/sitemap.xml");
+  await refreshSitemap("product_saved");
   redirect(`/admin/products/${item.id}/edit?saved=1`);
 }
 
 export async function deleteProduct(formData: FormData) {
   const id = text(formData, "id");
-  await cmsStore.deleteProduct(id);
+  const existing = (await listCmsProducts()).find((item) => item.id === id);
+  if (existing) await cmsStore.upsertProduct({ ...existing, status: "archived", indexable: false, updatedAt: new Date().toISOString() });
+  revalidateTag("cms-products");
   await audit("delete_product", id);
   revalidatePath("/admin/products");
   revalidatePath("/");
   revalidatePath("/products");
-  revalidatePath("/sitemap.xml");
+  if (existing) revalidatePath(`/products/${existing.slug}`);
+  await refreshSitemap("product_archived");
 }
 
 export async function saveNews(formData: FormData) {
@@ -216,21 +231,25 @@ export async function saveNews(formData: FormData) {
   };
   z.object({ title: z.string().min(2), slug: z.string().min(2) }).parse(item);
   await cmsStore.upsertNews(item);
+  revalidateTag("cms-blog");
   await audit("save_news", item.id);
   revalidatePath("/admin/news");
   revalidatePath("/blog");
   revalidatePath(`/blog/${item.slug}`);
-  revalidatePath("/sitemap.xml");
+  await refreshSitemap("blog_saved");
   redirect(`/admin/news/${item.id}/edit?saved=1`);
 }
 
 export async function deleteNews(formData: FormData) {
   const id = text(formData, "id");
-  await cmsStore.deleteNews(id);
+  const existing = (await listCmsNews()).find((item) => item.id === id);
+  if (existing) await cmsStore.upsertNews({ ...existing, status: "archived", indexable: false, updatedAt: new Date().toISOString() });
+  revalidateTag("cms-blog");
   await audit("delete_news", id);
   revalidatePath("/admin/news");
   revalidatePath("/blog");
-  revalidatePath("/sitemap.xml");
+  if (existing) revalidatePath(`/blog/${existing.slug}`);
+  await refreshSitemap("blog_archived");
 }
 
 export async function saveMedia(formData: FormData) {
@@ -310,6 +329,8 @@ export async function saveManagedPage(formData: FormData) {
   await cmsStore.upsertPage(item);
   await audit("save_page", item.id);
   revalidatePath("/admin/pages");
+  revalidatePath(item.slug || "/");
+  await refreshSitemap("page_saved");
 }
 
 export async function saveSettings(formData: FormData) {

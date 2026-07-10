@@ -24,7 +24,8 @@ export async function generateMetadata({ params }: BlogDetailProps): Promise<Met
   return {
     title: post.title,
     description: post.text,
-    alternates: { canonical: `/blog/${post.slug}` },
+    alternates: { canonical: post.canonicalUrl || `/blog/${post.slug}` },
+    robots: post.indexable ? { index: true, follow: true } : { index: false, follow: true },
     openGraph: { title: post.title, description: post.text, images: [post.image] },
   };
 }
@@ -42,7 +43,7 @@ export default async function BlogDetailPage({ params }: BlogDetailProps) {
     description: post.text,
     image: [imageUrl],
     datePublished: post.date,
-    dateModified: post.date,
+    dateModified: post.updatedAt,
     author: { "@type": "Organization", name: company.shortName, url: company.website },
     publisher: {
       "@type": "Organization",

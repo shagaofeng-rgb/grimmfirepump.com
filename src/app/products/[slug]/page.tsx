@@ -33,7 +33,8 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
   return {
     title: product.title,
     description,
-    alternates: { canonical: `/products/${product.slug}` },
+    alternates: { canonical: product.canonicalUrl || `/products/${product.slug}` },
+    robots: product.indexable ? { index: true, follow: true } : { index: false, follow: true },
     openGraph: { title: product.title, description, images: [product.image] },
   };
 }

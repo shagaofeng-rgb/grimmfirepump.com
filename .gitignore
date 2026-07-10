@@ -9,10 +9,12 @@ build
 .env*.local
 
 data/runtime/*.json
+data/runtime/sitemaps/
 tmp
 qa-*.png
 preview-*.png
 *.log
+*.tsbuildinfo
 .DS_Store
 .env*
 !.env.example

@@ -300,6 +300,18 @@ const newsSeeds: CmsNews[] = posts.map((post, index) => ({
   indexable: true,
 }));
 
+const legacyBlogExclusions = new Set([
+  "fire-aboard-uss-gerald-r-ford-injures-sailors-triggers-navy-investigation",
+  "why-choose-us2",
+  "why-choose-us",
+  "si-necesita-una-bomba-contra-incendios-o-no-sabe-c-mo-elegir-una-puede-ponerse-e",
+  "global-fire-pump-industry-growth-accelerates-amid-stricter-safety-regulations",
+  "trailer-type-fire-pump-truck-equipped-with-a-fire-monitor",
+  "dragon-boat-festival-2026-traditions-history-and-cultural-significance",
+  "professional-production-of-fire-pumps-and-water-supply-equipment",
+  "why-fire-pumps-are-essential-to-modern-fire-protection-systems",
+]);
+
 const downloadSeeds: DownloadAsset[] = downloads.map((item, index) => ({
   id: `down_${index + 1}`,
   createdAt: now(),
@@ -362,13 +374,18 @@ export async function listCmsProducts() {
 export async function listCmsNews() {
   const items = await readStore<CmsNews[]>("cms-news.json", []);
   if (items.length) {
+    const normalizedItems = items.map((item) => legacyBlogExclusions.has(item.slug) && (item.status !== "archived" || item.indexable)
+      ? { ...item, status: "archived" as const, indexable: false, updatedAt: new Date().toISOString() }
+      : item);
+    if (normalizedItems.some((item, index) => item !== items[index])) await writeStore("cms-news.json", normalizedItems);
     const existing = new Set(items.map((item) => item.slug));
-    return [...items, ...newsSeeds.filter((item) => !existing.has(item.slug))].sort(
+    return [...normalizedItems, ...newsSeeds.filter((item) => !existing.has(item.slug) && !legacyBlogExclusions.has(item.slug))].sort(
       (a, b) => new Date(b.publishAt).getTime() - new Date(a.publishAt).getTime(),
     );
   }
-  await writeStore("cms-news.json", newsSeeds);
-  return newsSeeds;
+  const indexableSeeds = newsSeeds.filter((item) => !legacyBlogExclusions.has(item.slug));
+  await writeStore("cms-news.json", indexableSeeds);
+  return indexableSeeds;
 }
 
 export async function listMediaFiles() {

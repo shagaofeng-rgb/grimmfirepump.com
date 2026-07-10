@@ -2,6 +2,9 @@ import crypto from "crypto";
 import { company } from "@/data/site";
 import { getPublicProducts, type PublicProduct } from "@/lib/public-cms";
 import { createId, readStore, upsertStore, writeStore } from "@/lib/local-store";
+import { cmsStore, listCmsNews, type CmsNews } from "@/lib/admin-cms";
+import { markSitemapDirty } from "@/lib/sitemap-dirty";
+import { unstable_cache } from "next/cache";
 
 export type NewsStatus =
   | "discovered"
@@ -117,6 +120,12 @@ const SOURCES_STORE = "news-sources.json";
 const JOBS_STORE = "news-jobs.json";
 const AUDITS_STORE = "news-publication-audits.json";
 
+const cachedNewsArticles = unstable_cache(
+  () => readStore<NewsArticle[]>(ARTICLES_STORE, []),
+  ["public-news-articles-v1"],
+  { revalidate: 300, tags: ["news-articles"] },
+);
+
 const fallbackNewsImages = [
   {
     url: "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1200&q=80",
@@ -177,13 +186,23 @@ export function getNewsConfig() {
   };
 }
 
+export function getBlogAutomationConfig() {
+  const dailyTarget = Number(process.env.BLOG_DAILY_TARGET || 1);
+  return {
+    dailyTarget: Number.isFinite(dailyTarget) && dailyTarget >= 0 ? Math.min(dailyTarget, 3) : 1,
+    autoPublish: process.env.BLOG_AUTO_PUBLISH !== "false",
+  };
+}
+
 export async function listNewsArticles() {
-  const articles = await readStore<NewsArticle[]>(ARTICLES_STORE, []);
-  return articles.sort((a, b) => Date.parse(b.publishAt || b.createdAt) - Date.parse(a.publishAt || a.createdAt));
+  const articles = await cachedNewsArticles();
+  return articles
+    .map((article) => normalizeStoredArticle(article))
+    .sort((a, b) => Date.parse(b.publishAt || b.createdAt) - Date.parse(a.publishAt || a.createdAt));
 }
 
 export async function listPublishedNews() {
-  return (await listNewsArticles()).filter((item) => item.status === "published");
+  return (await listNewsArticles()).filter((item) => item.status === "published" && isHighIntentNews(item.title, item.summary));
 }
 
 export async function getNewsArticle(slug: string) {
@@ -231,6 +250,8 @@ export async function runNewsAutomation(reason = "scheduled") {
   const publishedToday = (await listPublishedNews()).filter((item) => (item.publishAt || item.createdAt).slice(0, 10) === today).length;
 
   if (publishedToday >= config.dailyTarget) {
+    const blog = await publishBlogBriefsFromNews();
+    if (blog.generated) await markSitemapDirty("automated_blog_published");
     const audit = await saveAudit({
       date: today,
       target: config.dailyTarget,
@@ -242,12 +263,14 @@ export async function runNewsAutomation(reason = "scheduled") {
       status: "success",
       message: "Daily target already met.",
     });
-    await finishJob(job, "success", "Daily target already met.", { publishedToday, audit: audit.id });
-    return { ok: true, jobId: job.id, audit, stats: { publishedToday, generated: 0 } };
+    await finishJob(job, "success", "Daily target already met.", { publishedToday, blogPublished: blog.published, audit: audit.id });
+    return { ok: true, jobId: job.id, audit, stats: { publishedToday, generated: 0, blog } };
   }
 
   try {
     const result = await collectAndPublishNews(config.dailyTarget - publishedToday);
+    const blog = await publishBlogBriefsFromNews();
+    if (result.published || blog.generated) await markSitemapDirty("automated_content_published");
     const audit = await saveAudit({
       date: today,
       target: config.dailyTarget,
@@ -256,11 +279,16 @@ export async function runNewsAutomation(reason = "scheduled") {
       duplicates: result.duplicates,
       rejected: result.rejected,
       failed: result.failed,
-      status: publishedToday + result.published >= config.dailyTarget ? "success" : result.published ? "partial" : "failed",
+      status:
+        publishedToday + result.published >= config.dailyTarget
+          ? "success"
+          : result.failed > 0 && result.generated === 0
+            ? "failed"
+            : "partial",
       message: result.message,
     });
-    await finishJob(job, audit.status === "failed" ? "failed" : "success", result.message, { ...result, audit: audit.id });
-    return { ok: audit.status !== "failed", jobId: job.id, audit, stats: result };
+    await finishJob(job, audit.status === "failed" ? "failed" : "success", result.message, { ...result, blogPublished: blog.published, audit: audit.id });
+    return { ok: audit.status !== "failed", jobId: job.id, audit, stats: { ...result, blog } };
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown news automation error";
     await finishJob(job, "failed", message, { failed: 1 });
@@ -277,6 +305,63 @@ export async function runNewsAutomation(reason = "scheduled") {
     });
     return { ok: false, jobId: job.id, audit, stats: { failed: 1 }, error: message };
   }
+}
+
+export async function publishBlogBriefsFromNews(limit = getBlogAutomationConfig().dailyTarget) {
+  const config = getBlogAutomationConfig();
+  const existing = await listCmsNews();
+  const today = todayKey();
+  const publishedToday = existing.filter(
+    (post) => post.author === "GRIMM PUMP Editorial Automation" && post.publishAt.slice(0, 10) === today && post.status === "published",
+  ).length;
+  const remaining = Math.max(0, Math.min(limit, config.dailyTarget - publishedToday));
+  if (!remaining) return { generated: 0, published: 0, reviewed: 0, message: "Daily Blog target already met." };
+
+  const sourceUrls = new Set(existing.map((post) => post.source).filter(Boolean));
+  const products = await getPublicProducts();
+  const candidates = (await listPublishedNews()).filter((article) => !sourceUrls.has(article.sourceCanonicalUrl) && !sourceUrls.has(article.sourceUrl));
+  let generated = 0;
+  let published = 0;
+  let reviewed = 0;
+
+  for (const article of candidates.slice(0, remaining)) {
+    const now = new Date().toISOString();
+    const related = products.find((product) => product.slug === article.relatedProducts[0]?.slug);
+    const title = trimText(`Fire Pump Project Brief: ${article.title}`, 88);
+    const slug = `project-brief-${article.slug}`.slice(0, 110).replace(/-+$/g, "");
+    const status: CmsNews["status"] = config.autoPublish ? "published" : "review";
+    const productName = related?.title || article.relatedProducts[0]?.title || "fire pump package";
+    const body = [
+      `${article.summary} This engineering brief explains the practical points an EPC contractor, fire protection company or project owner should verify before using the topic in a pump selection decision.`,
+      `For a ${productName} inquiry, the source update should be treated as project context rather than a complete design basis. The buyer still needs to confirm design flow, required pressure, water source, power supply, fuel availability, installation altitude and pump room constraints.`,
+      `The pump configuration should be checked against the applicable project specification and local fire code. GRIMM PUMP does not infer certification, approval or compliance from a news report; those items must be confirmed from the required product documents and the authority having jurisdiction.`,
+      `A useful quotation package normally includes the duty point, pump curve, driver power, controller scope, materials, connection sizes, base-frame arrangement, testing evidence, packing method and delivery schedule. Providing these requirements early reduces technical revisions.`,
+      `Project teams should also review maintenance access, ventilation, drainage, fuel storage where applicable, alarm interfaces and the responsibilities of the local installer. These details often determine whether a technically suitable pump can be installed and operated reliably.`,
+      `The original public source is linked for traceability. This article is an independent GRIMM PUMP engineering commentary and does not reproduce the source article. Send the project duty point and specification to receive a model recommendation and quotation.`,
+    ];
+    const post: CmsNews = {
+      id: createId("blog_auto"), createdAt: now, updatedAt: now, title, subtitle: article.summary, slug,
+      category: "Engineering Brief", tags: [article.category, productName, "fire pump selection"],
+      author: "GRIMM PUMP Editorial Automation", coverImage: related?.image || "/assets/applications/hero-edj.webp",
+      excerpt: trimText(`${article.summary} Practical selection and documentation guidance for global fire pump project buyers.`, 180),
+      content: body.join("\n\n"), status, featured: false, pinned: false,
+      source: article.sourceCanonicalUrl || article.sourceUrl, publishAt: now,
+      seoTitle: trimText(title, 60),
+      seoDescription: trimText(`${article.summary} Review fire pump selection inputs, compliance checks and submittal documents for EPC and fire protection projects.`, 160),
+      indexable: status === "published",
+    };
+    await cmsStore.upsertNews(post);
+    generated += 1;
+    if (status === "published") published += 1;
+    else reviewed += 1;
+  }
+
+  return {
+    generated,
+    published,
+    reviewed,
+    message: generated ? `Generated ${generated} Blog engineering brief(s).` : "No unused published News source was available for Blog automation.",
+  };
 }
 
 export async function collectAndPublishNews(limit = getNewsConfig().dailyTarget) {
@@ -301,6 +386,10 @@ export async function collectAndPublishNews(limit = getNewsConfig().dailyTarget)
 
   for (const item of freshItems) {
     if (published >= limit) break;
+    if (!isHighIntentNews(item.title, item.description)) {
+      rejected += 1;
+      continue;
+    }
     const fingerprint = fingerprintForSource(item);
     const eventFingerprint = fingerprintForEvent(item.title);
     const contentHash = hash(`${item.title} ${cleanText(item.description)}`);
@@ -738,6 +827,7 @@ function cleanText(value: string) {
 
 function decodeEntities(value: string) {
   return value
+    .replace(/&nbsp;/g, " ")
     .replace(/&amp;/g, "&")
     .replace(/&lt;/g, "<")
     .replace(/&gt;/g, ">")
@@ -745,6 +835,26 @@ function decodeEntities(value: string) {
     .replace(/&#39;/g, "'")
     .replace(/&#x27;/g, "'")
     .replace(/&#x2F;/g, "/");
+}
+
+export function isHighIntentNews(title: string, description = "") {
+  const text = cleanText(`${title} ${description}`).toLowerCase();
+  return /\b(fire pumps?|pump rooms?|sprinklers?|hydrants?|fire water|water supply|nfpa\s*20|data cent(?:er|re).{0,35}fire|warehouse.{0,35}fire)\b/.test(text);
+}
+
+function normalizeStoredArticle(article: NewsArticle): NewsArticle {
+  const sourceSuffix = article.sourceName ? new RegExp(`\\s+-\\s+${article.sourceName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*$`, "i") : null;
+  const clean = (value: string) => cleanText(value).replace(sourceSuffix || /$a/, "").trim();
+  return {
+    ...article,
+    title: clean(article.title),
+    summary: cleanText(article.summary),
+    seoTitle: cleanText(article.seoTitle),
+    seoDescription: cleanText(article.seoDescription),
+    sourceTitle: clean(article.sourceTitle),
+    sourceFacts: article.sourceFacts.map(cleanText),
+    body: article.body.map(cleanText),
+  };
 }
 
 function trimText(value: string, maxLength: number) {

@@ -1,6 +1,7 @@
 import { promises as fs } from "fs";
 import path from "path";
 import { neon } from "@neondatabase/serverless";
+import crypto from "node:crypto";
 
 const runtimeDir = process.env.VERCEL
   ? path.join("/tmp", "grimm-pump-runtime")
@@ -141,4 +142,58 @@ export async function deleteStoreItem<T extends { id: string; createdAt: string;
 
 export function createId(prefix: string) {
   return `${prefix}_${Date.now()}_${Math.random().toString(16).slice(2, 8)}`;
+}
+
+export async function acquireTaskLock(name: string, ttlMs = 10 * 60 * 1000) {
+  const token = crypto.randomUUID();
+  const sql = getSql();
+  if (sql) {
+    try {
+      await sql`
+        CREATE TABLE IF NOT EXISTS task_locks (
+          name TEXT PRIMARY KEY,
+          token TEXT NOT NULL,
+          expires_at TIMESTAMPTZ NOT NULL,
+          updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
+      `;
+      const expiresAt = new Date(Date.now() + ttlMs).toISOString();
+      const rows = await sql`
+        INSERT INTO task_locks (name, token, expires_at, updated_at)
+        VALUES (${name}, ${token}, ${expiresAt}, NOW())
+        ON CONFLICT (name)
+        DO UPDATE SET token = EXCLUDED.token, expires_at = EXCLUDED.expires_at, updated_at = NOW()
+        WHERE task_locks.expires_at < NOW()
+        RETURNING token
+      `;
+      if (!rows.some((row) => row.token === token)) return null;
+      return async () => {
+        await sql`DELETE FROM task_locks WHERE name = ${name} AND token = ${token}`;
+      };
+    } catch (error) {
+      console.warn(`Database lock failed for ${name}; using local runtime lock.`, error);
+    }
+  }
+
+  await ensureRuntimeDir();
+  const lockPath = path.join(runtimeDir, `${name.replace(/[^a-z0-9_-]/gi, "-")}.lock`);
+  const attempt = async () => {
+    const handle = await fs.open(lockPath, "wx");
+    await handle.writeFile(JSON.stringify({ token, expiresAt: Date.now() + ttlMs }));
+    await handle.close();
+  };
+  try {
+    await attempt();
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== "EEXIST") throw error;
+    const details = await fs.stat(lockPath).catch(() => null);
+    if (!details || Date.now() - details.mtimeMs <= ttlMs) return null;
+    await fs.rm(lockPath, { force: true });
+    await attempt();
+  }
+
+  return async () => {
+    const current = await fs.readFile(lockPath, "utf8").catch(() => "");
+    if (current.includes(token)) await fs.rm(lockPath, { force: true });
+  };
 }

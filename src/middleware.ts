@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 const ADMIN_COOKIE_NAME = "grimm_admin_session";
+const localePattern = /^\/(es|ru|ar|fr|pt)(?:\/|$)/;
 
 function bytesToHex(bytes: ArrayBuffer) {
   return [...new Uint8Array(bytes)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
@@ -38,29 +39,29 @@ async function verifySession(session: string | undefined, secret: string) {
 }
 
 export async function middleware(request: NextRequest) {
-  const pathname = request.nextUrl.pathname;
-  const protectsAdminPage = pathname.startsWith("/admin") && pathname !== "/admin/login";
-  const protectsAdminReadApi =
-    request.method === "GET" &&
-    ["/api/inquiries", "/api/download-leads", "/api/analytics"].includes(pathname);
+  const host = (request.headers.get("host") || "").split(":")[0].toLowerCase();
+  if (host === "grimmfirepump.com") {
+    const target = request.nextUrl.clone();
+    target.protocol = "https";
+    target.host = "www.grimmfirepump.com";
+    return NextResponse.redirect(target, 301);
+  }
 
+  const pathname = request.nextUrl.pathname;
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-site-locale", pathname.match(localePattern)?.[1] || "en");
+
+  const protectsAdminPage = pathname.startsWith("/admin") && pathname !== "/admin/login";
+  const protectsAdminReadApi = request.method === "GET" && ["/api/inquiries", "/api/download-leads", "/api/analytics"].includes(pathname);
   if (!protectsAdminPage && !protectsAdminReadApi) {
-    return NextResponse.next();
+    return NextResponse.next({ request: { headers: requestHeaders } });
   }
 
   const secret = process.env.ADMIN_SESSION_SECRET || process.env.ADMIN_PASSWORD_HASH || process.env.ADMIN_PASSWORD;
-  const isAuthed = secret
-    ? await verifySession(request.cookies.get(ADMIN_COOKIE_NAME)?.value, secret)
-    : false;
+  const isAuthed = secret ? await verifySession(request.cookies.get(ADMIN_COOKIE_NAME)?.value, secret) : false;
+  if (isAuthed) return NextResponse.next({ request: { headers: requestHeaders } });
 
-  if (isAuthed) {
-    return NextResponse.next();
-  }
-
-  if (pathname.startsWith("/api/")) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
+  if (pathname.startsWith("/api/")) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const loginUrl = request.nextUrl.clone();
   loginUrl.pathname = "/admin/login";
   loginUrl.searchParams.set("next", pathname);
@@ -68,5 +69,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/api/inquiries", "/api/download-leads", "/api/analytics"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|assets/).*)"],
 };

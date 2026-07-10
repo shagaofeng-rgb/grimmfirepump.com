@@ -103,7 +103,7 @@ export const company = {
   name: "GRIMM PUMP Fire Pump Systems",
   legalName: "Grimm Water Treatment (Zhejiang) Co.,Ltd.",
   shortName: "GRIMM PUMP",
-  website: "https://grimmfirepump.com",
+  website: "https://www.grimmfirepump.com",
   email: "Cain@grimmfirepump.com",
   phone: "+86-18101616808",
   whatsapp: "8618101616808",

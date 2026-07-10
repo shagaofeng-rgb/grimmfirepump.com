@@ -8,7 +8,10 @@
     "start": "next start -p 4174",
     "typecheck": "tsc --noEmit",
     "lint": "tsc --noEmit",
-    "audit:site": "node scripts/site-self-audit.mjs"
+    "audit:site": "node scripts/site-self-audit.mjs",
+    "audit:deep": "node scripts/site-deep-audit.mjs",
+    "sitemap:generate": "node scripts/sitemap.mjs",
+    "test:sitemap": "node --test --experimental-strip-types tests/sitemap.test.mjs"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",

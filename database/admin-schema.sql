@@ -13,6 +13,13 @@ CREATE TABLE IF NOT EXISTS lead_store (
 CREATE INDEX IF NOT EXISTS idx_lead_store_name_created
   ON lead_store (store_name, created_at DESC);
 
+CREATE TABLE IF NOT EXISTS task_locks (
+  name TEXT PRIMARY KEY,
+  token TEXT NOT NULL,
+  expires_at TIMESTAMPTZ NOT NULL,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
 CREATE TABLE IF NOT EXISTS admin_users (
   id TEXT PRIMARY KEY,
   username TEXT NOT NULL UNIQUE,

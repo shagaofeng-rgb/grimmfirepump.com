@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import { headers } from "next/headers";
 import "./globals.css";
 import { company } from "@/data/site";
 import { AnalyticsListener } from "@/components/analytics-listener";
@@ -21,6 +22,12 @@ export const metadata: Metadata = {
     locale: "en_US",
     type: "website",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "GRIMM PUMP Fire Pump Systems",
+    description: "Factory-built fire pump systems for industrial, commercial and infrastructure projects worldwide.",
+    images: ["/assets/applications/hero-edj.webp"],
+  },
   icons: {
     icon: "/assets/images/logo.png",
     shortcut: "/assets/images/logo.png",
@@ -28,7 +35,9 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
+export default async function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
+  const locale = (await headers()).get("x-site-locale") || "en";
+  const languageMap: Record<string, string> = { en: "en", es: "es", ru: "ru", ar: "ar", fr: "fr", pt: "pt-BR" };
   const organizationSchema = {
     "@context": "https://schema.org",
     "@type": "Organization",
@@ -55,7 +64,7 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
   };
 
   return (
-    <html lang="en">
+    <html lang={languageMap[locale] || "en"} dir={locale === "ar" ? "rtl" : "ltr"}>
       <body>
         {children}
         <AnalyticsListener />

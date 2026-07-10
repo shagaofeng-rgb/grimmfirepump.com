@@ -9,11 +9,14 @@ import { company, navItems, productMegaMenuGroups } from "@/data/site";
 export function Header() {
   const [open, setOpen] = useState(false);
   const [productsOpen, setProductsOpen] = useState(false);
-  const [mobileProductsOpen, setMobileProductsOpen] = useState(true);
+  const [resourcesOpen, setResourcesOpen] = useState(false);
+  const [mobileProductsOpen, setMobileProductsOpen] = useState(false);
+  const desktopNavItems = navItems.filter((item) => ["About", "Products", "Applications", "Projects", "Factory"].includes(item.label));
+  const resourceItems = navItems.filter((item) => ["Testing", "Downloads", "News", "Knowledge", "Search"].includes(item.label));
 
   const closeMobileMenu = () => {
     setOpen(false);
-    setMobileProductsOpen(true);
+    setMobileProductsOpen(false);
   };
 
   return (
@@ -27,8 +30,8 @@ export function Header() {
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-3 text-[13px] font-bold text-slate-700 xl:gap-5 xl:text-sm lg:flex" aria-label="Primary">
-          {navItems.map((item) =>
+        <nav className="hidden items-center gap-4 text-[13px] font-bold text-slate-700 xl:flex 2xl:gap-5 2xl:text-sm" aria-label="Primary">
+          {desktopNavItems.map((item) =>
             item.label === "Products" ? (
               <div
                 key={item.href}
@@ -52,6 +55,28 @@ export function Header() {
               </Link>
             )
           )}
+          <div
+            className="group relative"
+            onMouseEnter={() => setResourcesOpen(true)}
+            onMouseLeave={() => setResourcesOpen(false)}
+            onFocus={() => setResourcesOpen(true)}
+          >
+            <button
+              className="flex items-center gap-1 border-b-2 border-transparent py-7 font-bold hover:border-[var(--orange)]"
+              type="button"
+              aria-expanded={resourcesOpen}
+            >
+              Resources
+              <ChevronDown size={15} className={`transition ${resourcesOpen ? "rotate-180" : ""}`} />
+            </button>
+            <div className={`absolute right-0 top-[68px] w-56 rounded-md border border-slate-200 bg-white p-2 shadow-xl transition ${resourcesOpen ? "visible opacity-100" : "invisible pointer-events-none opacity-0"}`}>
+              {resourceItems.map((item) => (
+                <Link key={item.href} href={item.href} className="block rounded px-3 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50 hover:text-[var(--navy-900)]">
+                  {item.label}
+                </Link>
+              ))}
+            </div>
+          </div>
         </nav>
 
         <div className="flex items-center gap-3">
@@ -69,7 +94,7 @@ export function Header() {
             Get Quote
           </Link>
           <button
-            className="grid h-11 w-11 place-items-center rounded-md border border-slate-200 lg:hidden"
+            className="grid h-11 w-11 place-items-center rounded-md border border-slate-200 xl:hidden"
             type="button"
             onClick={() => setOpen((value) => !value)}
             aria-label="Open menu"
@@ -80,7 +105,7 @@ export function Header() {
       </div>
 
       {open ? (
-        <nav className="max-h-[calc(100vh-76px)] overflow-y-auto border-t border-slate-100 bg-white px-5 pb-5 shadow-xl lg:hidden" aria-label="Mobile">
+        <nav className="max-h-[calc(100vh-76px)] overflow-y-auto border-t border-slate-100 bg-white px-5 pb-5 shadow-xl xl:hidden" aria-label="Mobile">
           {navItems.map((item) =>
             item.label === "Products" ? (
               <div key={item.href} className="border-b border-slate-100">

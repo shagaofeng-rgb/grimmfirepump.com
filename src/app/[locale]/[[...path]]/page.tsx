@@ -47,6 +47,7 @@ export async function generateMetadata({ params }: LocalizedPageProps): Promise<
     title: pagePath === "/" ? content.home.title : page.title,
     description: page.text,
     alternates: localizedAlternates(pagePath, locale),
+    robots: pagePath === "/search" ? { index: false, follow: true } : { index: true, follow: true },
     openGraph: {
       title: page.title,
       description: page.text,

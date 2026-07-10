@@ -1,8 +1,15 @@
 import { posts as staticPosts, products as staticProducts } from "@/data/site";
 import { listCmsNews, listCmsProducts, type CmsNews, type CmsProduct } from "@/lib/admin-cms";
+import { unstable_cache } from "next/cache";
+
+const cachedCmsProducts = unstable_cache(listCmsProducts, ["public-cms-products-v1"], { revalidate: 300, tags: ["cms-products"] });
+const cachedCmsNews = unstable_cache(listCmsNews, ["public-cms-blog-v1"], { revalidate: 300, tags: ["cms-blog"] });
 
 export type PublicProduct = {
   slug: string;
+  updatedAt: string;
+  canonicalUrl: string;
+  indexable: boolean;
   sourceUrl: string;
   title: string;
   category: string;
@@ -18,6 +25,9 @@ export type PublicProduct = {
 
 export type PublicPost = {
   slug: string;
+  updatedAt: string;
+  canonicalUrl: string;
+  indexable: boolean;
   sourceUrl: string;
   category: string;
   title: string;
@@ -56,6 +66,9 @@ function mapProduct(item: CmsProduct): PublicProduct {
   const gallery = item.gallery.length ? item.gallery : fallback?.detailImages?.map((detail) => detail.src) || [image];
   return {
     slug: item.slug,
+    updatedAt: item.updatedAt || item.createdAt,
+    canonicalUrl: item.canonicalUrl || `/products/${item.slug}`,
+    indexable: item.indexable,
     sourceUrl: fallback?.sourceUrl || item.canonicalUrl || `/products/${item.slug}`,
     title: item.title,
     category: item.categoryName || fallback?.category || "Products",
@@ -73,6 +86,9 @@ function mapProduct(item: CmsProduct): PublicProduct {
 function mapStaticProduct(item: (typeof staticProducts)[number]): PublicProduct {
   return {
     slug: item.slug,
+    updatedAt: item.releaseTime,
+    canonicalUrl: `/products/${item.slug}`,
+    indexable: true,
     sourceUrl: item.sourceUrl,
     title: item.title,
     category: item.category,
@@ -91,6 +107,9 @@ function mapPost(item: CmsNews): PublicPost {
   const fallback = staticPosts.find((post) => post.slug === item.slug) as PublicPost | undefined;
   return {
     slug: item.slug,
+    updatedAt: item.updatedAt || item.publishAt || item.createdAt,
+    canonicalUrl: `/blog/${item.slug}`,
+    indexable: item.indexable,
     sourceUrl: item.source || fallback?.sourceUrl || `/blog/${item.slug}`,
     category: item.category || fallback?.category || "News",
     title: item.title,
@@ -105,6 +124,9 @@ function mapPost(item: CmsNews): PublicPost {
 function mapStaticPost(item: (typeof staticPosts)[number]): PublicPost {
   return {
     slug: item.slug,
+    updatedAt: item.date,
+    canonicalUrl: `/blog/${item.slug}`,
+    indexable: true,
     sourceUrl: item.sourceUrl,
     category: item.category,
     title: item.title,
@@ -117,12 +139,12 @@ function mapStaticPost(item: (typeof staticPosts)[number]): PublicPost {
 }
 
 export async function getPublicProducts() {
-  const cmsProducts = await listCmsProducts();
+  const cmsProducts = await cachedCmsProducts();
   const cmsMapped = cmsProducts
     .filter((item) => item.status === "published")
     .sort((a, b) => a.sortOrder - b.sortOrder)
     .map(mapProduct);
-  const cmsSlugs = new Set(cmsMapped.map((item) => item.slug));
+  const cmsSlugs = new Set(cmsProducts.map((item) => item.slug));
   const fallbackProducts = staticProducts.filter((item) => !cmsSlugs.has(item.slug)).map(mapStaticProduct);
   return [...cmsMapped, ...fallbackProducts];
 }
@@ -132,12 +154,12 @@ export async function getPublicProduct(slug: string) {
 }
 
 export async function getPublicPosts() {
-  const cmsNews = await listCmsNews();
+  const cmsNews = await cachedCmsNews();
   const cmsMapped = cmsNews
-    .filter((item) => item.status === "published")
+    .filter((item) => item.status === "published" && new Date(item.publishAt || item.createdAt).getTime() <= Date.now())
     .sort((a, b) => Number(Boolean(b.pinned)) - Number(Boolean(a.pinned)) || new Date(b.publishAt).getTime() - new Date(a.publishAt).getTime())
     .map(mapPost);
-  const cmsSlugs = new Set(cmsMapped.map((item) => item.slug));
+  const cmsSlugs = new Set(cmsNews.map((item) => item.slug));
   const fallbackPosts = staticPosts.filter((item) => !cmsSlugs.has(item.slug)).map(mapStaticPost);
   return [...cmsMapped, ...fallbackPosts];
 }

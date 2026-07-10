@@ -14,6 +14,10 @@ const routes = [
   "/contact",
   "/search?q=fire%20pump",
   "/sitemap.xml",
+  "/sitemaps/pages-1.xml",
+  "/sitemaps/products-1.xml",
+  "/sitemaps/posts-1.xml",
+  "/sitemaps/categories-1.xml",
   "/robots.txt",
   "/news/rss.xml",
   "/blog/rss.xml",
@@ -42,6 +46,15 @@ async function checkRoute(path) {
 
   if (path.endsWith(".xml")) {
     assert(body.includes("<?xml") || body.includes("<urlset") || body.includes("<rss"), `${path} is not valid XML/RSS output`);
+  }
+
+  if (path === "/sitemap.xml") {
+    assert(body.includes("https://www.grimmfirepump.com/sitemaps/"), "Sitemap index does not use the production www domain");
+    assert(!body.includes("/search"), "Sitemap index must not include search pages");
+  }
+
+  if (path === "/robots.txt") {
+    assert(body.includes("Sitemap: https://www.grimmfirepump.com/sitemap.xml"), "robots.txt is missing the production Sitemap declaration");
   }
 
   if (path.startsWith("/api/")) {
