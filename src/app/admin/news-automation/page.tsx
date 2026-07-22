@@ -23,7 +23,7 @@ export default async function AdminNewsAutomationPage() {
       <AdminPageHeader
         eyebrow="新闻自动化"
         title="News 自动采集、去重、发布与审计"
-        description="检查公开新闻来源、72 小时过滤、7 天去重、产品关联、图片来源、RSS/Sitemap 和发布审计状态。"
+        description="检查公开新闻来源、时效过滤、7 天去重、产品关联、图片来源、RSS/Sitemap 和发布审计状态。"
         action={<Link className="button button-primary" href="/news" target="_blank">查看前台 News</Link>}
       />
 

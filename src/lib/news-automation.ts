@@ -1,7 +1,7 @@
 import crypto from "crypto";
 import { company } from "@/data/site";
 import { getPublicProducts, type PublicProduct } from "@/lib/public-cms";
-import { createId, readStore, upsertStore, writeStore } from "@/lib/local-store";
+import { acquireTaskLock, createId, readStore, upsertStore, writeStore } from "@/lib/local-store";
 import { cmsStore, listCmsNews, type CmsNews } from "@/lib/admin-cms";
 import { markSitemapDirty } from "@/lib/sitemap-dirty";
 import { unstable_cache } from "next/cache";
@@ -150,15 +150,33 @@ const fallbackNewsImages = [
 ];
 
 const defaultSourceUrls = [
-  "https://news.google.com/rss/search?q=%22fire%20pump%22%20OR%20%22fire%20protection%22%20industrial&hl=en-US&gl=US&ceid=US:en",
-  "https://news.google.com/rss/search?q=%22NFPA%2020%22%20%22fire%20pump%22&hl=en-US&gl=US&ceid=US:en",
-  "https://news.google.com/rss/search?q=%22data%20center%22%20%22fire%20protection%22&hl=en-US&gl=US&ceid=US:en",
-  "https://news.google.com/rss/search?q=%22warehouse%22%20%22fire%20protection%22%20pump&hl=en-US&gl=US&ceid=US:en",
+  "https://news.google.com/rss/search?q=%22fire%20pump%22%20OR%20%22NFPA%2020%22&hl=en-US&gl=US&ceid=US:en",
+  "https://news.google.com/rss/search?q=%22industrial%20fire%20protection%22%20OR%20%22fire%20suppression%20system%22&hl=en-US&gl=US&ceid=US:en",
+  "https://news.google.com/rss/search?q=%22data%20center%22%20%22fire%20suppression%22&hl=en-US&gl=US&ceid=US:en",
+  "https://news.google.com/rss/search?q=%22warehouse%22%20%22fire%20sprinkler%22&hl=en-US&gl=US&ceid=US:en",
+  "https://news.google.com/rss/search?q=%22fire%20water%22%20industrial&hl=en-US&gl=US&ceid=US:en",
+];
+
+const defaultBlockedNewsTerms = [
+  "wildfire",
+  "brush fire",
+  "house fire",
+  "home fire",
+  "apartment fire",
+  "vehicle fire",
+  "car fire",
+  "firefighters",
+  "firefighter",
+  "obituary",
+  "arson",
+  "crops",
+  "groundwater",
+  "weather alert",
 ];
 
 export function getNewsConfig() {
-  const dailyTarget = Number(process.env.NEWS_DAILY_TARGET || 4);
-  const lookbackHours = Number(process.env.NEWS_LOOKBACK_HOURS || 72);
+  const dailyTarget = Number(process.env.NEWS_DAILY_TARGET || 1);
+  const lookbackHours = Number(process.env.NEWS_LOOKBACK_HOURS || 168);
   const dedupDays = Number(process.env.NEWS_DEDUP_DAYS || 7);
   const maxRetries = Number(process.env.NEWS_MAX_RETRIES || 3);
   const relevanceThreshold = Number(process.env.NEWS_RELEVANCE_THRESHOLD || 10);
@@ -171,9 +189,13 @@ export function getNewsConfig() {
     .split(",")
     .map((item) => item.trim())
     .filter(Boolean);
+  const sourceBlacklist = (process.env.NEWS_SOURCE_BLACKLIST || defaultBlockedNewsTerms.join(","))
+    .split(",")
+    .map((item) => item.trim().toLowerCase())
+    .filter(Boolean);
 
   return {
-    dailyTarget: Number.isFinite(dailyTarget) ? dailyTarget : 4,
+    dailyTarget: Number.isFinite(dailyTarget) ? dailyTarget : 1,
     timezone: process.env.NEWS_TIMEZONE || "Asia/Shanghai",
     lookbackHours: Number.isFinite(lookbackHours) ? lookbackHours : 72,
     dedupDays: Number.isFinite(dedupDays) ? dedupDays : 7,
@@ -182,6 +204,7 @@ export function getNewsConfig() {
     autoPublish,
     allowedLanguages,
     sourceWhitelist,
+    sourceBlacklist,
     alertEmailConfigured: Boolean(process.env.NEWS_ALERT_EMAIL || process.env.RESEND_API_KEY),
   };
 }
@@ -206,16 +229,20 @@ export async function listPublishedNews() {
 }
 
 export async function getNewsArticle(slug: string) {
-  return (await listNewsArticles()).find((item) => item.slug === slug && item.status === "published");
+  return (await listNewsArticles()).find(
+    (item) => item.slug === slug && item.status === "published" && isHighIntentNews(item.title, item.summary),
+  );
 }
 
 export async function listNewsSources() {
   const stored = await readStore<NewsSource[]>(SOURCES_STORE, []);
-  const storedUrls = new Set(stored.map((item) => item.url));
   const now = new Date().toISOString();
-  const configSources: NewsSource[] = getNewsConfig().sourceWhitelist
-    .filter((url) => !storedUrls.has(url))
-    .map((url, index) => ({
+  const configuredUrls = getNewsConfig().sourceWhitelist;
+  const configuredByUrl = new Map(stored.map((item) => [item.url, item]));
+  const manualSources = stored.filter((item) => !isManagedGoogleNewsSource(item.url));
+  const configuredSources: NewsSource[] = configuredUrls.map((url, index) => {
+    const existing = configuredByUrl.get(url);
+    return existing || {
       id: `source_${hash(url).slice(0, 14)}`,
       createdAt: now,
       updatedAt: now,
@@ -225,8 +252,9 @@ export async function listNewsSources() {
       enabled: true,
       language: "en",
       lastStatus: "not_configured",
-    }));
-  return [...stored, ...configSources];
+    };
+  });
+  return [...manualSources, ...configuredSources];
 }
 
 export async function listNewsJobs() {
@@ -244,66 +272,84 @@ export async function getRelatedNewsForProduct(productSlug: string, limit = 3) {
 }
 
 export async function runNewsAutomation(reason = "scheduled") {
-  const job = await startJob("daily-run", `News automation started by ${reason}.`);
-  const config = getNewsConfig();
-  const today = todayKey();
-  const publishedToday = (await listPublishedNews()).filter((item) => (item.publishAt || item.createdAt).slice(0, 10) === today).length;
-
-  if (publishedToday >= config.dailyTarget) {
-    const blog = await publishBlogBriefsFromNews();
-    if (blog.generated) await markSitemapDirty("automated_blog_published");
-    const audit = await saveAudit({
-      date: today,
-      target: config.dailyTarget,
-      published: publishedToday,
-      generated: 0,
-      duplicates: 0,
-      rejected: 0,
-      failed: 0,
-      status: "success",
-      message: "Daily target already met.",
-    });
-    await finishJob(job, "success", "Daily target already met.", { publishedToday, blogPublished: blog.published, audit: audit.id });
-    return { ok: true, jobId: job.id, audit, stats: { publishedToday, generated: 0, blog } };
+  const release = await acquireTaskLock("news-automation", 12 * 60 * 1000);
+  if (!release) {
+    return {
+      ok: true,
+      skipped: true,
+      message: "News automation is already running. This invocation was skipped.",
+      stats: { published: 0, generated: 0 },
+    };
   }
 
   try {
-    const result = await collectAndPublishNews(config.dailyTarget - publishedToday);
-    const blog = await publishBlogBriefsFromNews();
-    if (result.published || blog.generated) await markSitemapDirty("automated_content_published");
-    const audit = await saveAudit({
-      date: today,
-      target: config.dailyTarget,
-      published: publishedToday + result.published,
-      generated: result.generated,
-      duplicates: result.duplicates,
-      rejected: result.rejected,
-      failed: result.failed,
-      status:
-        publishedToday + result.published >= config.dailyTarget
-          ? "success"
-          : result.failed > 0 && result.generated === 0
-            ? "failed"
-            : "partial",
-      message: result.message,
-    });
-    await finishJob(job, audit.status === "failed" ? "failed" : "success", result.message, { ...result, blogPublished: blog.published, audit: audit.id });
-    return { ok: audit.status !== "failed", jobId: job.id, audit, stats: { ...result, blog } };
-  } catch (error) {
-    const message = error instanceof Error ? error.message : "Unknown news automation error";
-    await finishJob(job, "failed", message, { failed: 1 });
-    const audit = await saveAudit({
-      date: today,
-      target: config.dailyTarget,
-      published: publishedToday,
-      generated: 0,
-      duplicates: 0,
-      rejected: 0,
-      failed: 1,
-      status: "failed",
-      message,
-    });
-    return { ok: false, jobId: job.id, audit, stats: { failed: 1 }, error: message };
+    const job = await startJob("daily-run", `News automation started by ${reason}.`);
+    const config = getNewsConfig();
+    const today = todayKey();
+    const publishedToday = (await listPublishedNews()).filter((item) => (item.publishAt || item.createdAt).slice(0, 10) === today).length;
+
+    try {
+      if (publishedToday >= config.dailyTarget) {
+        const blog = await publishBlogBriefsFromNews();
+        if (blog.generated) await markSitemapDirty("automated_blog_published");
+        const audit = await saveAudit({
+          date: today,
+          target: config.dailyTarget,
+          published: publishedToday,
+          generated: 0,
+          duplicates: 0,
+          rejected: 0,
+          failed: 0,
+          status: "success",
+          message: "Daily target already met.",
+        });
+        await finishJob(job, "success", "Daily target already met.", { publishedToday, blogPublished: blog.published, audit: audit.id });
+        return { ok: true, jobId: job.id, audit, stats: { publishedToday, generated: 0, blog } };
+      }
+
+      const result = await collectAndPublishNews(config.dailyTarget - publishedToday);
+      const blog = await publishBlogBriefsFromNews();
+      if (result.published || blog.generated) await markSitemapDirty("automated_content_published");
+      const audit = await saveAudit({
+        date: today,
+        target: config.dailyTarget,
+        published: publishedToday + result.published,
+        generated: result.generated,
+        duplicates: result.duplicates,
+        rejected: result.rejected,
+        failed: result.failed,
+        status:
+          publishedToday + result.published >= config.dailyTarget
+            ? "success"
+            : result.failed > 0 && result.generated === 0
+              ? "failed"
+              : "partial",
+        message: result.message,
+      });
+      const jobStatus = audit.status === "failed" ? "failed" : audit.status === "partial" ? "skipped" : "success";
+      await finishJob(job, jobStatus, result.message, { ...result, blogPublished: blog.published, audit: audit.id });
+      if (audit.status === "partial" && result.published === 0) {
+        console.warn("News automation completed without a publishable item.", { reason, ...result });
+      }
+      return { ok: audit.status !== "failed", jobId: job.id, audit, stats: { ...result, blog } };
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unknown news automation error";
+      await finishJob(job, "failed", message, { failed: 1 });
+      const audit = await saveAudit({
+        date: today,
+        target: config.dailyTarget,
+        published: publishedToday,
+        generated: 0,
+        duplicates: 0,
+        rejected: 0,
+        failed: 1,
+        status: "failed",
+        message,
+      });
+      return { ok: false, jobId: job.id, audit, stats: { failed: 1 }, error: message };
+    }
+  } finally {
+    await release();
   }
 }
 
@@ -374,9 +420,10 @@ export async function collectAndPublishNews(limit = getNewsConfig().dailyTarget)
   let failed = 0;
   let generated = 0;
   let published = 0;
+  let qualityRejected = 0;
 
   if (!sources.length) {
-    return { generated, published, duplicates, rejected, failed: 1, message: "No enabled public news sources are configured." };
+    return { generated, published, duplicates, rejected, failed: 1, qualityRejected, sources: 0, feedItems: 0, freshItems: 0, message: "No enabled public news sources are configured." };
   }
 
   const feedItems = (await Promise.all(sources.map((source) => fetchFeedItems(source)))).flat();
@@ -386,8 +433,9 @@ export async function collectAndPublishNews(limit = getNewsConfig().dailyTarget)
 
   for (const item of freshItems) {
     if (published >= limit) break;
-    if (!isHighIntentNews(item.title, item.description)) {
+    if (!isHighIntentNews(item.title, item.description, item.sourceName, config.sourceBlacklist)) {
       rejected += 1;
+      qualityRejected += 1;
       continue;
     }
     const fingerprint = fingerprintForSource(item);
@@ -439,9 +487,9 @@ export async function collectAndPublishNews(limit = getNewsConfig().dailyTarget)
   const message =
     published > 0
       ? `Generated ${generated} article(s), published ${published}, skipped ${duplicates} duplicate(s).`
-      : `No publishable fresh news found. Generated ${generated}, duplicates ${duplicates}, rejected ${rejected}, failed ${failed}.`;
+      : `No publishable fresh news found from ${sources.length} active source(s). Fresh ${freshItems.length}, duplicates ${duplicates}, quality rejected ${qualityRejected}, failed ${failed}.`;
 
-  return { generated, published, duplicates, rejected, failed, message };
+  return { generated, published, duplicates, rejected, failed, qualityRejected, sources: sources.length, feedItems: feedItems.length, freshItems: freshItems.length, message };
 }
 
 async function fetchFeedItems(source: NewsSource): Promise<FeedItem[]> {
@@ -803,6 +851,15 @@ function sourceNameFromUrl(value: string) {
   }
 }
 
+function isManagedGoogleNewsSource(value: string) {
+  try {
+    const url = new URL(value);
+    return url.hostname.toLowerCase() === "news.google.com" && url.pathname === "/rss/search";
+  } catch {
+    return false;
+  }
+}
+
 function isWithinHours(date: string, hours: number) {
   const parsed = Date.parse(date);
   return Number.isFinite(parsed) && Date.now() - parsed <= hours * 60 * 60 * 1000 && parsed <= Date.now() + 60 * 60 * 1000;
@@ -837,9 +894,22 @@ function decodeEntities(value: string) {
     .replace(/&#x2F;/g, "/");
 }
 
-export function isHighIntentNews(title: string, description = "") {
-  const text = cleanText(`${title} ${description}`).toLowerCase();
-  return /\b(fire pumps?|pump rooms?|sprinklers?|hydrants?|fire water|water supply|nfpa\s*20|data cent(?:er|re).{0,35}fire|warehouse.{0,35}fire)\b/.test(text);
+export function isHighIntentNews(title: string, description = "", sourceName = "", blockedTerms = defaultBlockedNewsTerms) {
+  const text = cleanText(`${title} ${description} ${sourceName}`).toLowerCase();
+  if (blockedTerms.some((term) => text.includes(term.toLowerCase()))) return false;
+
+  let score = 0;
+  if (/\bfire pumps?\b/.test(text)) score += 8;
+  if (/\bnfpa\s*20\b/.test(text)) score += 9;
+  if (/\bfire water\b/.test(text)) score += 7;
+  if (/\bfire suppression\b/.test(text)) score += 5;
+  if (/\bfire sprinkler(?:s| system)?\b/.test(text)) score += 5;
+  if (/\bfire protection(?: system| equipment)?\b/.test(text)) score += 4;
+  if (/\bpump room\b/.test(text)) score += 5;
+  if (/\b(hydrant|water supply)\b/.test(text)) score += 2;
+  if (/\b(industrial|data cent(?:er|re)|warehouse|hospital|airport|oil\s*(?:and|&)\s*gas|power plant|epc)\b/.test(text)) score += 3;
+
+  return score >= 6;
 }
 
 function normalizeStoredArticle(article: NewsArticle): NewsArticle {
