@@ -390,10 +390,15 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
           <ProductSidebar activeSlug={product.slug} />
 
           <div className="grid min-w-0 gap-8">
-            <nav className="card flex min-w-0 flex-wrap gap-2 p-3 text-sm font-black text-[var(--navy-900)] lg:hidden">
-              {["overview", "structure", "applications", "technical-data", "product-quote"].map((id) => (
-                <a key={id} className="rounded-md bg-slate-50 px-3 py-2" href={`#${id}`}>
-                  {id === "technical-data" ? "Technical Data" : id === "product-quote" ? "Get Quote" : id.replace("-", " ")}
+            <nav aria-label="Product section navigation" className="sticky top-20 z-20 flex min-w-0 gap-1 overflow-x-auto rounded-lg border border-slate-200 bg-white p-2 shadow-[0_12px_30px_rgba(7,20,38,0.08)]">
+              {[
+                ["overview", "Product Overview"],
+                ["structure", "Product Structure"],
+                ["applications", "Applications"],
+                ["technical-data", "Technical Data"],
+              ].map(([id, label]) => (
+                <a key={id} className="shrink-0 rounded-md px-4 py-2.5 text-sm font-black text-[var(--navy-900)] transition hover:bg-orange-50 hover:text-[var(--orange-dark)]" href={`#${id}`}>
+                  {label}
                 </a>
               ))}
             </nav>

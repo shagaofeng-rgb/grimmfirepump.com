@@ -183,8 +183,9 @@ function menuProducts(slugs: string[]) {
 
 export const productMegaMenuGroups = [
   {
+    slug: "fire-pump-series",
     title: "Fire Pump Series",
-    href: "/products",
+    href: "/products?group=fire-pump-series",
     description: "Complete fire pump packages, diesel sets, electric sets and jockey pump combinations.",
     image: "/assets/synced/products/edj-fire-pump-set.jpg",
     items: menuProducts([
@@ -197,8 +198,9 @@ export const productMegaMenuGroups = [
     ]),
   },
   {
+    slug: "water-supply-series",
     title: "Water Supply Series",
-    href: "/products",
+    href: "/products?group=water-supply-series",
     description: "Booster and variable-frequency water supply equipment for building and utility projects.",
     image: "/assets/synced/products/frequency-conversion-water-supply-equipment.jpg",
     items: menuProducts([
@@ -208,24 +210,27 @@ export const productMegaMenuGroups = [
     ]),
   },
   {
+    slug: "mobile-pump-truck",
     title: "Mobile Pump Truck",
-    href: "/products/diesel-engine-irrigation-pump-trailer-type",
+    href: "/products?group=mobile-pump-truck",
     description: "Trailer-mounted diesel pump solutions for emergency drainage, irrigation and temporary water transfer.",
     image: "/assets/synced/products/diesel-engine-irrigation-pump-trailer-type.jpg",
     items: menuProducts(["diesel-engine-irrigation-pump-trailer-type"]),
   },
   {
+    slug: "sewage-pump-series",
     title: "Sewage Pump Series",
-    href: "/products",
+    href: "/products?group=sewage-pump-series",
     description: "Submersible sewage pumps and integrated prefabricated pump stations for drainage projects.",
     image: "/assets/synced/products/integrated-prefabricated-pump-station-frp.jpg",
     items: menuProducts(["submersible-sewage-pump", "integrated-prefabricated-pump-station-frp"]),
   },
   {
+    slug: "pumps",
     title: "Pumps",
-    href: "/products",
+    href: "/products?group=pumps",
     description: "Core pump models for fire protection, pressure boosting and long-shaft installation conditions.",
-    image: "/assets/synced/products/electric-long-shaft-fire-pump.png",
+    image: "/assets/synced/products/vertical-stainless-steel-multistage-pump-jockey-pump.png",
     items: menuProducts([
       "electric-horizontal-split-end-suction-pump",
       "electric-long-shaft-fire-pump",

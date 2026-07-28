@@ -189,6 +189,10 @@ function ProductMegaMenu({ open }: { open: boolean }) {
                     </Link>
                   ))}
                 </div>
+                <Link href={group.href} className="mt-auto inline-flex items-center gap-1 pt-4 text-xs font-black text-[var(--orange)] hover:text-[var(--orange-dark)]">
+                  More
+                  <ArrowRight size={14} />
+                </Link>
               </section>
             ))}
           </div>
@@ -222,6 +226,10 @@ function MobileProductMenu({ closeMenu }: { closeMenu: () => void }) {
               </Link>
             ))}
           </div>
+          <Link className="mt-3 inline-flex items-center gap-1 text-xs font-black text-[var(--orange)]" href={group.href} onClick={closeMenu}>
+            More
+            <ArrowRight size={14} />
+          </Link>
         </section>
       ))}
     </div>

@@ -11,14 +11,19 @@ export const metadata: Metadata = {
 
 export const dynamic = "force-dynamic";
 
-export default function ProductsPage() {
+type ProductsPageProps = {
+  searchParams: Promise<{ group?: string }>;
+};
+
+export default async function ProductsPage({ searchParams }: ProductsPageProps) {
+  const { group } = await searchParams;
   return (
     <SimplePage
       eyebrow="Product Center"
       title="Official GRIMM product catalog for fire pump and water system projects."
       text="Synchronized from the current GRIMM website, including fire pump packages, diesel and electric fire pumps, jockey pumps, booster systems, sewage pumps and water supply equipment."
     >
-      <ProductSection />
+      <ProductSection group={group} />
     </SimplePage>
   );
 }

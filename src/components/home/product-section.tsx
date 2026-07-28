@@ -1,21 +1,26 @@
 import Image from "next/image";
 import Link from "next/link";
 import { SectionHeading } from "@/components/section-heading";
+import { productMegaMenuGroups } from "@/data/site";
 import { getPublicProducts } from "@/lib/public-cms";
 
 type ProductSectionProps = {
   featuredOnly?: boolean;
+  group?: string;
 };
 
-export async function ProductSection({ featuredOnly = false }: ProductSectionProps) {
+export async function ProductSection({ featuredOnly = false, group }: ProductSectionProps) {
   const products = await getPublicProducts();
-  const visibleProducts = featuredOnly ? products.slice(0, 3) : products;
+  const activeGroup = productMegaMenuGroups.find((item) => item.slug === group);
+  const groupProductSlugs = new Set(activeGroup?.items.map((item) => item.href.split("/").pop()).filter(Boolean));
+  const groupedProducts = activeGroup ? products.filter((product) => groupProductSlugs.has(product.slug)) : products;
+  const visibleProducts = featuredOnly ? groupedProducts.slice(0, 3) : groupedProducts;
 
   return (
     <section className="section bg-[var(--grey-50)]">
       <SectionHeading
         eyebrow="Product Center"
-        title="Fire pump products arranged by overseas buying intent."
+        title={activeGroup ? `${activeGroup.title} for global project requirements.` : "Fire pump products arranged by overseas buying intent."}
         action={
           <Link className="font-black text-[var(--navy-800)] underline decoration-[var(--orange)] decoration-2 underline-offset-4" href="/tools/fire-pump-selector">
             Use Fire Pump Selector
