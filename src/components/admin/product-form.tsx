@@ -1,5 +1,6 @@
 import { saveProduct } from "@/app/admin/actions";
 import { Field, inputClass, textareaClass } from "@/components/admin/admin-widgets";
+import { ProductMediaFields } from "@/components/admin/product-media-fields";
 import type { CmsProduct, CmsProductCategory } from "@/lib/admin-cms";
 
 export function ProductForm({ product, categories }: { product?: CmsProduct; categories: CmsProductCategory[] }) {
@@ -61,9 +62,7 @@ export function ProductForm({ product, categories }: { product?: CmsProduct; cat
 
       <section className="grid gap-4 rounded-lg border border-slate-200 bg-white p-6 shadow-sm md:grid-cols-2">
         <h2 className="text-xl font-black text-slate-950 md:col-span-2">媒体与技术参数</h2>
-        <Field label="产品主图路径"><input name="mainImage" defaultValue={product?.mainImage} className={inputClass} /></Field>
-        <Field label="OG 图片路径"><input name="ogImage" defaultValue={product?.ogImage || product?.mainImage} className={inputClass} /></Field>
-        <Field label="产品图库，逗号分隔"><textarea name="gallery" rows={3} defaultValue={product?.gallery.join(", ")} className={`${textareaClass} md:col-span-2`} /></Field>
+        <ProductMediaFields initialMainImage={product?.mainImage} initialGallery={product?.gallery} initialOgImage={product?.ogImage} />
         <Field label="动态技术参数：参数名|参数值|单位，每行一个"><textarea name="parameters" rows={8} defaultValue={parameters} className={textareaClass} /></Field>
       </section>
 

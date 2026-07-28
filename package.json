@@ -16,6 +16,7 @@
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",
     "@tailwindcss/postcss": "^4.1.17",
+    "@vercel/blob": "^2.6.1",
     "clsx": "^2.1.1",
     "framer-motion": "^12.23.25",
     "lucide-react": "^0.468.0",
