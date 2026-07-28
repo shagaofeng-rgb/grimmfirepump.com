@@ -123,6 +123,22 @@ export async function writeStore<T extends { id: string; createdAt: string; upda
 }
 
 export async function upsertStore<T extends { id: string; createdAt: string; updatedAt?: string }>(fileName: string, item: T) {
+  const sql = getSql();
+  if (sql) {
+    try {
+      await ensureSchema();
+      await sql`
+        INSERT INTO lead_store (store_name, id, created_at, payload)
+        VALUES (${fileName}, ${item.id}, ${item.createdAt}, ${JSON.stringify(item)}::jsonb)
+        ON CONFLICT (store_name, id)
+        DO UPDATE SET payload = EXCLUDED.payload, created_at = EXCLUDED.created_at
+      `;
+      return item;
+    } catch (error) {
+      console.warn(`Database upsert failed for ${fileName}; using local runtime store.`, error);
+    }
+  }
+
   const current = await readStore<T[]>(fileName, []);
   const existingIndex = current.findIndex((record) => record.id === item.id);
   const next = existingIndex >= 0 ? [...current] : [item, ...current];

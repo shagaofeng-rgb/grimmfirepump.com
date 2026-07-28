@@ -128,23 +128,23 @@ const cachedNewsArticles = unstable_cache(
 
 const fallbackNewsImages = [
   {
-    url: "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1200&q=80",
-    source: "https://unsplash.com/",
+    url: "/assets/products/diesel-fire-pump.webp",
+    source: company.website,
     topic: "industrial fire protection pump room",
   },
   {
-    url: "https://images.unsplash.com/photo-1581092335878-2d9ff86ca2bf?auto=format&fit=crop&w=1200&q=80",
-    source: "https://unsplash.com/",
+    url: "/assets/products/electric-fire-pump.webp",
+    source: company.website,
     topic: "factory engineering equipment",
   },
   {
-    url: "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1200&q=80",
-    source: "https://unsplash.com/",
+    url: "/assets/applications/hero-edj.webp",
+    source: company.website,
     topic: "commercial building fire protection",
   },
   {
-    url: "https://images.unsplash.com/photo-1518005020951-eccb494ad742?auto=format&fit=crop&w=1200&q=80",
-    source: "https://unsplash.com/",
+    url: "/assets/factory/factory-testing.webp",
+    source: company.website,
     topic: "infrastructure water system",
   },
 ];
@@ -429,7 +429,8 @@ export async function collectAndPublishNews(limit = getNewsConfig().dailyTarget)
   const feedItems = (await Promise.all(sources.map((source) => fetchFeedItems(source)))).flat();
   const freshItems = feedItems
     .filter((item) => isWithinHours(item.publishedAt, config.lookbackHours))
-    .sort((a, b) => Date.parse(b.publishedAt) - Date.parse(a.publishedAt));
+    .sort((a, b) => Date.parse(b.publishedAt) - Date.parse(a.publishedAt))
+    .slice(0, 36);
 
   for (const item of freshItems) {
     if (published >= limit) break;
@@ -495,7 +496,7 @@ export async function collectAndPublishNews(limit = getNewsConfig().dailyTarget)
 async function fetchFeedItems(source: NewsSource): Promise<FeedItem[]> {
   const nextSource: NewsSource = { ...source, lastFetchedAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
   try {
-    const xml = await fetchText(source.url, 12000);
+    const xml = await fetchText(source.url, 7000);
     const items = parseFeed(xml, source).slice(0, 24);
     await upsertStore(SOURCES_STORE, { ...nextSource, lastStatus: "success", lastError: "" });
     return items;
@@ -567,49 +568,29 @@ async function buildArticle(item: FeedItem, relatedProducts: Array<{ slug: strin
 }
 
 async function resolveNewsImage(item: FeedItem, topic: string) {
-  const candidates = [
-    item.imageUrl
-      ? {
-          url: absoluteUrl(item.imageUrl, item.link),
-          sourceUrl: item.imageSourceUrl || item.link,
-          pageUrl: item.link,
-          width: 1200,
-          height: 630,
-        }
-      : null,
-    ...(await extractPageImages(item.link)).map((url) => ({
-      url,
-      sourceUrl: url,
-      pageUrl: item.link,
-      width: 1200,
-      height: 630,
-    })),
-    ...fallbackNewsImages
-      .filter((image) => image.topic.includes(topic.toLowerCase().split(" ")[0]) || topic)
-      .map((image) => ({
-        url: image.url,
-        sourceUrl: image.url,
-        pageUrl: image.source,
+  if (item.imageUrl) {
+    const imageUrl = absoluteUrl(item.imageUrl, item.link);
+    if (isAllowedExternalUrl(imageUrl) && (await isUsableImage(imageUrl, 3000))) {
+      return {
+        url: imageUrl,
+        sourceUrl: item.imageSourceUrl || item.link,
+        pageUrl: item.link,
         width: 1200,
         height: 630,
-      })),
-  ].filter((candidate): candidate is { url: string; sourceUrl: string; pageUrl: string; width: number; height: number } =>
-    Boolean(candidate?.url && isAllowedExternalUrl(candidate.url)),
-  );
-
-  for (const candidate of candidates) {
-    if (await isUsableImage(candidate.url)) {
-      return { ...candidate, status: "ready" as const };
+        status: "ready" as const,
+      };
     }
   }
 
+  const topicWord = topic.toLowerCase().split(" ")[0];
+  const fallback = fallbackNewsImages.find((image) => image.topic.includes(topicWord)) || fallbackNewsImages[0];
   return {
-    url: "",
-    sourceUrl: "",
-    pageUrl: "",
-    width: 0,
-    height: 0,
-    status: "failed" as const,
+    url: fallback.url,
+    sourceUrl: fallback.url,
+    pageUrl: fallback.source,
+    width: 1200,
+    height: 630,
+    status: "ready" as const,
   };
 }
 
@@ -777,10 +758,10 @@ async function fetchText(url: string, timeoutMs: number) {
   }
 }
 
-async function isUsableImage(url: string) {
+async function isUsableImage(url: string, timeoutMs = 4000) {
   if (!isAllowedExternalUrl(url)) return false;
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 7000);
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
   try {
     const response = await fetch(url, {
       method: "GET",
