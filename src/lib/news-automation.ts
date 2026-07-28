@@ -879,6 +879,10 @@ export function isHighIntentNews(title: string, description = "", sourceName = "
   const text = cleanText(`${title} ${description} ${sourceName}`).toLowerCase();
   if (blockedTerms.some((term) => text.includes(term.toLowerCase()))) return false;
 
+  const projectBuyerContext = /\b(industrial|data cent(?:er|re)|warehouse|hospital|airport|oil\s*(?:and|&)\s*gas|power plant|epc)\b/.test(text);
+  const emergencyServiceContent = /\b(fire department|fire crews?|rescue|firefighter training|fire pump training|hands-on training)\b/.test(text);
+  if (emergencyServiceContent && !projectBuyerContext) return false;
+
   let score = 0;
   if (/\bfire pumps?\b/.test(text)) score += 8;
   if (/\bnfpa\s*20\b/.test(text)) score += 9;
@@ -888,7 +892,7 @@ export function isHighIntentNews(title: string, description = "", sourceName = "
   if (/\bfire protection(?: system| equipment)?\b/.test(text)) score += 4;
   if (/\bpump room\b/.test(text)) score += 5;
   if (/\b(hydrant|water supply)\b/.test(text)) score += 2;
-  if (/\b(industrial|data cent(?:er|re)|warehouse|hospital|airport|oil\s*(?:and|&)\s*gas|power plant|epc)\b/.test(text)) score += 3;
+  if (projectBuyerContext) score += 3;
 
   return score >= 6;
 }
