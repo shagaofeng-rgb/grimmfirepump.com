@@ -182,6 +182,12 @@ const defaultBlockedNewsTerms = [
   "crops",
   "groundwater",
   "weather alert",
+  "archaeolog",
+  "ancient",
+  "historical",
+  "heritage site",
+  "museum",
+  "history of fire",
 ];
 
 export function getNewsConfig() {
