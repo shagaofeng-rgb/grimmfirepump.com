@@ -149,12 +149,24 @@ const fallbackNewsImages = [
   },
 ];
 
+function googleNewsSearch(query: string) {
+  return `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=en-US&gl=US&ceid=US:en`;
+}
+
 const defaultSourceUrls = [
-  "https://news.google.com/rss/search?q=%22fire%20pump%22%20OR%20%22NFPA%2020%22&hl=en-US&gl=US&ceid=US:en",
-  "https://news.google.com/rss/search?q=%22industrial%20fire%20protection%22%20OR%20%22fire%20suppression%20system%22&hl=en-US&gl=US&ceid=US:en",
-  "https://news.google.com/rss/search?q=%22data%20center%22%20%22fire%20suppression%22&hl=en-US&gl=US&ceid=US:en",
-  "https://news.google.com/rss/search?q=%22warehouse%22%20%22fire%20sprinkler%22&hl=en-US&gl=US&ceid=US:en",
-  "https://news.google.com/rss/search?q=%22fire%20water%22%20industrial&hl=en-US&gl=US&ceid=US:en",
+  googleNewsSearch('"fire pump" OR "NFPA 20"'),
+  googleNewsSearch('"fire pump system" OR "fire pump package"'),
+  googleNewsSearch('"industrial fire protection" OR "fire suppression system"'),
+  googleNewsSearch('"fire sprinkler system" industrial OR warehouse'),
+  googleNewsSearch('"data center" "fire protection"'),
+  googleNewsSearch('"warehouse" "fire sprinkler"'),
+  googleNewsSearch('"fire water" industrial'),
+  googleNewsSearch('"oil and gas" "fire protection"'),
+  googleNewsSearch('"power plant" "fire protection"'),
+  googleNewsSearch('"manufacturing facility" "fire protection"'),
+  googleNewsSearch('"energy storage" "fire suppression"'),
+  googleNewsSearch('"fire pump testing" OR "fire pump maintenance"'),
+  googleNewsSearch('"water supply" "fire protection" infrastructure'),
 ];
 
 const defaultBlockedNewsTerms = [
@@ -165,8 +177,6 @@ const defaultBlockedNewsTerms = [
   "apartment fire",
   "vehicle fire",
   "car fire",
-  "firefighters",
-  "firefighter",
   "obituary",
   "arson",
   "crops",
@@ -177,6 +187,7 @@ const defaultBlockedNewsTerms = [
 export function getNewsConfig() {
   const dailyTarget = Number(process.env.NEWS_DAILY_TARGET || 1);
   const lookbackHours = Number(process.env.NEWS_LOOKBACK_HOURS || 168);
+  const fallbackLookbackHours = Number(process.env.NEWS_FALLBACK_LOOKBACK_HOURS || 504);
   const dedupDays = Number(process.env.NEWS_DEDUP_DAYS || 7);
   const maxRetries = Number(process.env.NEWS_MAX_RETRIES || 3);
   const relevanceThreshold = Number(process.env.NEWS_RELEVANCE_THRESHOLD || 10);
@@ -198,6 +209,7 @@ export function getNewsConfig() {
     dailyTarget: Number.isFinite(dailyTarget) ? dailyTarget : 1,
     timezone: process.env.NEWS_TIMEZONE || "Asia/Shanghai",
     lookbackHours: Number.isFinite(lookbackHours) ? lookbackHours : 72,
+    fallbackLookbackHours: Number.isFinite(fallbackLookbackHours) ? Math.max(lookbackHours, fallbackLookbackHours) : 504,
     dedupDays: Number.isFinite(dedupDays) ? dedupDays : 7,
     maxRetries: Number.isFinite(maxRetries) ? maxRetries : 3,
     relevanceThreshold: Number.isFinite(relevanceThreshold) ? relevanceThreshold : 10,
@@ -423,16 +435,32 @@ export async function collectAndPublishNews(limit = getNewsConfig().dailyTarget)
   let qualityRejected = 0;
 
   if (!sources.length) {
-    return { generated, published, duplicates, rejected, failed: 1, qualityRejected, sources: 0, feedItems: 0, freshItems: 0, message: "No enabled public news sources are configured." };
+    return {
+      generated,
+      published,
+      duplicates,
+      rejected,
+      failed: 1,
+      qualityRejected,
+      sources: 0,
+      feedItems: 0,
+      freshItems: 0,
+      fallbackItems: 0,
+      message: "No enabled public news sources are configured.",
+    };
   }
 
   const feedItems = (await Promise.all(sources.map((source) => fetchFeedItems(source)))).flat();
   const freshItems = feedItems
     .filter((item) => isWithinHours(item.publishedAt, config.lookbackHours))
     .sort((a, b) => Date.parse(b.publishedAt) - Date.parse(a.publishedAt))
-    .slice(0, 36);
+    .slice(0, 72);
+  const fallbackItems = feedItems
+    .filter((item) => !isWithinHours(item.publishedAt, config.lookbackHours) && isWithinHours(item.publishedAt, config.fallbackLookbackHours))
+    .sort((a, b) => Date.parse(b.publishedAt) - Date.parse(a.publishedAt))
+    .slice(0, 48);
 
-  for (const item of freshItems) {
+  for (const item of [...freshItems, ...fallbackItems]) {
     if (published >= limit) break;
     if (!isHighIntentNews(item.title, item.description, item.sourceName, config.sourceBlacklist)) {
       rejected += 1;
@@ -488,9 +516,21 @@ export async function collectAndPublishNews(limit = getNewsConfig().dailyTarget)
   const message =
     published > 0
       ? `Generated ${generated} article(s), published ${published}, skipped ${duplicates} duplicate(s).`
-      : `No publishable fresh news found from ${sources.length} active source(s). Fresh ${freshItems.length}, duplicates ${duplicates}, quality rejected ${qualityRejected}, failed ${failed}.`;
+      : `No publishable news found from ${sources.length} active source(s). Recent ${freshItems.length}, fallback ${fallbackItems.length}, duplicates ${duplicates}, quality rejected ${qualityRejected}, failed ${failed}.`;
 
-  return { generated, published, duplicates, rejected, failed, qualityRejected, sources: sources.length, feedItems: feedItems.length, freshItems: freshItems.length, message };
+  return {
+    generated,
+    published,
+    duplicates,
+    rejected,
+    failed,
+    qualityRejected,
+    sources: sources.length,
+    feedItems: feedItems.length,
+    freshItems: freshItems.length,
+    fallbackItems: fallbackItems.length,
+    message,
+  };
 }
 
 async function fetchFeedItems(source: NewsSource): Promise<FeedItem[]> {
@@ -879,7 +919,7 @@ export function isHighIntentNews(title: string, description = "", sourceName = "
   const text = cleanText(`${title} ${description} ${sourceName}`).toLowerCase();
   if (blockedTerms.some((term) => text.includes(term.toLowerCase()))) return false;
 
-  const projectBuyerContext = /\b(industrial|data cent(?:er|re)|warehouse|hospital|airport|oil\s*(?:and|&)\s*gas|power plant|epc)\b/.test(text);
+  const projectBuyerContext = /\b(industrial|data cent(?:er|re)|warehouse|hospital|airport|oil\s*(?:and|&)\s*gas|power plant|epc|manufactur(?:ing|er)|energy storage|semiconductor|logistics|infrastructure|commercial building|critical infrastructure|utility|municipal)\b/.test(text);
   const emergencyServiceContent = /\b(fire department|fire crews?|rescue|firefighter training|fire pump training|hands-on training)\b/.test(text);
   if (emergencyServiceContent && !projectBuyerContext) return false;
 
@@ -891,6 +931,8 @@ export function isHighIntentNews(title: string, description = "", sourceName = "
   if (/\bfire sprinkler(?:s| system)?\b/.test(text)) score += 5;
   if (/\bfire protection(?: system| equipment)?\b/.test(text)) score += 4;
   if (/\bpump room\b/.test(text)) score += 5;
+  if (/\bfire safety\b/.test(text) && projectBuyerContext) score += 3;
+  if (/\bwater mist\b/.test(text)) score += 4;
   if (/\b(hydrant|water supply)\b/.test(text)) score += 2;
   if (projectBuyerContext) score += 3;
 
