@@ -58,8 +58,8 @@ export async function AdminShell({ children }: { children: ReactNode }) {
 
   return (
     <main className="min-h-screen bg-[#f4f7fb] text-slate-900">
-      <aside className="fixed inset-y-0 left-0 hidden w-72 border-r border-slate-200 bg-[#071426] p-5 text-white lg:block">
-        <Link href="/admin/dashboard" className="flex items-center gap-3 text-xl font-black tracking-[0.04em] text-white">
+      <aside className="fixed inset-y-0 left-0 hidden w-64 border-r border-slate-800 bg-[#071426] p-4 text-white lg:block">
+        <Link href="/admin/dashboard" className="flex items-center gap-3 text-xl font-black text-white">
           <span className="grid h-11 w-11 place-items-center rounded-md bg-white p-1.5">
             <Image src="/assets/images/logo.png" alt={`${company.shortName} logo`} width={34} height={25} className="h-auto w-full object-contain" priority />
           </span>
@@ -68,15 +68,15 @@ export async function AdminShell({ children }: { children: ReactNode }) {
             <small className="block text-xs font-bold tracking-normal text-slate-400">网站运营后台</small>
           </span>
         </Link>
-        <nav className="mt-7 grid max-h-[calc(100vh-150px)] gap-1 overflow-y-auto pr-1">
+        <nav className="mt-7 grid max-h-[calc(100vh-142px)] gap-1 overflow-y-auto pr-1">
           {adminNav.map((item) => (
-            <Link key={item.href} href={item.href} className="flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-bold text-slate-300 hover:bg-white/10 hover:text-white">
+            <Link key={item.href} href={item.href} className="flex min-h-10 items-center gap-3 rounded-md px-3 py-2 text-sm font-bold text-slate-300 hover:bg-white/10 hover:text-white">
               <item.icon size={17} />
               {item.label}
             </Link>
           ))}
         </nav>
-        <form action="/admin/logout" method="post" className="absolute bottom-5 left-5 right-5">
+        <form action="/admin/logout" method="post" className="absolute bottom-4 left-4 right-4">
           <button className="flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-left text-sm font-bold text-slate-400 hover:bg-white/10 hover:text-white" type="submit">
             <Lock size={17} />
             安全退出
@@ -84,11 +84,11 @@ export async function AdminShell({ children }: { children: ReactNode }) {
         </form>
       </aside>
 
-      <section className="lg:pl-72">
+      <section className="lg:pl-64">
         <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 px-5 py-4 backdrop-blur">
           <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4">
             <div className="min-w-0">
-              <p className="text-xs font-black uppercase tracking-[0.16em] text-orange-500">GRIMM PUMP</p>
+              <p className="text-xs font-black text-orange-600">GRIMM PUMP</p>
               <p className="mt-1 text-sm text-slate-500">当前用户：{admin?.displayName || "Admin"} · {roleName(admin?.role)}</p>
             </div>
             <div className="flex min-w-0 flex-1 items-center justify-end gap-3">
@@ -97,7 +97,7 @@ export async function AdminShell({ children }: { children: ReactNode }) {
                 <input className="min-h-10 w-full rounded-md border border-slate-200 bg-slate-50 pl-10 pr-3 text-sm" placeholder="搜索产品、询盘、页面..." />
               </label>
               <Link href="/admin/leads" className="rounded-md border border-orange-200 bg-orange-50 px-3 py-2 text-sm font-black text-orange-700">
-                待处理 {pendingLeads}
+                待处理询盘 {pendingLeads}
               </Link>
               <Link href="/" className="rounded-md border border-slate-200 px-3 py-2 text-sm font-bold text-slate-600" target="_blank">
                 查看网站
@@ -115,7 +115,7 @@ export async function AdminShell({ children }: { children: ReactNode }) {
             ))}
           </nav>
         </header>
-        <div className="mx-auto max-w-7xl px-5 py-8 lg:px-8">
+        <div className="mx-auto max-w-[1440px] px-5 py-7 lg:px-8 lg:py-8">
           {children}
         </div>
       </section>

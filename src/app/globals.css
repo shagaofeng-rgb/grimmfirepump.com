@@ -10,6 +10,7 @@
   --grey-50: #f6f8fb;
   --grey-100: #eef2f6;
   --grey-200: #e4e9ef;
+  --grey-300: #cbd5df;
   --orange: #f28c28;
   --orange-dark: #cf6d16;
 }
@@ -26,7 +27,9 @@ body {
   margin: 0;
   color: #111827;
   background: #ffffff;
-  font-family: Inter, "Helvetica Neue", Arial, sans-serif;
+  font-family: "Avenir Next", Avenir, "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 img,
@@ -35,20 +38,19 @@ video {
 }
 
 .container-shell {
-  width: min(1180px, calc(100vw - 48px));
+  width: min(1240px, calc(100vw - 48px));
   margin-inline: auto;
 }
 
 .section {
-  padding-block: 84px;
+  padding-block: 76px;
 }
 
 .eyebrow {
   color: var(--orange);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 800;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  letter-spacing: 0;
 }
 
 .button {
@@ -59,7 +61,8 @@ video {
   border-radius: 6px;
   padding-inline: 22px;
   font-weight: 800;
-  transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+  line-height: 1.2;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
 }
 
 .button:hover {
@@ -93,13 +96,30 @@ video {
 
 .dark-gradient {
   color: white;
-  background: radial-gradient(circle at top left, #1b4770, var(--navy-950) 54%);
+  background: var(--navy-950);
 }
 
 .card {
   border: 1px solid var(--grey-200);
   border-radius: 8px;
   background: white;
+}
+
+.card-interactive {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+@media (hover: hover) {
+  .card-interactive:hover {
+    border-color: #b9c8d5;
+    box-shadow: 0 18px 36px rgba(7, 20, 38, 0.1);
+    transform: translateY(-2px);
+  }
+}
+
+:where(a, button, input, select, textarea):focus-visible {
+  outline: 3px solid rgba(242, 140, 40, 0.42);
+  outline-offset: 2px;
 }
 
 .industrial-shadow {
@@ -112,7 +132,7 @@ video {
   }
 
   .section {
-    padding-block: 56px;
+    padding-block: 52px;
   }
 
   .product-card {

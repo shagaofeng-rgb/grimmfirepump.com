@@ -132,10 +132,10 @@ export function ProductMediaFields({ initialMainImage = "", initialGallery = [],
               <figure key={url} className="overflow-hidden rounded-lg border border-slate-200 bg-white">
                 <img src={url} alt="产品图库预览" className="aspect-square w-full object-contain bg-slate-50 p-3" />
                 <figcaption className="flex items-center justify-between gap-2 border-t border-slate-200 p-2">
-                  <button type="button" onClick={() => setAsMain(url)} className={`inline-flex items-center gap-1 rounded px-2 py-1 text-xs font-black ${mainImage === url ? "bg-orange-100 text-orange-700" : "text-slate-600 hover:bg-slate-100"}`}>
+                  <button type="button" onClick={() => setAsMain(url)} className={`inline-flex items-center gap-1 rounded px-2 py-1 text-xs font-black ${mainImage === url ? "bg-orange-100 text-orange-800" : "text-[var(--navy-800)] hover:bg-slate-100"}`}>
                     <Star size={14} fill={mainImage === url ? "currentColor" : "none"} /> 主图
                   </button>
-                  <button type="button" onClick={() => setGallery((current) => current.filter((item) => item !== url))} className="rounded p-1.5 text-slate-500 hover:bg-red-50 hover:text-red-700" aria-label="移除图片">
+                  <button type="button" onClick={() => setGallery((current) => current.filter((item) => item !== url))} className="rounded p-1.5 text-red-700 hover:bg-red-50" aria-label="移除图片">
                     <Trash2 size={16} />
                   </button>
                 </figcaption>

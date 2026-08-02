@@ -4,7 +4,7 @@ import { FormEvent, useState } from "react";
 import { company } from "@/data/site";
 
 export function QuoteSection() {
-  const [message, setMessage] = useState("Submit your requirement. The local admin dashboard will capture this lead.");
+  const [message, setMessage] = useState("Tell us your project requirement and our team will reply by email or WhatsApp.");
   const [submitting, setSubmitting] = useState(false);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
@@ -36,10 +36,10 @@ export function QuoteSection() {
 
   return (
     <section className="dark-gradient px-6 py-20">
-      <div className="mx-auto grid max-w-[1200px] gap-12 lg:grid-cols-[0.82fr_1fr]">
+      <div className="mx-auto grid max-w-[1240px] gap-10 lg:grid-cols-[0.82fr_1fr]">
         <div>
-          <p className="eyebrow mb-4">Project Inquiry</p>
           <h2 className="text-3xl font-black leading-tight text-white md:text-[40px]">Send your fire pump requirement.</h2>
+          <p className="mt-3 text-sm font-bold text-orange-200">Project inquiry</p>
           <p className="mt-5 text-base leading-7 text-slate-300">
             Our team will reply with suggested pump configuration, catalog and quotation information.
           </p>

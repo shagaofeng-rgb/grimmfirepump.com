@@ -20,7 +20,7 @@ export default async function AdminLoginPage() {
           <span className="grid h-12 w-12 place-items-center rounded-md bg-white p-1.5">
             <Image src="/assets/images/logo.png" alt="GRIMM PUMP logo" width={40} height={29} className="h-auto w-full object-contain" priority />
           </span>
-          <p className="text-sm font-black uppercase tracking-[0.16em] text-orange-300">GRIMM 管理后台</p>
+          <p className="text-sm font-black text-orange-200">GRIMM 管理后台</p>
         </div>
         <h1 className="mt-5 text-4xl font-black leading-tight text-white">登录网站运营后台</h1>
         <p className="mt-4 leading-7 text-slate-400">管理产品、新闻、询盘、下载资料和网站运营数据。</p>

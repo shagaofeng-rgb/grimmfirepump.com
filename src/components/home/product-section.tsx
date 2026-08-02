@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
 import { SectionHeading } from "@/components/section-heading";
 import { productMegaMenuGroups } from "@/data/site";
 import { getPublicProducts } from "@/lib/public-cms";
@@ -31,14 +32,14 @@ export async function ProductSection({ featuredOnly = false, group }: ProductSec
         {visibleProducts.map((product) => (
           <article
             key={product.slug}
-            className="product-card card group relative flex min-h-[430px] flex-col overflow-hidden transition hover:-translate-y-1 hover:shadow-xl"
+            className="product-card card card-interactive group relative flex min-h-[405px] flex-col overflow-hidden"
           >
             <Link
               href={`/products/${product.slug}`}
               className="absolute inset-0 z-10"
               aria-label={`View details for ${product.title}`}
             />
-            <figure className="product-card-media relative grid h-[205px] place-items-center bg-gradient-to-b from-white to-slate-100 p-5">
+            <figure className="product-card-media relative grid h-[200px] place-items-center bg-[#f4f7f9] p-5">
               <Image
                 src={product.image}
                 alt={product.title}
@@ -48,7 +49,7 @@ export async function ProductSection({ featuredOnly = false, group }: ProductSec
               />
             </figure>
             <div className="product-card-body flex flex-1 flex-col p-5">
-              <p className="mb-2 text-xs font-black uppercase tracking-[0.12em] text-[var(--orange)]">{product.category}</p>
+              <p className="mb-2 text-xs font-black text-[var(--orange-dark)]">{product.category}</p>
               <h3 className="text-xl font-black text-[var(--navy-950)]">{product.title}</h3>
               <p className="mt-3 text-sm leading-6 text-slate-600">{product.summary}</p>
               <ul className="product-card-specs mt-auto flex flex-wrap gap-2 pt-5">
@@ -58,9 +59,7 @@ export async function ProductSection({ featuredOnly = false, group }: ProductSec
                   </li>
                 ))}
               </ul>
-              <span className="button button-secondary mt-5 min-h-11">
-                View Details
-              </span>
+              <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-black text-[var(--navy-800)]">View details <ArrowUpRight size={16} /></span>
             </div>
           </article>
         ))}

@@ -14,8 +14,8 @@ export function AdminPageHeader({
   return (
     <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
       <div>
-        <p className="text-sm font-black uppercase tracking-[0.14em] text-orange-600">{eyebrow}</p>
-        <h1 className="mt-3 text-3xl font-black text-slate-950 md:text-4xl">{title}</h1>
+        <p className="text-sm font-black text-orange-700">{eyebrow}</p>
+        <h1 className="mt-2 text-3xl font-black leading-tight text-slate-950 md:text-4xl">{title}</h1>
         {description ? <p className="mt-3 max-w-3xl leading-7 text-slate-600">{description}</p> : null}
       </div>
       {action ? <div className="shrink-0">{action}</div> : null}
@@ -25,7 +25,7 @@ export function AdminPageHeader({
 
 export function StatCard({ label, value, hint }: { label: string; value: string | number; hint?: string }) {
   return (
-    <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+    <div className="rounded-lg border border-slate-200 bg-white p-5">
       <span className="text-sm font-bold text-slate-500">{label}</span>
       <strong className="mt-3 block text-3xl font-black text-slate-950">{value}</strong>
       {hint ? <p className="mt-2 text-xs font-bold text-slate-400">{hint}</p> : null}
@@ -35,7 +35,7 @@ export function StatCard({ label, value, hint }: { label: string; value: string 
 
 export function AdminCard({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+    <section className="rounded-lg border border-slate-200 bg-white p-5 md:p-6">
       <h2 className="text-xl font-black text-slate-950">{title}</h2>
       <div className="mt-5">{children}</div>
     </section>
@@ -88,5 +88,5 @@ export function Field({ label, children }: { label: string; children: ReactNode 
   );
 }
 
-export const inputClass = "min-h-11 rounded-md border border-slate-300 px-3 text-sm";
-export const textareaClass = "rounded-md border border-slate-300 px-3 py-3 text-sm";
+export const inputClass = "min-h-11 rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400";
+export const textareaClass = "rounded-md border border-slate-300 bg-white px-3 py-3 text-sm text-slate-900 placeholder:text-slate-400";

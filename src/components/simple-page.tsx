@@ -16,12 +16,12 @@ export function SimplePage({ eyebrow, title, text, children }: SimplePageProps) 
     <>
       <Header />
       <main>
-        <section className="dark-gradient px-6 py-24">
-          <div className="mx-auto max-w-[1200px]">
-            <p className="eyebrow mb-4">{eyebrow}</p>
-            <h1 className="max-w-4xl text-5xl font-black leading-tight text-white md:text-6xl">{title}</h1>
-            <p className="mt-6 max-w-3xl text-lg leading-8 text-slate-300">{text}</p>
-            <div className="mt-8 flex flex-wrap gap-4">
+        <section className="dark-gradient border-b border-white/10 px-6 py-16 md:py-20">
+          <div className="mx-auto max-w-[1240px]">
+            <p className="text-sm font-bold text-orange-200">{eyebrow}</p>
+            <h1 className="mt-3 max-w-4xl text-[38px] font-black leading-[1.08] text-white md:text-[56px]">{title}</h1>
+            <p className="mt-5 max-w-3xl text-base leading-8 text-slate-300 md:text-lg">{text}</p>
+            <div className="mt-7 flex flex-wrap gap-3">
               <Link className="button button-primary" href="/contact">Get Quote</Link>
               <Link className="button button-secondary" href="/downloads">Download Catalog</Link>
             </div>

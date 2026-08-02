@@ -45,17 +45,17 @@ export function DownloadsPageClient() {
     <>
       <Header />
       <main>
-        <section className="dark-gradient px-6 py-24">
-          <div className="mx-auto max-w-[1200px]">
-            <p className="eyebrow mb-4">Download Center</p>
-            <h1 className="max-w-4xl text-5xl font-black leading-tight text-white md:text-6xl">Catalogs, datasheets and certificates for buyer review.</h1>
+        <section className="dark-gradient px-6 py-16 md:py-20">
+          <div className="mx-auto max-w-[1240px]">
+            <p className="text-sm font-bold text-orange-200">Download center</p>
+            <h1 className="mt-3 max-w-4xl text-[38px] font-black leading-[1.08] text-white md:text-[56px]">Catalogs, datasheets and certificates for buyer review.</h1>
             <p className="mt-6 max-w-3xl text-lg leading-8 text-slate-300">Downloads are gated in production to collect country, application, email and WhatsApp.</p>
           </div>
         </section>
         <section className="section">
           <div className="container-shell grid gap-6 lg:grid-cols-3">
             {downloads.map((item) => (
-              <article key={item.title} className="card p-7">
+              <article key={item.title} className="card p-6 md:p-7">
                 <h2 className="text-2xl font-black text-[var(--navy-950)]">{item.title}</h2>
                 <p className="mt-4 leading-7 text-slate-600">{item.text}</p>
                 <button className="button button-primary mt-6" type="button" onClick={() => { setActive(item.title); setMessage("Submit buyer details to unlock the download."); }}>Request Download</button>
@@ -66,9 +66,8 @@ export function DownloadsPageClient() {
       </main>
       {active ? (
         <div className="fixed inset-0 z-[80] grid place-items-center bg-[rgba(7,20,38,0.64)] p-4">
-          <form onSubmit={submitDownload} className="grid w-full max-w-xl gap-4 rounded-lg bg-white p-8">
-            <button type="button" className="justify-self-end text-2xl" onClick={() => setActive(null)}>×</button>
-            <p className="eyebrow">Download Gate</p>
+          <form onSubmit={submitDownload} className="grid w-full max-w-xl gap-4 rounded-lg bg-white p-6 shadow-[0_24px_60px_rgba(7,20,38,0.28)] md:p-8">
+            <button type="button" className="justify-self-end text-2xl" aria-label="Close download form" onClick={() => setActive(null)}>×</button>
             <h2 className="text-3xl font-black text-[var(--navy-950)]">{active}</h2>
             <input name="website" className="hidden" tabIndex={-1} autoComplete="off" />
             <input name="name" required className="min-h-12 rounded-md border border-slate-300 px-3" placeholder="Name" />

@@ -20,12 +20,12 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/92 backdrop-blur-xl">
-      <div className="mx-auto flex h-[76px] max-w-[1280px] items-center justify-between gap-6 px-6">
-        <Link href="/" className="flex min-w-[220px] items-center gap-3" aria-label={`${company.shortName} Fire Pump home`}>
+    <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur-xl">
+      <div className="mx-auto flex h-[72px] max-w-[1280px] items-center justify-between gap-5 px-5 md:px-6">
+        <Link href="/" className="flex min-w-0 items-center gap-3" aria-label={`${company.shortName} Fire Pump home`}>
           <Image src="/assets/images/logo.png" alt={`${company.shortName} logo`} width={42} height={42} className="object-contain" />
           <span className="flex flex-col leading-none">
-            <strong className="text-base tracking-[0.04em] text-[var(--navy-900)]">{company.shortName}</strong>
+            <strong className="text-base text-[var(--navy-900)]">{company.shortName}</strong>
             <small className="mt-1 text-xs text-slate-500">Fire Pump Systems</small>
           </span>
         </Link>
@@ -42,7 +42,7 @@ export function Header() {
               >
                 <Link
                   href={item.href}
-                  className="flex items-center gap-1 border-b-2 border-transparent py-7 hover:border-[var(--orange)]"
+                  className="flex items-center gap-1 border-b-2 border-transparent py-[25px] hover:border-[var(--orange)]"
                 >
                   {item.label}
                   <ChevronDown size={15} className={`transition ${productsOpen ? "rotate-180" : ""}`} />
@@ -50,7 +50,7 @@ export function Header() {
                 <ProductMegaMenu open={productsOpen} />
               </div>
             ) : (
-              <Link key={item.href} href={item.href} className="border-b-2 border-transparent py-7 hover:border-[var(--orange)]">
+              <Link key={item.href} href={item.href} className="border-b-2 border-transparent py-[25px] hover:border-[var(--orange)]">
                 {item.label}
               </Link>
             )
@@ -62,14 +62,14 @@ export function Header() {
             onFocus={() => setResourcesOpen(true)}
           >
             <button
-              className="flex items-center gap-1 border-b-2 border-transparent py-7 font-bold hover:border-[var(--orange)]"
+              className="flex items-center gap-1 border-b-2 border-transparent py-[25px] font-bold hover:border-[var(--orange)]"
               type="button"
               aria-expanded={resourcesOpen}
             >
               Resources
               <ChevronDown size={15} className={`transition ${resourcesOpen ? "rotate-180" : ""}`} />
             </button>
-            <div className={`absolute right-0 top-[68px] w-56 rounded-md border border-slate-200 bg-white p-2 shadow-xl transition ${resourcesOpen ? "visible opacity-100" : "invisible pointer-events-none opacity-0"}`}>
+            <div className={`absolute right-0 top-[64px] w-56 rounded-md border border-slate-200 bg-white p-2 shadow-[0_18px_36px_rgba(7,20,38,0.12)] transition ${resourcesOpen ? "visible opacity-100" : "invisible pointer-events-none opacity-0"}`}>
               {resourceItems.map((item) => (
                 <Link key={item.href} href={item.href} className="block rounded px-3 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50 hover:text-[var(--navy-900)]">
                   {item.label}
@@ -105,7 +105,7 @@ export function Header() {
       </div>
 
       {open ? (
-        <nav className="max-h-[calc(100vh-76px)] overflow-y-auto border-t border-slate-100 bg-white px-5 pb-5 shadow-xl xl:hidden" aria-label="Mobile">
+        <nav className="max-h-[calc(100vh-72px)] overflow-y-auto border-t border-slate-100 bg-white px-5 pb-5 shadow-xl xl:hidden" aria-label="Mobile">
           {navItems.map((item) =>
             item.label === "Products" ? (
               <div key={item.href} className="border-b border-slate-100">
@@ -138,15 +138,15 @@ export function Header() {
 function ProductMegaMenu({ open }: { open: boolean }) {
   return (
     <div
-      className={`fixed left-1/2 top-[76px] z-50 max-h-[calc(100vh-92px)] w-[min(1160px,calc(100vw-48px))] -translate-x-1/2 overflow-y-auto pt-3 transition duration-150 ${
+      className={`fixed left-1/2 top-[72px] z-50 max-h-[calc(100vh-88px)] w-[min(1160px,calc(100vw-48px))] -translate-x-1/2 overflow-y-auto pt-3 transition duration-150 ${
         open ? "visible opacity-100" : "invisible pointer-events-none opacity-0"
       }`}
     >
       <div className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-[0_30px_80px_rgba(7,20,38,0.18)]">
         <div className="grid grid-cols-[260px_1fr]">
           <div className="bg-[var(--navy-950)] p-6 text-white">
-            <p className="eyebrow">Product Categories</p>
-            <h2 className="mt-3 text-2xl font-black leading-tight">Pump systems organized for project buyers.</h2>
+            <h2 className="text-2xl font-black leading-tight">Pump systems organized for project buyers.</h2>
+            <p className="mt-3 text-sm font-bold text-orange-200">Product categories</p>
             <p className="mt-4 text-sm leading-6 text-white/72">
               Browse by system type, application condition and buying scenario.
             </p>

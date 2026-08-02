@@ -29,8 +29,8 @@ export default async function NewsPage() {
       <main className="bg-[var(--grey-50)]">
         <section className="bg-[var(--navy-950)] text-white">
           <div className="container-shell py-14 md:py-18">
-            <p className="eyebrow mb-4">News Automation</p>
-            <h1 className="max-w-4xl text-4xl font-black leading-tight md:text-6xl">Fire pump industry news with product-level engineering context.</h1>
+            <p className="text-sm font-bold text-orange-200">Industry news</p>
+            <h1 className="mt-3 max-w-4xl text-[38px] font-black leading-[1.08] md:text-[56px]">Fire pump industry news with product-level engineering context.</h1>
             <p className="mt-6 max-w-3xl text-lg leading-8 text-slate-300">
               Public global news is filtered for recent fire protection relevance, deduplicated, connected to real GRIMM products and reviewed through a buyer-focused engineering lens.
             </p>
@@ -47,7 +47,7 @@ export default async function NewsPage() {
                       <img src={item.coverImageUrl} alt={item.coverImageAlt} className="h-full w-full object-cover" loading="lazy" />
                     </span>
                     <span className="block p-6">
-                      <span className="text-xs font-black uppercase tracking-[0.12em] text-[var(--orange)]">{item.category}</span>
+                  <span className="text-xs font-black text-[var(--orange-dark)]">{item.category}</span>
                       <h2 className="mt-3 text-xl font-black leading-snug text-[var(--navy-950)]">{item.title}</h2>
                       <p className="mt-3 text-sm leading-6 text-slate-600">{item.summary}</p>
                       <span className="mt-5 flex flex-wrap gap-2 text-xs font-bold text-slate-500">
@@ -61,9 +61,9 @@ export default async function NewsPage() {
             </div>
           ) : (
             <div className="rounded-lg border border-dashed border-slate-300 bg-white p-8">
-              <h2 className="text-2xl font-black text-[var(--navy-950)]">No automated news has been published yet.</h2>
+              <h2 className="text-2xl font-black text-[var(--navy-950)]">New industry updates are being prepared.</h2>
               <p className="mt-3 max-w-3xl leading-7 text-slate-600">
-                The news automation pipeline is installed. It will publish once fresh public sources, product relevance, 7-day deduplication and cover image validation all pass.
+                Browse our existing company updates and technical articles, or contact the team for a project-specific discussion.
               </p>
               <Link className="button button-primary mt-6" href="/blog">Read existing company updates</Link>
             </div>
