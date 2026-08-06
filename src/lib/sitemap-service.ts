@@ -194,7 +194,7 @@ async function buildSitemapBundleUncached(): Promise<SitemapBundle> {
   return { origin: getSiteOrigin(), entries, chunks, indexXml: buildSitemapIndexXml(getSiteOrigin(), chunks), skipped, errors };
 }
 
-export const buildSitemapBundle = unstable_cache(buildSitemapBundleUncached, ["sitemap-bundle-v2"], {
+export const buildSitemapBundle = unstable_cache(buildSitemapBundleUncached, ["sitemap-bundle-v3"], {
   revalidate: 300,
   tags: ["sitemap-data"],
 });
