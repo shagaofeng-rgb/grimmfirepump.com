@@ -11,7 +11,7 @@ The public Sitemap is generated dynamically from published CMS records and stati
 
 Each file is split before 45,000 URLs or 45 MB, leaving margin below Google's 50,000 URL and 50 MB limits. Draft, review, offline, archived, scheduled, noindex, parameterized and non-self-canonical records are excluded. `lastmod` comes from each record's real update or publish date; static pages use their recorded content update date.
 
-Content changes mark the Sitemap dirty and invalidate the public Sitemap routes. The daily Vercel Cron performs a consistency check, writes an atomically verified runtime snapshot, compares the current URL manifest with the previous one, records added/modified/removed URLs and optionally submits the Sitemap Index through the Google Search Console Sitemaps API.
+Content changes mark the Sitemap dirty and invalidate the public Sitemap routes. The Vercel Cron runs every three days, performs a consistency check, writes an atomically verified runtime snapshot, compares the current URL manifest with the previous one, records added/modified/removed URLs and optionally submits the Sitemap Index through the Google Search Console Sitemaps API.
 
 ## Public URLs
 
@@ -40,7 +40,7 @@ For a local server, set `SITEMAP_BASE_URL=http://localhost:4174`. The production
 
 ## Scheduled execution
 
-Vercel runs `/api/cron/sitemap` daily at `03:00 UTC`, configured in `vercel.json`. Do not configure a second Linux cron or external scheduler unless the Vercel Cron is removed. `SITEMAP_CRON_SECRET` or `CRON_SECRET` must be configured in production.
+Vercel runs `/api/cron/sitemap` at `03:00 UTC` every three days, configured in `vercel.json`. Do not configure a second Linux cron or external scheduler unless the Vercel Cron is removed. `SITEMAP_CRON_SECRET` or `CRON_SECRET` must be configured in production.
 
 ## Search Console configuration
 

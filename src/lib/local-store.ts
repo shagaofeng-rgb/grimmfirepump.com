@@ -21,15 +21,21 @@ function getSql() {
 async function ensureSchema() {
   const sql = getSql();
   if (!sql) return;
-  schemaReady ??= sql`
-    CREATE TABLE IF NOT EXISTS lead_store (
-      store_name TEXT NOT NULL,
-      id TEXT NOT NULL,
-      created_at TIMESTAMPTZ NOT NULL,
-      payload JSONB NOT NULL,
-      PRIMARY KEY (store_name, id)
-    )
-  `.then(() => undefined);
+  schemaReady ??= Promise.all([
+    sql`
+      CREATE TABLE IF NOT EXISTS lead_store (
+        store_name TEXT NOT NULL,
+        id TEXT NOT NULL,
+        created_at TIMESTAMPTZ NOT NULL,
+        payload JSONB NOT NULL,
+        PRIMARY KEY (store_name, id)
+      )
+    `,
+    sql`
+      CREATE INDEX IF NOT EXISTS idx_lead_store_name_created
+      ON lead_store (store_name, created_at DESC)
+    `,
+  ]).then(() => undefined);
   await schemaReady;
 }
 
@@ -66,7 +72,6 @@ export async function readStore<T>(fileName: string, fallback: T): Promise<T> {
         FROM lead_store
         WHERE store_name = ${fileName}
         ORDER BY created_at DESC
-        LIMIT 1000
       `;
       return rows.map((row) => row.payload) as T;
     } catch (error) {
@@ -102,15 +107,15 @@ export async function writeStore<T extends { id: string; createdAt: string; upda
   if (sql) {
     try {
       await ensureSchema();
-      await sql`DELETE FROM lead_store WHERE store_name = ${fileName}`;
-      for (const item of items) {
-        await sql`
+      await sql.transaction([
+        sql`DELETE FROM lead_store WHERE store_name = ${fileName}`,
+        ...items.map((item) => sql`
           INSERT INTO lead_store (store_name, id, created_at, payload)
           VALUES (${fileName}, ${item.id}, ${item.createdAt}, ${JSON.stringify(item)}::jsonb)
           ON CONFLICT (store_name, id)
           DO UPDATE SET payload = EXCLUDED.payload, created_at = EXCLUDED.created_at
-        `;
-      }
+        `),
+      ]);
       return items;
     } catch (error) {
       console.warn(`Database write failed for ${fileName}; using local runtime store.`, error);

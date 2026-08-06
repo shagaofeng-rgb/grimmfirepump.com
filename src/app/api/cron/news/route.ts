@@ -16,11 +16,9 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   const result = await runNewsAutomation("cron");
-  revalidateTag("cms-blog");
   revalidateTag("news-articles");
   revalidateTag("sitemap-data");
   revalidatePath("/news");
-  revalidatePath("/blog");
   revalidatePath("/sitemap.xml");
   return NextResponse.json(result, { status: result.ok ? 200 : 500 });
 }
