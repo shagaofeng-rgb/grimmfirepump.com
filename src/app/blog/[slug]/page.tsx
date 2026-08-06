@@ -63,9 +63,11 @@ export default async function BlogDetailPage({ params }: BlogDetailProps) {
           <h1 className="text-4xl font-black leading-tight text-[var(--navy-950)] md:text-5xl">{post.title}</h1>
           <div className="mt-5 flex flex-wrap gap-4 text-sm font-bold text-slate-500">
             <span>{post.date || "News"}</span>
-            <a className="text-[var(--navy-800)] underline decoration-[var(--orange)] underline-offset-4" href={post.sourceUrl} target="_blank" rel="noreferrer">
-              Original website page
-            </a>
+            {post.sourceUrl ? (
+              <a className="text-[var(--navy-800)] underline decoration-[var(--orange)] underline-offset-4" href={post.sourceUrl} target="_blank" rel="noreferrer">
+                Original website page
+              </a>
+            ) : null}
           </div>
           <p className="mt-6 text-xl leading-9 text-slate-600">{post.text}</p>
           <div className="relative mt-10 aspect-[16/9] overflow-hidden rounded-lg bg-slate-100">

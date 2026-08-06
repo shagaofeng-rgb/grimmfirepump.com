@@ -110,7 +110,7 @@ function mapPost(item: CmsNews): PublicPost {
     updatedAt: item.updatedAt || item.publishAt || item.createdAt,
     canonicalUrl: `/blog/${item.slug}`,
     indexable: item.indexable,
-    sourceUrl: item.source || fallback?.sourceUrl || `/blog/${item.slug}`,
+    sourceUrl: item.source || fallback?.sourceUrl || "",
     category: item.category || fallback?.category || "News",
     title: item.title,
     date: (item.publishAt || item.createdAt).slice(0, 10),
