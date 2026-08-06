@@ -391,9 +391,13 @@ export async function listCmsNews() {
     const normalizedItems = items.map((item) => legacyBlogExclusions.has(item.slug) && (item.status !== "archived" || item.indexable)
       ? { ...item, status: "archived" as const, indexable: false, updatedAt: new Date().toISOString() }
       : item);
-    if (normalizedItems.some((item, index) => item !== items[index])) await writeStore("cms-news.json", normalizedItems);
-    const existing = new Set(items.map((item) => item.slug));
-    return [...normalizedItems, ...newsSeeds.filter((item) => !existing.has(item.slug) && !legacyBlogExclusions.has(item.slug))].sort(
+    const existing = new Set(normalizedItems.map((item) => item.slug));
+    const missingSeeds = newsSeeds.filter((item) => !existing.has(item.slug) && !legacyBlogExclusions.has(item.slug));
+    const persistedItems = [...normalizedItems, ...missingSeeds];
+    if (normalizedItems.some((item, index) => item !== items[index]) || missingSeeds.length) {
+      await writeStore("cms-news.json", persistedItems);
+    }
+    return persistedItems.sort(
       (a, b) => new Date(b.publishAt).getTime() - new Date(a.publishAt).getTime(),
     );
   }
