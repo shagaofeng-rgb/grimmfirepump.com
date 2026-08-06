@@ -2,8 +2,7 @@ import { NextResponse } from "next/server";
 import { createHash, timingSafeEqual } from "node:crypto";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { z } from "zod";
-import { cmsStore, logAudit, type CmsNews } from "@/lib/admin-cms";
-import { listCmsNews } from "@/lib/admin-cms";
+import { cmsStore, listCmsNews, listCmsBlogCategories, logAudit, type CmsNews } from "@/lib/admin-cms";
 import { markSitemapDirty } from "@/lib/sitemap-dirty";
 
 export const runtime = "nodejs";
@@ -12,8 +11,8 @@ export const dynamic = "force-dynamic";
 const payloadSchema = z.object({
   sign: z.string().min(1),
   class_id: z.string().optional().default("blog"),
-  title: z.string().trim().min(2).max(180),
-  content: z.string().trim().min(20).max(100_000),
+  title: z.string().trim().max(180).optional().default(""),
+  content: z.string().trim().max(100_000).optional().default(""),
   author_id: z.string().trim().max(120).optional().default(""),
   image_url: z.string().trim().max(2_000).optional().default(""),
 });
@@ -76,18 +75,29 @@ async function parsePayload(request: Request) {
   return payloadSchema.safeParse(Object.fromEntries(form.entries()));
 }
 
+function isPublishableArticle(title: string, content: string) {
+  return title.trim().length >= 2 && plainText(content).length >= 20;
+}
+
 export async function POST(request: Request) {
-  const secret = process.env.BLOG_WEBHOOK_API_KEY;
-  if (!secret) return response(0, "Webhook is not configured.");
+  const secret = process.env.WEBHOOK_ARTICLE_SIGN;
+  if (!secret) return response(0, "发布接口未配置。");
 
   try {
     const parsed = await parsePayload(request);
-    if (!parsed.success) return response(0, "Invalid article data: title and content are required.");
-    if (!validSecret(parsed.data.sign, secret)) return response(0, "Invalid API key.");
+    if (!parsed.success) return response(0, "请求参数不符合要求。");
+    if (!validSecret(parsed.data.sign, secret)) return response(0, "秘钥错误");
+
+    // The plugin sends a signed, intentionally incomplete request while testing a custom root webhook.
+    // It is a verification request only and must never create a CMS record.
+    if (!isPublishableArticle(parsed.data.title, parsed.data.content)) {
+      return response(1, "验证成功");
+    }
 
     const now = new Date().toISOString();
     const content = plainText(parsed.data.content);
-    if (content.length < 20) return response(0, "Article content is too short after formatting.");
+    if (content.length < 20) return response(1, "验证成功");
+    await listCmsBlogCategories();
     const fingerprint = createHash("sha256")
       .update(`${parsed.data.class_id}\n${parsed.data.title}\n${parsed.data.author_id}`)
       .digest("hex");
@@ -124,13 +134,13 @@ export async function POST(request: Request) {
     revalidatePath("/blog");
     revalidatePath(`/blog/${item.slug}`);
     revalidatePath("/sitemap.xml");
-    return response(1, existing ? "Article updated successfully." : "Article published successfully.");
+    return response(1, "发布成功");
   } catch (error) {
     console.error("Blog webhook publish failed", error);
-    return response(0, "Article publishing failed. Please retry.");
+    return response(0, "发布失败，请稍后重试。");
   }
 }
 
 export async function GET() {
-  return response(0, "Use POST with application/x-www-form-urlencoded article data.");
+  return response(0, "仅支持POST请求。");
 }

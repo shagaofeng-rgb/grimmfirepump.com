@@ -40,6 +40,14 @@ async function verifySession(session: string | undefined, secret: string) {
 
 export async function middleware(request: NextRequest) {
   const host = (request.headers.get("host") || "").split(":")[0].toLowerCase();
+  // The external publishing plugin validates custom webhooks by POSTing to the domain root.
+  // Rewrite internally so GET / and all public homepage behavior remain unchanged.
+  if (request.method === "POST" && request.nextUrl.pathname === "/") {
+    const target = request.nextUrl.clone();
+    target.pathname = "/api/webhook/send_article";
+    target.search = "";
+    return NextResponse.rewrite(target);
+  }
   if (host === "grimmfirepump.com") {
     const target = request.nextUrl.clone();
     target.protocol = "https";

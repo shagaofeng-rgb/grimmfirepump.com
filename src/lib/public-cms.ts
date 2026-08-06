@@ -1,4 +1,4 @@
-import { posts as staticPosts, products as staticProducts } from "@/data/site";
+import { products as staticProducts } from "@/data/site";
 import { listCmsNews, listCmsProducts, type CmsNews, type CmsProduct } from "@/lib/admin-cms";
 import { unstable_cache } from "next/cache";
 
@@ -104,37 +104,19 @@ function mapStaticProduct(item: (typeof staticProducts)[number]): PublicProduct 
 }
 
 function mapPost(item: CmsNews): PublicPost {
-  const fallback = staticPosts.find((post) => post.slug === item.slug) as PublicPost | undefined;
   return {
     slug: item.slug,
     updatedAt: item.updatedAt || item.publishAt || item.createdAt,
     canonicalUrl: `/blog/${item.slug}`,
     indexable: item.indexable,
-    sourceUrl: item.source || fallback?.sourceUrl || "",
-    category: item.category || fallback?.category || "News",
+    sourceUrl: item.source || "",
+    category: item.category || "News",
     title: item.title,
     date: (item.publishAt || item.createdAt).slice(0, 10),
-    image: item.coverImage || fallback?.image || "/assets/applications/hero-edj.webp",
-    text: item.excerpt || item.subtitle || fallback?.text || item.title,
-    keywords: item.tags.join(", ") || fallback?.keywords || item.title,
-    content: lines(item.content || fallback?.content?.join("\n\n") || item.excerpt),
-  };
-}
-
-function mapStaticPost(item: (typeof staticPosts)[number]): PublicPost {
-  return {
-    slug: item.slug,
-    updatedAt: item.date,
-    canonicalUrl: `/blog/${item.slug}`,
-    indexable: true,
-    sourceUrl: item.sourceUrl,
-    category: item.category,
-    title: item.title,
-    date: item.date,
-    image: item.image,
-    text: item.text,
-    keywords: item.keywords,
-    content: item.content,
+    image: item.coverImage || "/assets/applications/hero-edj.webp",
+    text: item.excerpt || item.subtitle || item.title,
+    keywords: item.tags.join(", ") || item.title,
+    content: lines(item.content || item.excerpt),
   };
 }
 
@@ -159,9 +141,7 @@ export async function getPublicPosts() {
     .filter((item) => item.status === "published" && new Date(item.publishAt || item.createdAt).getTime() <= Date.now())
     .sort((a, b) => Number(Boolean(b.pinned)) - Number(Boolean(a.pinned)) || new Date(b.publishAt).getTime() - new Date(a.publishAt).getTime())
     .map(mapPost);
-  const cmsSlugs = new Set(cmsNews.map((item) => item.slug));
-  const fallbackPosts = staticPosts.filter((item) => !cmsSlugs.has(item.slug)).map(mapStaticPost);
-  return [...cmsMapped, ...fallbackPosts];
+  return cmsMapped;
 }
 
 export async function getPublicPost(slug: string) {

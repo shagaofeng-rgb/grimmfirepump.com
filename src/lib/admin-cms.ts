@@ -95,6 +95,16 @@ export type CmsNews = {
   indexable: boolean;
 };
 
+export type CmsBlogCategory = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  name: string;
+  slug: string;
+  sortOrder: number;
+  enabled: boolean;
+};
+
 export type MediaFile = {
   id: string;
   createdAt: string;
@@ -300,6 +310,10 @@ const newsSeeds: CmsNews[] = posts.map((post, index) => ({
   indexable: true,
 }));
 
+const blogCategorySeeds: CmsBlogCategory[] = [
+  { id: "blog_industry_news", createdAt: now(), updatedAt: now(), name: "Industry News", slug: "blog", sortOrder: 1, enabled: true },
+];
+
 const legacyBlogExclusions = new Set([
   "fire-aboard-uss-gerald-r-ford-injures-sailors-triggers-navy-investigation",
   "why-choose-us2",
@@ -386,6 +400,13 @@ export async function listCmsNews() {
   const indexableSeeds = newsSeeds.filter((item) => !legacyBlogExclusions.has(item.slug));
   await writeStore("cms-news.json", indexableSeeds);
   return indexableSeeds;
+}
+
+export async function listCmsBlogCategories() {
+  const items = await readStore<CmsBlogCategory[]>("cms-blog-categories.json", []);
+  if (items.length) return [...items].sort((a, b) => a.sortOrder - b.sortOrder);
+  await writeStore("cms-blog-categories.json", blogCategorySeeds);
+  return blogCategorySeeds;
 }
 
 export async function listMediaFiles() {
@@ -475,6 +496,7 @@ export const cmsStore = {
   deleteProduct: (id: string) => deleteStoreItem<CmsProduct>("cms-products.json", id),
   upsertNews: (item: CmsNews) => upsertStore("cms-news.json", item),
   deleteNews: (id: string) => deleteStoreItem<CmsNews>("cms-news.json", id),
+  upsertBlogCategory: (item: CmsBlogCategory) => upsertStore("cms-blog-categories.json", item),
   upsertMedia: (item: MediaFile) => upsertStore("cms-media.json", item),
   deleteMedia: (id: string) => deleteStoreItem<MediaFile>("cms-media.json", id),
   upsertDownload: (item: DownloadAsset) => upsertStore("cms-downloads.json", item),

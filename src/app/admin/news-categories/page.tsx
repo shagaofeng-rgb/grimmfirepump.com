@@ -1,15 +1,17 @@
 import { AdminShell } from "@/components/admin/admin-shell";
 import { AdminPageHeader, StatusPill } from "@/components/admin/admin-widgets";
-import { listCmsNews } from "@/lib/admin-cms";
+import { listCmsBlogCategories, listCmsNews } from "@/lib/admin-cms";
 
 export const dynamic = "force-dynamic";
 
 export default async function NewsCategoriesPage() {
-  const news = await listCmsNews();
-  const categories = Object.entries(news.reduce<Record<string, number>>((acc, item) => {
+  const [news, configuredCategories] = await Promise.all([listCmsNews(), listCmsBlogCategories()]);
+  const counts = news.reduce<Record<string, number>>((acc, item) => {
     acc[item.category] = (acc[item.category] || 0) + 1;
     return acc;
-  }, {})).sort((a, b) => b[1] - a[1]);
+  }, {});
+  const categories = [...configuredCategories.map((item) => [item.name, counts[item.name] || 0] as const), ...Object.entries(counts).filter(([name]) => !configuredCategories.some((item) => item.name === name))]
+    .sort((a, b) => b[1] - a[1]);
 
   return (
     <AdminShell>

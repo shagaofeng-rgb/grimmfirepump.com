@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { Footer } from "@/components/footer";
 import { StickyCta } from "@/components/sticky-cta";
-import { applications, certificates, company, downloads, knowledgePosts, posts, products, projects } from "@/data/site";
+import { applications, certificates, company, downloads, knowledgePosts, products, projects } from "@/data/site";
 import { localizedSite } from "@/data/localized-site";
 import {
   isLocalizedLocale,
@@ -17,6 +17,7 @@ import {
   type LocalizedLocale,
   type LocalizedPath,
 } from "@/lib/i18n";
+import { getPublicPosts } from "@/lib/public-cms";
 
 type LocalizedPageProps = { params: Promise<{ locale: string; path?: string[] }> };
 
@@ -197,8 +198,9 @@ function ApplicationCards({ locale }: { locale: LocalizedLocale }) {
   );
 }
 
-function ResourceCards({ locale, path }: { locale: LocalizedLocale; path: LocalizedPath }) {
+async function ResourceCards({ locale, path }: { locale: LocalizedLocale; path: LocalizedPath }) {
   const content = localizedSite[locale];
+  const blogPosts = path === "/blog" ? await getPublicPosts() : [];
   const cards =
     path === "/projects"
       ? projects.map((item) => ({ title: item.title, text: `${item.region} · ${item.meta}`, image: item.image, href: "/projects" }))
@@ -207,7 +209,7 @@ function ResourceCards({ locale, path }: { locale: LocalizedLocale; path: Locali
         : path === "/certificates"
           ? certificates.map((item) => ({ title: item.title, text: item.note, image: item.src, href: "/certificates" }))
           : path === "/blog"
-            ? posts.slice(0, 6).map((item) => ({ title: item.title, text: item.text, image: item.image, href: `/blog/${item.slug}` }))
+            ? blogPosts.slice(0, 6).map((item) => ({ title: item.title, text: item.text, image: item.image, href: `/${locale}/blog/${item.slug}` }))
             : path === "/knowledge"
               ? knowledgePosts.slice(0, 6).map((item) => ({ title: item.title, text: item.text, image: item.image, href: `/knowledge/${item.slug}` }))
               : [];
