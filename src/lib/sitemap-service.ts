@@ -89,7 +89,7 @@ function canonicalIsSelf(canonical: string, expectedPath: string) {
 }
 
 function safeSlug(slug: string) {
-  return /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug);
+  return /^[A-Za-z0-9]+(?:-[A-Za-z0-9]+)*$/.test(slug);
 }
 
 function latestDate(values: string[], fallback = STATIC_CONTENT_UPDATED_AT) {
@@ -238,7 +238,8 @@ export async function runSitemapMaintenance(options: {
   }
 
   try {
-    const bundle = await buildSitemapBundle();
+    // Maintenance must read the latest CMS state; public routes keep their own tagged cache.
+    const bundle = await buildSitemapBundleUncached();
     const manifests = await readStore<SitemapManifest[]>(MANIFEST_STORE, []);
     const previous = manifests[0];
     const diff = diffSitemapEntries(previous?.entries || [], bundle.entries);

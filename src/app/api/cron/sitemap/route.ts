@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { runSitemapMaintenance } from "@/lib/sitemap-service";
+import { revalidatePath, revalidateTag } from "next/cache";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -13,6 +14,11 @@ function authorized(request: Request) {
 export async function GET(request: Request) {
   if (!authorized(request)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const result = await runSitemapMaintenance({ trigger: "cron", submit: true });
+  if (result.status === "success") {
+    revalidateTag("sitemap-data");
+    revalidatePath("/sitemap.xml");
+    revalidatePath("/sitemaps/[file]", "page");
+  }
   return NextResponse.json(result, { status: result.status === "failed" ? 500 : 200 });
 }
 
