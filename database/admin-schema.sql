@@ -105,6 +105,28 @@ CREATE TABLE IF NOT EXISTS blog_categories (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+CREATE TABLE IF NOT EXISTS product_keyword_knowledge (
+  id TEXT PRIMARY KEY,
+  product_slug TEXT NOT NULL UNIQUE,
+  product_series TEXT NOT NULL,
+  primary_keyword TEXT NOT NULL,
+  secondary_keywords JSONB NOT NULL DEFAULT '[]',
+  specification_keywords JSONB NOT NULL DEFAULT '[]',
+  application_keywords JSONB NOT NULL DEFAULT '[]',
+  industries JSONB NOT NULL DEFAULT '[]',
+  scenarios JSONB NOT NULL DEFAULT '[]',
+  buyer_pain_points JSONB NOT NULL DEFAULT '[]',
+  solution_summary TEXT,
+  buyer_benefits JSONB NOT NULL DEFAULT '[]',
+  related_product_slugs JSONB NOT NULL DEFAULT '[]',
+  related_application_slugs JSONB NOT NULL DEFAULT '[]',
+  related_knowledge_slugs JSONB NOT NULL DEFAULT '[]',
+  prohibited_claims JSONB NOT NULL DEFAULT '[]',
+  enabled BOOLEAN NOT NULL DEFAULT TRUE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
 CREATE TABLE IF NOT EXISTS leads (
   id TEXT PRIMARY KEY,
   source_type TEXT NOT NULL DEFAULT 'website_form',

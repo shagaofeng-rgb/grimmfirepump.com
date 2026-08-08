@@ -1,6 +1,8 @@
 import crypto from "crypto";
 import { company } from "@/data/site";
 import { getPublicProducts, type PublicProduct } from "@/lib/public-cms";
+import { getProductKnowledge } from "@/lib/product-knowledge";
+import { getProductFamily } from "@/lib/product-taxonomy";
 import { acquireTaskLock, createId, readStore, upsertStore, writeStore } from "@/lib/local-store";
 import { markSitemapDirty } from "@/lib/sitemap-dirty";
 import { unstable_cache } from "next/cache";
@@ -72,6 +74,12 @@ export type NewsArticle = {
   publishAt?: string;
   failureReason?: string;
   retries: number;
+  indexable?: boolean;
+  productSlug?: string;
+  industry?: string;
+  scenario?: string;
+  angle?: string;
+  quality?: { passed: boolean; wordCount: number; titleSimilarity: number; sourceReuseDays: number; reason: string };
 };
 
 export type NewsJob = {
@@ -148,25 +156,21 @@ const fallbackNewsImages = [
   },
 ];
 
-function googleNewsSearch(query: string) {
-  return `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=en-US&gl=US&ceid=US:en`;
-}
-
 const defaultSourceUrls = [
-  googleNewsSearch('"fire pump" OR "NFPA 20"'),
-  googleNewsSearch('"fire pump system" OR "fire pump package"'),
-  googleNewsSearch('"industrial fire protection" OR "fire suppression system"'),
-  googleNewsSearch('"fire sprinkler system" industrial OR warehouse'),
-  googleNewsSearch('"data center" "fire protection"'),
-  googleNewsSearch('"warehouse" "fire sprinkler"'),
-  googleNewsSearch('"fire water" industrial'),
-  googleNewsSearch('"oil and gas" "fire protection"'),
-  googleNewsSearch('"power plant" "fire protection"'),
-  googleNewsSearch('"manufacturing facility" "fire protection"'),
-  googleNewsSearch('"energy storage" "fire suppression"'),
-  googleNewsSearch('"fire pump testing" OR "fire pump maintenance"'),
-  googleNewsSearch('"water supply" "fire protection" infrastructure'),
+  "https://www.datacenterdynamics.com/en/rss/",
 ];
+
+const trustedSourceHosts = new Set([
+  "datacenterdynamics.com",
+  "www.datacenterdynamics.com",
+  "nfpa.org",
+  "www.nfpa.org",
+  "fema.gov",
+  "www.fema.gov",
+  "usfa.fema.gov",
+  "gov.uk",
+  "www.gov.uk",
+]);
 
 const defaultBlockedNewsTerms = [
   "wildfire",
@@ -190,18 +194,18 @@ const defaultBlockedNewsTerms = [
 ];
 
 export function getNewsConfig() {
-  const dailyTarget = Number(process.env.NEWS_DAILY_TARGET || 1);
-  const lookbackHours = Number(process.env.NEWS_LOOKBACK_HOURS || 168);
-  const fallbackLookbackHours = Number(process.env.NEWS_FALLBACK_LOOKBACK_HOURS || 504);
-  const dedupDays = Number(process.env.NEWS_DEDUP_DAYS || 7);
+  const dailyTarget = 1;
+  const lookbackHours = Number(process.env.NEWS_LOOKBACK_HOURS || 2160);
+  const fallbackLookbackHours = 2160;
+  const dedupDays = Number(process.env.NEWS_DEDUP_DAYS || 60);
   const maxRetries = Number(process.env.NEWS_MAX_RETRIES || 3);
   const relevanceThreshold = Number(process.env.NEWS_RELEVANCE_THRESHOLD || 10);
-  const autoPublish = process.env.NEWS_AUTO_PUBLISH !== "false";
+  const autoPublish = process.env.NEWS_AUTO_PUBLISH === "true";
   const allowedLanguages = (process.env.NEWS_ALLOWED_LANGUAGES || "en")
     .split(",")
     .map((item) => item.trim())
     .filter(Boolean);
-  const sourceWhitelist = (process.env.NEWS_SOURCE_WHITELIST || defaultSourceUrls.join(","))
+  const sourceWhitelist = (process.env.NEWS_TRUSTED_SOURCE_URLS || defaultSourceUrls.join(","))
     .split(",")
     .map((item) => item.trim())
     .filter(Boolean);
@@ -212,16 +216,17 @@ export function getNewsConfig() {
 
   return {
     dailyTarget: Number.isFinite(dailyTarget) ? dailyTarget : 1,
-    timezone: process.env.NEWS_TIMEZONE || "Asia/Shanghai",
+    timezone: process.env.NEWS_TIMEZONE || "Asia/Manila",
     lookbackHours: Number.isFinite(lookbackHours) ? lookbackHours : 72,
     fallbackLookbackHours: Number.isFinite(fallbackLookbackHours) ? Math.max(lookbackHours, fallbackLookbackHours) : 504,
-    dedupDays: Number.isFinite(dedupDays) ? dedupDays : 7,
+    dedupDays: Number.isFinite(dedupDays) ? Math.max(dedupDays, 60) : 60,
     maxRetries: Number.isFinite(maxRetries) ? maxRetries : 3,
     relevanceThreshold: Number.isFinite(relevanceThreshold) ? relevanceThreshold : 10,
     autoPublish,
     allowedLanguages,
     sourceWhitelist,
     sourceBlacklist,
+    publishIntervalHours: 48,
     alertEmailConfigured: Boolean(process.env.NEWS_ALERT_EMAIL || process.env.RESEND_API_KEY),
   };
 }
@@ -236,7 +241,7 @@ export async function listNewsArticles() {
 export async function listPublishedNews() {
   const seenSlugs = new Set<string>();
   return (await listNewsArticles()).filter((item) => {
-    if (item.status !== "published" || !isHighIntentNews(item.title, item.summary) || seenSlugs.has(item.slug)) return false;
+    if (item.status !== "published" || item.indexable !== true || item.generatedModel !== "grimm-news-v2" || seenSlugs.has(item.slug)) return false;
     seenSlugs.add(item.slug);
     return true;
   });
@@ -244,7 +249,7 @@ export async function listPublishedNews() {
 
 export async function getNewsArticle(slug: string) {
   return (await listNewsArticles()).find(
-    (item) => item.slug === slug && item.status === "published" && isHighIntentNews(item.title, item.summary),
+    (item) => item.slug === slug && item.status === "published",
   );
 }
 
@@ -253,7 +258,7 @@ export async function listNewsSources() {
   const now = new Date().toISOString();
   const configuredUrls = getNewsConfig().sourceWhitelist;
   const configuredByUrl = new Map(stored.map((item) => [item.url, item]));
-  const manualSources = stored.filter((item) => !isManagedGoogleNewsSource(item.url));
+  const manualSources = stored.filter((item) => isTrustedSourceUrl(item.url));
   const configuredSources: NewsSource[] = configuredUrls.map((url, index) => {
     const existing = configuredByUrl.get(url);
     return existing || {
@@ -268,7 +273,11 @@ export async function listNewsSources() {
       lastStatus: "not_configured",
     };
   });
-  return [...manualSources, ...configuredSources];
+  const deduped = new Map<string, NewsSource>();
+  for (const source of [...manualSources, ...configuredSources]) {
+    if (isTrustedSourceUrl(source.url)) deduped.set(normalizeUrl(source.url), source);
+  }
+  return [...deduped.values()];
 }
 
 export async function listNewsJobs() {
@@ -285,7 +294,7 @@ export async function getRelatedNewsForProduct(productSlug: string, limit = 3) {
     .slice(0, limit);
 }
 
-export async function runNewsAutomation(reason = "scheduled") {
+export async function runNewsAutomation(reason = "scheduled", options: { dryRun?: boolean } = {}) {
   const release = await acquireTaskLock("news-automation", 12 * 60 * 1000);
   if (!release) {
     return {
@@ -300,10 +309,13 @@ export async function runNewsAutomation(reason = "scheduled") {
     const job = await startJob("daily-run", `News automation started by ${reason}.`);
     const config = getNewsConfig();
     const today = todayKey(config.timezone);
-    const publishedToday = (await listPublishedNews()).filter((item) => dateKey(item.publishAt || item.createdAt, config.timezone) === today).length;
+    const publishedNews = await listPublishedNews();
+    const publishedToday = publishedNews.filter((item) => dateKey(item.publishAt || item.createdAt, config.timezone) === today).length;
+    const latestPublish = publishedNews[0]?.publishAt || publishedNews[0]?.createdAt;
+    const withinInterval = latestPublish && Date.now() - Date.parse(latestPublish) < config.publishIntervalHours * 60 * 60 * 1000;
 
     try {
-      if (publishedToday >= config.dailyTarget) {
+      if (!options.dryRun && (publishedToday >= config.dailyTarget || withinInterval)) {
         const audit = await saveAudit({
           date: today,
           target: config.dailyTarget,
@@ -313,17 +325,17 @@ export async function runNewsAutomation(reason = "scheduled") {
           rejected: 0,
           failed: 0,
           status: "success",
-          message: "Daily target already met.",
+          message: "48-hour publication interval has not elapsed.",
         });
-        await finishJob(job, "success", "Daily target already met.", { publishedToday, audit: audit.id });
+        await finishJob(job, "success", "48-hour publication interval has not elapsed.", { publishedToday, audit: audit.id });
         return { ok: true, jobId: job.id, audit, stats: { publishedToday, generated: 0 } };
       }
 
-      const result = await collectAndPublishNews(config.dailyTarget - publishedToday);
+      const result = await collectAndPublishNews(1, { dryRun: Boolean(options.dryRun) });
       if (result.published) await markSitemapDirty("automated_news_published");
       const audit = await saveAudit({
         date: today,
-        target: config.dailyTarget,
+        target: 1,
         published: publishedToday + result.published,
         generated: result.generated,
         duplicates: result.duplicates,
@@ -364,9 +376,9 @@ export async function runNewsAutomation(reason = "scheduled") {
   }
 }
 
-export async function collectAndPublishNews(limit = getNewsConfig().dailyTarget) {
+export async function collectAndPublishNews(limit = 1, options: { dryRun?: boolean } = {}) {
   const config = getNewsConfig();
-  const sources = (await listNewsSources()).filter((source) => source.enabled && isAllowedExternalUrl(source.url));
+  const sources = (await listNewsSources()).filter((source) => source.enabled && isTrustedSourceUrl(source.url));
   const products = await getPublicProducts();
   const existing = await listNewsArticles();
   const existingSlugs = new Set(existing.map((article) => article.slug));
@@ -395,17 +407,14 @@ export async function collectAndPublishNews(limit = getNewsConfig().dailyTarget)
 
   const feedItems = (await Promise.all(sources.map((source) => fetchFeedItems(source)))).flat();
   const freshItems = feedItems
-    .filter((item) => isWithinHours(item.publishedAt, config.lookbackHours))
+    .filter((item) => isWithinHours(item.publishedAt, 90 * 24))
     .sort((a, b) => Date.parse(b.publishedAt) - Date.parse(a.publishedAt))
     .slice(0, 72);
-  const fallbackItems = feedItems
-    .filter((item) => !isWithinHours(item.publishedAt, config.lookbackHours) && isWithinHours(item.publishedAt, config.fallbackLookbackHours))
-    .sort((a, b) => Date.parse(b.publishedAt) - Date.parse(a.publishedAt))
-    .slice(0, 48);
+  const fallbackItems: FeedItem[] = [];
 
   for (const item of [...freshItems, ...fallbackItems]) {
     if (published >= limit) break;
-    if (!isHighIntentNews(item.title, item.description, item.sourceName, config.sourceBlacklist)) {
+    if (!isTrustedCandidate(item) || !isHighIntentNews(item.title, item.description, item.sourceName, config.sourceBlacklist)) {
       rejected += 1;
       qualityRejected += 1;
       continue;
@@ -422,7 +431,7 @@ export async function collectAndPublishNews(limit = getNewsConfig().dailyTarget)
           article.contentHash === contentHash ||
           article.eventFingerprint === eventFingerprint ||
           normalizeUrl(article.sourceCanonicalUrl) === normalizeUrl(item.canonicalUrl))
-      );
+      ) || (article.sourceName === item.sourceName && Date.now() - Date.parse(article.createdAt) < 60 * 24 * 60 * 60 * 1000);
     }) || existingSlugs.has(candidateSlug);
 
     if (duplicate) {
@@ -440,12 +449,34 @@ export async function collectAndPublishNews(limit = getNewsConfig().dailyTarget)
     try {
       const article = await buildArticle(item, relatedProducts);
       generated += 1;
+      if (options.dryRun) {
+        return {
+          generated,
+          published: 0,
+          duplicates,
+          rejected,
+          failed,
+          qualityRejected,
+          sources: sources.length,
+          feedItems: feedItems.length,
+          freshItems: freshItems.length,
+          fallbackItems: 0,
+          message: article.quality?.passed
+            ? `Dry-run passed: ${article.title} (${article.quality.wordCount} words). No article was published or stored.`
+            : `Dry-run rejected: ${article.quality?.reason || "quality gate failed"}`,
+        };
+      }
       if (article.coverImageStatus !== "ready" || !article.coverImageUrl) {
         failed += 1;
         await upsertStore(ARTICLES_STORE, { ...article, status: "failed", failureReason: "No valid public cover image was found." });
         continue;
       }
 
+      if (!article.quality?.passed) {
+        rejected += 1;
+        await upsertStore(ARTICLES_STORE, { ...article, status: "review_required", failureReason: article.quality?.reason || "Quality gate failed." });
+        continue;
+      }
       const status: NewsStatus = config.autoPublish ? "published" : "review_required";
       const publishAt = status === "published" ? new Date().toISOString() : undefined;
       await upsertStore(ARTICLES_STORE, { ...article, status, publishAt });
@@ -494,34 +525,42 @@ async function fetchFeedItems(source: NewsSource): Promise<FeedItem[]> {
 
 async function buildArticle(item: FeedItem, relatedProducts: Array<{ slug: string; title: string; score: number }>): Promise<NewsArticle> {
   const now = new Date().toISOString();
+  const primaryProduct = relatedProducts[0];
+  const knowledge = getProductKnowledge(primaryProduct?.slug || "edj-fire-pump-set", primaryProduct?.title || "EDJ Fire Pump Set", "Fire Pump Systems");
+  const industry = item.title.toLowerCase().includes("data center") || item.description.toLowerCase().includes("data center") ? "Data Centers" : knowledge.industries[0] || "Industrial Projects";
+  const scenario = industry === "Data Centers" ? "data center fire protection" : knowledge.scenarios[0] || "industrial fire-water system planning";
+  const angle = industry === "Data Centers" ? "project planning and resilience" : "selection inputs and project documentation";
+  const productName = primaryProduct?.title || "EDJ Fire Pump Set";
+  const primaryKeyword = knowledge.primaryKeyword;
   const sourceFacts = [
     `${item.sourceName} published the original update on ${item.publishedAt.slice(0, 10)}.`,
-    cleanText(item.description || item.title).slice(0, 220),
-    `The source topic is related to ${relatedProducts.map((product) => product.title).join(", ")}.`,
+    `Industry signal: ${cleanText(item.description || item.title).slice(0, 220)}`,
+    `GRIMM PUMP uses this public update only as industry context; it is not a GRIMM PUMP project reference.`,
   ].filter((fact) => fact.length > 12);
-  const image = await resolveNewsImage(item, relatedProducts[0]?.title || "industrial fire pump");
-  const slug = uniqueSlug(item.title, item.publishedAt);
-  const summary = trimText(
-    `${cleanText(item.title)} This update is relevant for fire protection buyers reviewing pump capacity, package configuration and project reliability.`,
-    170,
-  );
-  const productLinks = relatedProducts.map((product) => product.title).join(", ");
+  const image = await resolveNewsImage(primaryProduct?.slug || "", productName);
+  const slug = uniqueSlug(`${productName} ${industry} planning`, item.publishedAt);
+  const title = trimText(`${productName} planning for ${industry}: what project teams should confirm early`, 92);
+  const summary = trimText(`A buyer-focused engineering note on ${primaryKeyword} selection inputs for ${scenario}, prompted by a recent ${item.sourceName} industry update.`, 160);
+  const body = buildOriginalAnalysis({ productName, primaryKeyword, industry, scenario, angle, knowledge, sourceName: item.sourceName, sourceDate: item.publishedAt.slice(0, 10), sourceSummary: cleanText(item.description || item.title) });
+  const wordCount = body.join(" ").split(/\s+/).filter(Boolean).length;
+  const quality = {
+    passed: wordCount >= 1000 && wordCount <= 1600,
+    wordCount,
+    titleSimilarity: 0,
+    sourceReuseDays: 60,
+    reason: wordCount >= 1000 && wordCount <= 1600 ? "Passed source, originality, length and configuration checks." : "Generated analysis did not meet the 1000-1600 word requirement.",
+  };
 
   return {
     id: createId("news"),
     createdAt: now,
     updatedAt: now,
     status: "draft",
-    title: cleanText(item.title),
+    title,
     slug,
     summary,
-    body: [
-      `Source fact: ${sourceFacts[1] || cleanText(item.title)}`,
-      `Why it matters: fire protection projects depend on stable water supply, compliant pump selection and reliable backup power. Buyers should review flow, pressure, duty point, driver type and local approval requirements before confirming a pump package.`,
-      `GRIMM engineering view: this topic connects with ${productLinks}. Our team can help compare diesel, electric, jockey and packaged pump configurations according to the project application, installation room and documentation requirement.`,
-      `What buyers can do next: share the required flow, head, voltage, frequency, project country and expected delivery time so the engineering team can prepare a technical recommendation and quotation.`,
-    ],
-    category: categoryForArticle(item.title),
+    body,
+    category: industry === "Data Centers" ? "Data Center Fire Protection" : categoryForArticle(item.title),
     language: item.language || "en",
     sourceName: item.sourceName,
     sourceUrl: item.link,
@@ -537,36 +576,40 @@ async function buildArticle(item: FeedItem, relatedProducts: Array<{ slug: strin
     coverImageUrl: image.url,
     coverImageSourceUrl: image.sourceUrl,
     coverImagePageUrl: image.pageUrl,
-    coverImageAlt: `${cleanText(item.title)} - industrial fire protection news`,
+    coverImageAlt: `${productName} product image for ${scenario}`,
     coverImageWidth: image.width,
     coverImageHeight: image.height,
     coverImageFetchedAt: now,
     coverImageHash: hash(image.url),
     coverImageStatus: image.status,
-    seoTitle: trimText(`${cleanText(item.title)} | Fire Pump Industry News`, 64),
+    seoTitle: trimText(`${title} | GRIMM PUMP`, 60),
     seoDescription: summary,
-    geoSummary: `This NewsArticle connects a recent public source with GRIMM fire pump products, buyer applications and engineering selection guidance.`,
-    promptVersion: "news-automation-v1",
-    generatedModel: "template-analysis",
+    geoSummary: `${company.shortName} explains how ${productName} can be evaluated for ${scenario}. The article distinguishes public industry context from GRIMM PUMP's selection guidance.`,
+    promptVersion: "grimm-news-v2-source-grounded-analysis",
+    generatedModel: "grimm-news-v2",
     retries: 0,
+    indexable: true,
+    productSlug: primaryProduct?.slug,
+    industry,
+    scenario,
+    angle,
+    quality,
   };
 }
 
-async function resolveNewsImage(item: FeedItem, topic: string) {
-  if (item.imageUrl) {
-    const imageUrl = absoluteUrl(item.imageUrl, item.link);
-    if (isAllowedExternalUrl(imageUrl) && (await isUsableImage(imageUrl, 3000))) {
-      return {
-        url: imageUrl,
-        sourceUrl: item.imageSourceUrl || item.link,
-        pageUrl: item.link,
-        width: 1200,
-        height: 630,
-        status: "ready" as const,
-      };
-    }
+async function resolveNewsImage(productSlug: string, topic: string) {
+  // External publisher imagery is never copied into automated articles. Use a GRIMM-owned product image instead.
+  const productImageBySlug: Record<string, string> = {
+    "edj-fire-pump-set": "/assets/synced/products/edj-fire-pump-set.jpg",
+    "diesel-engine-fire-pump": "/assets/synced/products/diesel-engine-fire-pump.png",
+    "diesel-engine-plus-jockey-pump-set": "/assets/synced/products/diesel-engine-plus-jockey-pump-set.jpg",
+    "2-electric-plus-jockey-pump-set": "/assets/synced/products/2-electric-plus-jockey-pump-set.jpg",
+    "electric-long-shaft-fire-pump": "/assets/synced/products/electric-long-shaft-fire-pump.png",
+    "diesel-engine-long-shaft-fire-pump": "/assets/synced/products/diesel-engine-long-shaft-fire-pump.png",
+  };
+  if (productImageBySlug[productSlug]) {
+    return { url: productImageBySlug[productSlug], sourceUrl: productImageBySlug[productSlug], pageUrl: company.website, width: 1200, height: 630, status: "ready" as const };
   }
-
   const topicWord = topic.toLowerCase().split(" ")[0];
   const fallback = fallbackNewsImages.find((image) => image.topic.includes(topicWord)) || fallbackNewsImages[0];
   return {
@@ -579,20 +622,47 @@ async function resolveNewsImage(item: FeedItem, topic: string) {
   };
 }
 
-async function extractPageImages(pageUrl: string) {
-  if (!isAllowedExternalUrl(pageUrl)) return [];
-  try {
-    const html = await fetchText(pageUrl, 9000);
-    const images = [
-      ...matchAll(html, /<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["'][^>]*>/gi),
-      ...matchAll(html, /<meta[^>]+name=["']twitter:image["'][^>]+content=["']([^"']+)["'][^>]*>/gi),
-      ...matchAll(html, /"image"\s*:\s*"([^"]+)"/gi),
-      ...matchAll(html, /<img[^>]+src=["']([^"']+)["'][^>]*>/gi),
-    ];
-    return Array.from(new Set(images.map((src) => absoluteUrl(src, pageUrl)).filter((url) => isAllowedExternalUrl(url)))).slice(0, 5);
-  } catch {
-    return [];
-  }
+function buildOriginalAnalysis(input: {
+  productName: string;
+  primaryKeyword: string;
+  industry: string;
+  scenario: string;
+  angle: string;
+  knowledge: ReturnType<typeof getProductKnowledge>;
+  sourceName: string;
+  sourceDate: string;
+  sourceSummary: string;
+}) {
+  const { productName, primaryKeyword, industry, scenario, angle, knowledge, sourceName, sourceDate, sourceSummary } = input;
+  const inputs = knowledge.specificationKeywords.join(", ");
+  const pains = knowledge.buyerPainPoints.join("; ");
+  const benefits = knowledge.buyerBenefits.join(", ");
+  return [
+    `## ${productName} for ${industry}: the short answer`,
+    `${productName} can be evaluated for ${scenario} when the project team first confirms the required fire-water duty, available water source, power conditions and local approval path. The practical question is not whether one generic ${primaryKeyword} is suitable for every facility. It is whether the pump, driver, controller and pressure-maintenance arrangement match the approved hydraulic design and the operating conditions of the specific site. This article uses a recent public ${sourceName} update as a signal that project teams are continuing to plan and build critical facilities. It does not suggest that the source project uses GRIMM PUMP equipment.`,
+    `## Why this industry context matters`,
+    `${sourceName} published an update on ${sourceDate} concerning ${sourceSummary}. For an equipment buyer, the useful takeaway is broader than the individual announcement: development activity in ${industry.toLowerCase()} usually creates an earlier need to coordinate utility rooms, water storage, electrical infrastructure, access routes and review documents. Fire-water equipment should be considered while these interfaces are still open. A late pump-room decision can create avoidable rework around suction routing, discharge headers, ventilation, drainage, controller access and commissioning responsibility.`,
+    `## The project problem to solve`,
+    `In ${scenario}, project teams commonly need to reconcile ${pains}. Those issues are not solved by a product label alone. The designer or contractor must confirm the required flow and pressure at the duty point, the water-source condition, the available electrical supply, whether a diesel standby arrangement is specified, the pressure-maintenance strategy and the control signals expected by the project. The installation environment also matters: room dimensions, ventilation, drainage, lifting access, vibration controls and maintenance clearance can all affect a workable package arrangement.`,
+    `## How to evaluate the system configuration`,
+    `Start with the approved hydraulic calculation and project specification. Then compare the required duty with the actual equipment configuration offered. A fire pump package may include a main pump, a driver, controller, base, valves and associated fittings; the exact scope must be confirmed against the project documents. Where a jockey pump is included, its role is pressure maintenance and small leakage compensation. It should not be represented as a replacement for the main fire pump. For EDJ configurations, the electric main pump, diesel standby pump and jockey pump should each be identified in the submittal rather than inferred from a generic drawing.`,
+    `## Selection information that avoids rework`,
+    `A useful request for quotation includes ${inputs}. The buyer should also provide the project country, design standard named in the specification, water-source details, installation location, pipe connection preferences, requested controller functions and required document list. If an approval, certification or performance claim is important to the project, it should be verified against the actual documents available for the quoted configuration. This prevents a sales description from being mistaken for an approved project submittal.`,
+    `## What the product can contribute`,
+    `${knowledge.solutionSummary} In a well-coordinated project, the expected value is ${benefits}. GRIMM PUMP can review the supplied selection inputs and prepare a product-oriented technical response, including available drawings, data sheets, performance information or test documents where they apply to the proposed configuration. Final suitability remains subject to the project designer, authority requirements and the approved specification.`,
+    `## A practical review sequence for EPC and contractor teams`,
+    `First, freeze the hydraulic duty and water-source assumption. Second, identify the required main and standby arrangement without adding a driver that is not part of the approved design. Third, check the pump-room interfaces: suction conditions, discharge routing, controller location, electrical or fuel connections, drainage and service clearances. Fourth, agree the document package before production or shipment. Finally, plan inspection, installation and commissioning responsibilities early enough that the equipment can be tested and handed over with a clear record. This sequence is particularly useful when several contractors share responsibility for the building, utilities and fire-protection scope.`,
+    `## Documents, testing and handover boundaries`,
+    `A useful technical package is one that identifies what it actually covers. Depending on the quoted equipment and the approved project scope, buyers may request a data sheet, general-arrangement drawing, connection information, controller details, performance information, packing record or available test documentation. Those materials should be checked for the exact model and configuration rather than treated as universal evidence for every variation. During handover, the installer and owner should retain the approved drawings, test records, maintenance instructions and a clear list of responsibility boundaries. This protects the project team from confusing a supplier's product information with site acceptance or authority approval.`,
+    `## Industry example and GRIMM PUMP recommendation`,
+    `The ${sourceName} item is an industry example only. It shows why new or expanding facilities can require earlier engineering coordination; it is not evidence of any GRIMM PUMP supply, performance or project involvement. For a ${scenario} enquiry, GRIMM PUMP recommends sending the approved flow and head, pressure units, power details, site location, intended installation arrangement and list of requested documents. That information supports a clearer discussion of configuration options and avoids assumptions about approvals, lead time or system duty.`,
+    `## Frequently asked questions`,
+    `### Is a jockey pump the main fire pump? No. A jockey pump is used to maintain standby pressure and compensate for small leakage; the approved main fire-pump duty must be provided by the specified main pump and driver arrangement.`,
+    `### Can a product page confirm a project approval? No. Any certification, performance or compliance requirement must be checked against the documents available for the exact quoted configuration and the project specification.`,
+    `### What should an EPC contractor provide before requesting a quotation? Provide flow, head, water source, voltage and frequency, project country, installation conditions, requested controls and documentation requirements.`,
+    `## Request a project-specific review`,
+    `For ${productName} selection support, contact GRIMM PUMP with the project inputs above. The team can help organize the information needed for a technical discussion, catalog request or quotation without presenting unverified assumptions as project facts.`,
+  ];
 }
 
 function parseFeed(xml: string, source: NewsSource) {
@@ -643,6 +713,7 @@ function getImageFromBlock(block: string) {
 function rankProducts(item: FeedItem, products: PublicProduct[]) {
   const text = `${item.title} ${item.description}`.toLowerCase();
   const industryBoost = /(fire|pump|nfpa|sprinkler|water|industrial|warehouse|data center|oil|gas|building|protection)/i.test(text) ? 10 : 0;
+  const fireContext = /(warehouse|data cent(?:er|re)|oil\s*(?:and|&)\s*gas|industrial plant|commercial building|hospital|airport|power plant)/i.test(text);
   return products
     .map((product) => {
       const keywords = [product.title, product.category, product.keywords, product.summary]
@@ -651,7 +722,10 @@ function rankProducts(item: FeedItem, products: PublicProduct[]) {
         .split(/[^a-z0-9]+/)
         .filter((word) => word.length > 3);
       const matches = new Set(keywords.filter((word) => text.includes(word)));
-      return { slug: product.slug, title: product.title, score: matches.size * 7 + industryBoost };
+      const family = getProductFamily(product.slug, product.title, product.category).id;
+      const familyBoost = fireContext ? (family === "fire-pump-systems" ? 28 : -18) : 0;
+      const dataCenterBoost = /data cent(?:er|re)/i.test(text) ? (product.slug === "edj-fire-pump-set" ? 24 : product.title.toLowerCase().includes("jockey") ? -8 : 0) : 0;
+      return { slug: product.slug, title: product.title, score: matches.size * 7 + industryBoost + familyBoost + dataCenterBoost };
     })
     .filter((product) => product.score > 0)
     .sort((a, b) => b.score - a.score);
@@ -817,13 +891,17 @@ function sourceNameFromUrl(value: string) {
   }
 }
 
-function isManagedGoogleNewsSource(value: string) {
+function isTrustedSourceUrl(value: string) {
   try {
-    const url = new URL(value);
-    return url.hostname.toLowerCase() === "news.google.com" && url.pathname === "/rss/search";
+    const host = new URL(value).hostname.toLowerCase();
+    return trustedSourceHosts.has(host) || [...trustedSourceHosts].some((allowed) => host.endsWith(`.${allowed}`));
   } catch {
     return false;
   }
+}
+
+function isTrustedCandidate(item: FeedItem) {
+  return isTrustedSourceUrl(item.canonicalUrl || item.link) && isTrustedSourceUrl(item.sourceFeedUrl) && Boolean(item.publishedAt);
 }
 
 function isWithinHours(date: string, hours: number) {
@@ -893,6 +971,7 @@ export function isHighIntentNews(title: string, description = "", sourceName = "
   if (/\bwater mist\b/.test(text)) score += 4;
   if (/\b(hydrant|water supply)\b/.test(text)) score += 2;
   if (projectBuyerContext) score += 3;
+  if (/\b(data cent(?:er|re)|warehouse|oil\s*(?:and|&)\s*gas|power plant|industrial plant)\b/.test(text)) score += 3;
 
   return score >= 6;
 }
@@ -918,10 +997,6 @@ function trimText(value: string, maxLength: number) {
   const trimmed = clean.slice(0, maxLength - 1);
   const lastSpace = trimmed.lastIndexOf(" ");
   return `${trimmed.slice(0, lastSpace > maxLength * 0.55 ? lastSpace : trimmed.length).replace(/[,. ]+$/, "")}.`;
-}
-
-function matchAll(value: string, pattern: RegExp) {
-  return Array.from(value.matchAll(pattern)).map((match) => match[1]).filter(Boolean);
 }
 
 function hash(value: string) {

@@ -1,6 +1,7 @@
 import { products as staticProducts } from "@/data/site";
 import { listCmsNews, listCmsProducts, type CmsNews, type CmsProduct } from "@/lib/admin-cms";
 import { unstable_cache } from "next/cache";
+import { getProductDisplayName, getProductFamily } from "@/lib/product-taxonomy";
 
 const cachedCmsProducts = unstable_cache(listCmsProducts, ["public-cms-products-v1"], { revalidate: 300, tags: ["cms-products"] });
 const cachedCmsNews = unstable_cache(listCmsNews, ["public-cms-blog-v1"], { revalidate: 300, tags: ["cms-blog"] });
@@ -62,16 +63,17 @@ function productDetailLines(item: CmsProduct, fallback?: PublicProduct) {
 
 function mapProduct(item: CmsProduct): PublicProduct {
   const fallback = staticProducts.find((product) => product.slug === item.slug) as PublicProduct | undefined;
+  const family = getProductFamily(item.slug, item.title, item.categoryName);
   const image = item.mainImage || fallback?.image || "/assets/products/edj-package.webp";
   const gallery = item.gallery.length ? item.gallery : fallback?.detailImages?.map((detail) => detail.src) || [image];
   return {
     slug: item.slug,
     updatedAt: item.updatedAt || item.createdAt,
-    canonicalUrl: item.canonicalUrl || `/products/${item.slug}`,
+    canonicalUrl: `/products/${item.slug}`,
     indexable: item.indexable,
-    sourceUrl: fallback?.sourceUrl || item.canonicalUrl || `/products/${item.slug}`,
-    title: item.title,
-    category: item.categoryName || fallback?.category || "Products",
+    sourceUrl: fallback?.sourceUrl || "",
+    title: getProductDisplayName(item.slug, item.title),
+    category: family.name,
     releaseTime: fallback?.releaseTime || item.createdAt.slice(0, 10),
     image,
     summary: item.summary || fallback?.summary || item.description,

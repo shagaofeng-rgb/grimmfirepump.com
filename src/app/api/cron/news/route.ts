@@ -15,7 +15,8 @@ export async function GET(request: Request) {
   if (!authorized(request)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  const result = await runNewsAutomation("cron");
+  const dryRun = new URL(request.url).searchParams.get("dryRun") === "1";
+  const result = await runNewsAutomation(dryRun ? "cron-dry-run" : "cron", { dryRun });
   revalidateTag("news-articles");
   revalidateTag("sitemap-data");
   revalidatePath("/news");

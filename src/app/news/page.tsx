@@ -32,7 +32,7 @@ export default async function NewsPage() {
             <p className="text-sm font-bold text-orange-200">Industry news</p>
             <h1 className="mt-3 max-w-4xl text-[38px] font-black leading-[1.08] md:text-[56px]">Fire pump industry news with product-level engineering context.</h1>
             <p className="mt-6 max-w-3xl text-lg leading-8 text-slate-300">
-              Public global news is filtered for recent fire protection relevance, deduplicated, connected to real GRIMM products and reviewed through a buyer-focused engineering lens.
+              Public industry updates are accepted only from configured trusted sources, then connected to real GRIMM products through an original buyer-focused engineering analysis. Historical URLs remain available but are not represented as current automated analysis.
             </p>
           </div>
         </section>

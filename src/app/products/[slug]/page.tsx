@@ -11,6 +11,7 @@ import { ProductInquiryForm } from "@/components/product-inquiry-form";
 import { company, productMegaMenuGroups } from "@/data/site";
 import { getRelatedNewsForProduct } from "@/lib/news-automation";
 import { getPublicProduct, getPublicProducts, type PublicProduct } from "@/lib/public-cms";
+import { getProductKnowledge } from "@/lib/product-knowledge";
 
 type ProductPageProps = { params: Promise<{ slug: string }> };
 type Product = PublicProduct;
@@ -84,12 +85,39 @@ function getStructureItems(product: Product) {
   const title = product.title.toLowerCase();
   const category = product.category.toLowerCase();
 
-  if (title.includes("edj") || title.includes("jockey pump set") || title.includes("fire pump set")) {
+  if (title.includes("edj")) {
     return [
       "Main electric fire pump for regular emergency operation.",
       "Diesel engine standby pump for backup water supply.",
       "Jockey pump for pressure maintenance and small leakage compensation.",
       "Control panel, base frame, valves and pipe fittings configured as a package.",
+    ];
+  }
+
+  if (title.includes("diesel") && title.includes("jockey")) {
+    return [
+      "Diesel-engine-driven main fire pump selected to the verified duty point.",
+      "Jockey pump for standby pressure maintenance and small leakage compensation.",
+      "Controller, base frame, valves and pipe fittings configured to the approved project scope.",
+      "No electric main pump is assumed unless it is identified in the approved configuration.",
+    ];
+  }
+
+  if ((title.includes("electric") || title.startsWith("2 electric")) && title.includes("jockey")) {
+    return [
+      "Electric-motor-driven main fire pump selected to the verified duty point.",
+      "Jockey pump for standby pressure maintenance and small leakage compensation.",
+      "Controller, base frame, valves and pipe fittings configured to the approved project scope.",
+      "No diesel standby pump is assumed unless it is identified in the approved configuration.",
+    ];
+  }
+
+  if (title.includes("jockey")) {
+    return [
+      "Vertical multistage jockey pump for pressure maintenance in a fire-water system.",
+      "Pressure switch or control arrangement selected by the approved system design.",
+      "Small leakage compensation to reduce unnecessary starts of the main fire pump.",
+      "A jockey pump is not presented as a substitute for a main fire pump.",
     ];
   }
 
@@ -292,6 +320,7 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
   const structureImages = detailImages.slice(3, 8);
   const productUrl = `${company.website}/products/${product.slug}`;
   const metaDescription = productMetaDescription(product);
+  const knowledge = getProductKnowledge(product.slug, product.title, product.category);
   const productSchema = {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -434,6 +463,9 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
                     <strong className="text-sm text-[var(--navy-950)]">{item}</strong>
                   </div>
                 ))}
+              </div>
+              <div className="mt-6 rounded-md bg-slate-50 p-5 text-sm leading-7 text-slate-700">
+                <strong className="text-[var(--navy-950)]">Selection information to provide:</strong> {knowledge.specificationKeywords.join(", ")}. Confirm actual approval, drawings and documentation requirements with the project team before final selection.
               </div>
             </ContentCard>
 

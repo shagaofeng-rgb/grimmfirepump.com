@@ -40,6 +40,7 @@ export async function generateMetadata({ params }: NewsDetailProps): Promise<Met
       description: article.summary,
       images: [article.coverImageUrl],
     },
+    robots: article.indexable === true && article.generatedModel === "grimm-news-v2" ? { index: true, follow: true } : { index: false, follow: true },
   };
 }
 
@@ -51,7 +52,7 @@ export default async function NewsDetailPage({ params }: NewsDetailProps) {
   const url = `${company.website}/news/${article.slug}`;
   const newsSchema = {
     "@context": "https://schema.org",
-    "@type": "NewsArticle",
+    "@type": "Article",
     headline: article.title,
     description: article.summary,
     image: [article.coverImageUrl],
@@ -113,9 +114,11 @@ export default async function NewsDetailPage({ params }: NewsDetailProps) {
           </section>
 
           <div className="mt-10 grid gap-6 text-base leading-8 text-slate-700">
-            {article.body.map((paragraph) => (
-              <p key={paragraph}>{paragraph}</p>
-            ))}
+            {article.body.map((paragraph) => paragraph.startsWith("## ") ? (
+              <h2 key={paragraph} className="mt-4 text-2xl font-black leading-tight text-[var(--navy-950)]">{paragraph.slice(3)}</h2>
+            ) : paragraph.startsWith("### ") ? (
+              <h3 key={paragraph} className="mt-3 text-xl font-black leading-tight text-[var(--navy-950)]">{paragraph.slice(4)}</h3>
+            ) : <p key={paragraph}>{paragraph}</p>)}
           </div>
 
           <section className="mt-12 rounded-lg border border-slate-200 p-6">

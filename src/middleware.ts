@@ -2,6 +2,10 @@ import { NextResponse, type NextRequest } from "next/server";
 
 const ADMIN_COOKIE_NAME = "grimm_admin_session";
 const localePattern = /^\/(es|ru|ar|fr|pt)(?:\/|$)/;
+const productRedirects: Record<string, string> = {
+  "/products/GW-Sewage-Pump-Series-Set": "/products/GW-Sewage-Pump-Series-Pump",
+  "/products/LW-Sewage-Pump-Series-Set": "/products/LW-Sewage-Pump-Series-Pump",
+};
 
 function bytesToHex(bytes: ArrayBuffer) {
   return [...new Uint8Array(bytes)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
@@ -40,14 +44,6 @@ async function verifySession(session: string | undefined, secret: string) {
 
 export async function middleware(request: NextRequest) {
   const host = (request.headers.get("host") || "").split(":")[0].toLowerCase();
-  // The external publishing plugin validates custom webhooks by POSTing to the domain root.
-  // Rewrite internally so GET / and all public homepage behavior remain unchanged.
-  if (request.method === "POST" && request.nextUrl.pathname === "/") {
-    const target = request.nextUrl.clone();
-    target.pathname = "/api/webhook/send_article";
-    target.search = "";
-    return NextResponse.rewrite(target);
-  }
   if (host === "grimmfirepump.com") {
     const target = request.nextUrl.clone();
     target.protocol = "https";
@@ -56,6 +52,13 @@ export async function middleware(request: NextRequest) {
   }
 
   const pathname = request.nextUrl.pathname;
+  const productRedirect = productRedirects[pathname];
+  if (productRedirect) {
+    const target = request.nextUrl.clone();
+    target.pathname = productRedirect;
+    target.search = "";
+    return NextResponse.redirect(target, 301);
+  }
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("x-site-locale", pathname.match(localePattern)?.[1] || "en");
 

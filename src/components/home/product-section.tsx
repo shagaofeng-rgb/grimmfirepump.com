@@ -4,6 +4,7 @@ import { ArrowUpRight } from "lucide-react";
 import { SectionHeading } from "@/components/section-heading";
 import { productMegaMenuGroups } from "@/data/site";
 import { getPublicProducts } from "@/lib/public-cms";
+import { getProductFamily } from "@/lib/product-taxonomy";
 
 type ProductSectionProps = {
   featuredOnly?: boolean;
@@ -13,15 +14,15 @@ type ProductSectionProps = {
 export async function ProductSection({ featuredOnly = false, group }: ProductSectionProps) {
   const products = await getPublicProducts();
   const activeGroup = productMegaMenuGroups.find((item) => item.slug === group);
-  const groupProductSlugs = new Set(activeGroup?.items.map((item) => item.href.split("/").pop()).filter(Boolean));
-  const groupedProducts = activeGroup ? products.filter((product) => groupProductSlugs.has(product.slug)) : products;
-  const visibleProducts = featuredOnly ? groupedProducts.slice(0, 3) : groupedProducts;
+  const groupedProducts = activeGroup ? products.filter((product) => getProductFamily(product.slug, product.title, product.category).id === activeGroup.slug) : products;
+  const firePumpProducts = groupedProducts.filter((product) => getProductFamily(product.slug, product.title, product.category).id === "fire-pump-systems");
+  const visibleProducts = featuredOnly ? firePumpProducts.slice(0, 3) : groupedProducts;
 
   return (
     <section className="section bg-[var(--grey-50)]">
       <SectionHeading
         eyebrow="Product Center"
-        title={activeGroup ? `${activeGroup.title} for global project requirements.` : "Fire pump products arranged by overseas buying intent."}
+        title={activeGroup ? `${activeGroup.title} for global project requirements.` : featuredOnly ? "Fire pump systems for global project requirements." : "Pump systems arranged by real project application."}
         action={
           <Link className="font-black text-[var(--navy-800)] underline decoration-[var(--orange)] decoration-2 underline-offset-4" href="/tools/fire-pump-selector">
             Use Fire Pump Selector

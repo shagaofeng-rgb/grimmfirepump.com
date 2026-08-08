@@ -1,6 +1,8 @@
 import { company, downloads, posts, products } from "@/data/site";
 import { createId, deleteStoreItem, readStore, upsertStore, writeStore } from "@/lib/local-store";
 import { getConfiguredAdminUser, type AdminRole } from "@/lib/admin-auth";
+import { getProductFamily, productFamilies } from "@/lib/product-taxonomy";
+import { getProductKnowledge, type ProductKnowledge } from "@/lib/product-knowledge";
 
 export type PublishStatus = "draft" | "review" | "published" | "offline" | "archived";
 
@@ -102,6 +104,13 @@ export type CmsBlogCategory = {
   name: string;
   slug: string;
   sortOrder: number;
+  enabled: boolean;
+};
+
+export type CmsProductKnowledge = ProductKnowledge & {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
   enabled: boolean;
 };
 
@@ -208,45 +217,34 @@ function splitSpec(spec: string): CmsProductParameter {
   };
 }
 
-const categorySeeds: CmsProductCategory[] = [
-  ["Fire Pump Series", "fire-pump-series", "Complete fire pump packages, diesel fire pumps, electric fire pumps and jockey pump systems."],
-  ["Water Supply Series", "water-supply-series", "Booster and water supply equipment for buildings and utility rooms."],
-  ["Sewage Pump Series", "sewage-pump-series", "Submersible sewage pumps and integrated pump stations."],
-  ["Mobile Pump Truck", "mobile-pump-truck", "Trailer-mounted mobile pump trucks for emergency and temporary water transfer."],
-  ["Pumps", "pumps", "Core pump models for pressure boosting, fire protection and long-shaft applications."],
-  ["Accessories", "accessories", "Controllers, valves, documents and supporting accessories."],
-].map(([name, slug, summary], index) => ({
-  id: `cat_${slug}`,
+const categorySeeds: CmsProductCategory[] = productFamilies.map((family, index) => ({
+  id: `cat_${family.id}`,
   createdAt: now(),
   updatedAt: now(),
-  name,
-  slug,
+  name: family.name,
+  slug: family.id,
   parentId: "",
   sortOrder: index + 1,
   enabled: true,
   coverImage: "/assets/applications/hero-edj.webp",
   icon: "folder",
-  summary,
-  description: summary,
-  seoTitle: `${name} | GRIMM PUMP`,
-  seoDescription: summary,
-  seoKeywords: name,
-  canonicalUrl: `/products?category=${slug}`,
+  summary: family.description,
+  description: family.description,
+  seoTitle: `${family.name} | GRIMM PUMP`,
+  seoDescription: family.description,
+  seoKeywords: family.name,
+  canonicalUrl: `/products?group=${family.id}`,
   ogImage: "/assets/applications/hero-edj.webp",
   indexable: true,
 }));
 
-function categoryFor(productCategory: string) {
-  const lower = productCategory.toLowerCase();
-  if (lower.includes("water")) return categorySeeds[1];
-  if (lower.includes("sewage")) return categorySeeds[2];
-  if (lower.includes("truck") || lower.includes("trailer")) return categorySeeds[3];
-  if (lower.includes("pump") && !lower.includes("fire")) return categorySeeds[4];
-  return categorySeeds[0];
+function categoryFor(productSlug: string, productTitle: string, productCategory: string) {
+  const family = getProductFamily(productSlug, productTitle, productCategory);
+  return categorySeeds.find((item) => item.slug === family.id) || categorySeeds[0];
 }
 
 const productSeeds: CmsProduct[] = products.map((product, index) => {
-  const category = categoryFor(product.category);
+  const category = categoryFor(product.slug, product.title, product.category);
   return {
     id: `prod_${product.slug}`,
     createdAt: now(),
@@ -413,6 +411,26 @@ export async function listCmsBlogCategories() {
   return blogCategorySeeds;
 }
 
+export async function listCmsProductKnowledge() {
+  const products = await listCmsProducts();
+  const stored = await readStore<CmsProductKnowledge[]>("cms-product-knowledge.json", []);
+  const bySlug = new Map(stored.map((item) => [item.productSlug, item]));
+  const nowValue = now();
+  const seeded = products.map((product) => {
+    const existing = bySlug.get(product.slug);
+    if (existing) return existing;
+    return {
+      id: `knowledge_${product.slug}`,
+      createdAt: nowValue,
+      updatedAt: nowValue,
+      enabled: true,
+      ...getProductKnowledge(product.slug, product.title, product.categoryName),
+    };
+  });
+  if (seeded.length !== stored.length) await writeStore("cms-product-knowledge.json", [...stored, ...seeded.filter((item) => !bySlug.has(item.productSlug))]);
+  return seeded;
+}
+
 export async function listMediaFiles() {
   return readStore<MediaFile[]>("cms-media.json", []);
 }
@@ -501,6 +519,7 @@ export const cmsStore = {
   upsertNews: (item: CmsNews) => upsertStore("cms-news.json", item),
   deleteNews: (id: string) => deleteStoreItem<CmsNews>("cms-news.json", id),
   upsertBlogCategory: (item: CmsBlogCategory) => upsertStore("cms-blog-categories.json", item),
+  upsertProductKnowledge: (item: CmsProductKnowledge) => upsertStore("cms-product-knowledge.json", item),
   upsertMedia: (item: MediaFile) => upsertStore("cms-media.json", item),
   deleteMedia: (id: string) => deleteStoreItem<MediaFile>("cms-media.json", id),
   upsertDownload: (item: DownloadAsset) => upsertStore("cms-downloads.json", item),

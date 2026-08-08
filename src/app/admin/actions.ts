@@ -12,9 +12,11 @@ import {
   listManagedPages,
   listMediaFiles,
   listProductCategories,
+  listCmsProductKnowledge,
   type CmsNews,
   type CmsProduct,
   type CmsProductCategory,
+  type CmsProductKnowledge,
   type DownloadAsset,
   type ManagedPage,
   type MediaFile,
@@ -201,6 +203,35 @@ export async function deleteProduct(formData: FormData) {
   revalidatePath("/products");
   if (existing) revalidatePath(`/products/${existing.slug}`);
   await refreshSitemap("product_archived");
+}
+
+export async function saveProductKnowledge(formData: FormData) {
+  const existing = (await listCmsProductKnowledge()).find((item) => item.id === text(formData, "id"));
+  if (!existing) redirect("/admin/product-knowledge?error=not-found");
+  const now = new Date().toISOString();
+  const commaList = (key: string) => tags(text(formData, key));
+  const item: CmsProductKnowledge = {
+    ...existing,
+    updatedAt: now,
+    enabled: checkbox(formData, "enabled"),
+    primaryKeyword: text(formData, "primaryKeyword"),
+    secondaryKeywords: commaList("secondaryKeywords"),
+    specificationKeywords: commaList("specificationKeywords"),
+    applicationKeywords: commaList("applicationKeywords"),
+    industries: commaList("industries"),
+    scenarios: commaList("scenarios"),
+    buyerPainPoints: commaList("buyerPainPoints"),
+    solutionSummary: text(formData, "solutionSummary"),
+    buyerBenefits: commaList("buyerBenefits"),
+    relatedProductSlugs: commaList("relatedProductSlugs"),
+    relatedApplicationSlugs: commaList("relatedApplicationSlugs"),
+    relatedKnowledgeSlugs: commaList("relatedKnowledgeSlugs"),
+    prohibitedClaims: commaList("prohibitedClaims"),
+  };
+  await cmsStore.upsertProductKnowledge(item);
+  await audit("save_product_knowledge", item.id);
+  revalidatePath("/admin/product-knowledge");
+  redirect("/admin/product-knowledge?saved=1");
 }
 
 export async function saveNews(formData: FormData) {

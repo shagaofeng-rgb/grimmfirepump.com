@@ -27,6 +27,7 @@ const adminNav = [
   { label: "数据概览", href: "/admin/dashboard", icon: LayoutDashboard },
   { label: "产品管理", href: "/admin/products", icon: Boxes },
   { label: "产品分类", href: "/admin/product-categories", icon: FolderTree },
+  { label: "产品知识库", href: "/admin/product-knowledge", icon: ScrollText },
   { label: "新闻管理", href: "/admin/news", icon: Newspaper },
   { label: "新闻自动化", href: "/admin/news-automation", icon: ListChecks },
   { label: "媒体资源", href: "/admin/media", icon: ImageIcon },
