@@ -43,6 +43,18 @@ function lines(value: string) {
   return value.split(/\n+/).map((item) => item.trim()).filter(Boolean);
 }
 
+function publicArticleImage(value: string) {
+  const fallback = "/assets/applications/hero-edj.webp";
+  if (!value) return fallback;
+  if (value.startsWith("/") && !value.startsWith("//")) return value;
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:" && url.hostname.endsWith(".public.blob.vercel-storage.com") ? url.toString() : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
 function productSpecs(item: CmsProduct, fallback?: PublicProduct) {
   const params = item.parameters.map((param) => [param.name, param.value, param.unit].filter(Boolean).join(": "));
   return (params.length ? params : [...lines(item.sellingPoints), ...(fallback?.specs || [])]).slice(0, 12);
@@ -115,7 +127,7 @@ function mapPost(item: CmsNews): PublicPost {
     category: item.category || "News",
     title: item.title,
     date: (item.publishAt || item.createdAt).slice(0, 10),
-    image: item.coverImage || "/assets/applications/hero-edj.webp",
+    image: publicArticleImage(item.coverImage),
     text: item.excerpt || item.subtitle || item.title,
     keywords: item.tags.join(", ") || item.title,
     content: lines(item.content || item.excerpt),

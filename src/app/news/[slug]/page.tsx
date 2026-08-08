@@ -7,6 +7,8 @@ import { Footer } from "@/components/footer";
 import { StickyCta } from "@/components/sticky-cta";
 import { company } from "@/data/site";
 import { getNewsArticle, listPublishedNews } from "@/lib/news-automation";
+import { ArticleContent } from "@/components/article-content";
+import { safeArticleImageUrl } from "@/lib/article-content";
 
 type NewsDetailProps = { params: Promise<{ slug: string }> };
 
@@ -50,6 +52,9 @@ export default async function NewsDetailPage({ params }: NewsDetailProps) {
   if (!article) notFound();
 
   const url = `${company.website}/news/${article.slug}`;
+  const sourcePageHost = (() => {
+    try { return new URL(article.coverImagePageUrl).hostname; } catch { return "Source page"; }
+  })();
   const newsSchema = {
     "@context": "https://schema.org",
     "@type": "Article",
@@ -85,19 +90,19 @@ export default async function NewsDetailPage({ params }: NewsDetailProps) {
       <main>
         <article className="container-shell max-w-4xl py-14 lg:py-20">
           <p className="eyebrow mb-4">{article.category}</p>
-          <h1 className="text-4xl font-black leading-tight text-[var(--navy-950)] md:text-5xl">{article.title}</h1>
-          <div className="mt-5 flex flex-wrap gap-4 text-sm font-bold text-slate-500">
+          <h1 className="article-title break-words text-3xl font-black leading-tight text-[var(--navy-950)] md:text-5xl">{article.title}</h1>
+          <div className="mt-5 flex flex-wrap gap-x-4 gap-y-2 text-sm font-bold text-slate-500">
             <span>Published {(article.publishAt || article.sourcePublishedAt).slice(0, 10)}</span>
             <span>Source: {article.sourceName}</span>
             <a className="text-[var(--navy-800)] underline decoration-[var(--orange)] underline-offset-4" href={article.sourceUrl} target="_blank" rel="noreferrer">
               View original source
             </a>
           </div>
-          <p className="mt-6 text-xl leading-9 text-slate-600">{article.summary}</p>
+          <p className="article-content-copy mt-6 text-xl leading-9 text-slate-600">{article.summary}</p>
           <figure className="mt-10 overflow-hidden rounded-lg border border-slate-200 bg-slate-50">
-            <img src={article.coverImageUrl} alt={article.coverImageAlt} className="aspect-[16/9] w-full object-cover" loading="eager" />
-            <figcaption className="border-t border-slate-200 bg-white px-4 py-3 text-xs font-bold text-slate-500">
-              Image source: <a href={article.coverImagePageUrl} target="_blank" rel="noreferrer" className="underline">{article.coverImagePageUrl}</a>
+            <img src={safeArticleImageUrl(article.coverImageUrl)} alt={article.coverImageAlt} className="aspect-[16/9] h-auto w-full object-cover" loading="eager" decoding="async" />
+            <figcaption className="article-content-copy border-t border-slate-200 bg-white px-4 py-3 text-xs font-bold text-slate-500">
+              Image source: <a href={article.coverImagePageUrl} target="_blank" rel="noreferrer" className="underline">{sourcePageHost}</a>
             </figcaption>
           </figure>
 
@@ -105,21 +110,15 @@ export default async function NewsDetailPage({ params }: NewsDetailProps) {
             <h2 className="text-xl font-black text-[var(--navy-950)]">Source facts used</h2>
             <ul className="mt-4 grid gap-3 text-sm leading-6 text-slate-700">
               {article.sourceFacts.map((fact) => (
-                <li key={fact} className="flex gap-3">
+                <li key={fact} className="flex min-w-0 gap-3">
                   <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--orange)]" />
-                  <span>{fact}</span>
+                  <span className="article-content-copy">{fact}</span>
                 </li>
               ))}
             </ul>
           </section>
 
-          <div className="mt-10 grid gap-6 text-base leading-8 text-slate-700">
-            {article.body.map((paragraph) => paragraph.startsWith("## ") ? (
-              <h2 key={paragraph} className="mt-4 text-2xl font-black leading-tight text-[var(--navy-950)]">{paragraph.slice(3)}</h2>
-            ) : paragraph.startsWith("### ") ? (
-              <h3 key={paragraph} className="mt-3 text-xl font-black leading-tight text-[var(--navy-950)]">{paragraph.slice(4)}</h3>
-            ) : <p key={paragraph}>{paragraph}</p>)}
-          </div>
+          <ArticleContent content={article.body} />
 
           <section className="mt-12 rounded-lg border border-slate-200 p-6">
             <h2 className="text-2xl font-black text-[var(--navy-950)]">Related GRIMM products</h2>
