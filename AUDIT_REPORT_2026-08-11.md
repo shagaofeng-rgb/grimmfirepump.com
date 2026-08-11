@@ -82,6 +82,25 @@ Webhook does not trigger News automation.
   credentials; production validation after deployment checks scheduling code and public Sitemap,
   but cannot prove an unprovided Google credential exists.
 
+## Production validation after deployment
+
+- Release commit: `bc0db41` (`Restore secure Blog webhook publishing`) was pushed to `main` and
+  production served the new endpoint response (`GET /api/webhook/send_article` returned the new
+  POST-only contract rather than the retired 410 message).
+- Production smoke test: 23/23 primary routes returned HTTP 200. Production deep audit checked
+  156 Sitemap URLs across four shards with zero canonical, language, robots, admin-protection,
+  security-header, or status failures. Observed network timings were median 404 ms, p95 977 ms,
+  max 1,819 ms; these are single-location audit timings, not field Core Web Vitals.
+- A signed, non-writing root Webhook verification on production returned
+  `{"code":0,"msg":"发布接口未配置。"}`. This proves the deployment is live but neither
+  `WEBHOOK_ARTICLE_SIGN` nor the legacy `BLOG_WEBHOOK_API_KEY` is currently available to the
+  Vercel Production runtime. No production article was written.
+- Required production action: add one high-entropy existing plugin key as the secret
+  `WEBHOOK_ARTICLE_SIGN` in Vercel Production (or restore the legacy compatibility key), then
+  redeploy. This workstation has no Vercel API/CLI credential that can safely change a Production
+  environment variable. Repeat the signed root verification afterward; it must return
+  `{"code":1,"msg":"验证成功"}` before enabling plugin publishing.
+
 ## Tests and performance evidence
 
 - Type check: passed (`tsc --noEmit`).
