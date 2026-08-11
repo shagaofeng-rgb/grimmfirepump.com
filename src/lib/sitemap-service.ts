@@ -199,6 +199,16 @@ export const buildSitemapBundle = unstable_cache(buildSitemapBundleUncached, ["s
   tags: ["sitemap-data"],
 });
 
+/**
+ * News and CMS writes mark the Sitemap dirty before the scheduled maintenance
+ * job persists a new manifest. Public Sitemap requests must not serve the old
+ * cached bundle during that short window.
+ */
+export async function getCurrentSitemapBundle() {
+  const dirty = await readStore<Array<{ id: string }>>(DIRTY_STORE, []);
+  return dirty.length ? buildSitemapBundleUncached() : buildSitemapBundle();
+}
+
 function digestEntries(entries: SitemapEntry[]) {
   return crypto.createHash("sha256").update(JSON.stringify(entries.map((item) => [item.url, item.lastModified]).sort())).digest("hex");
 }
