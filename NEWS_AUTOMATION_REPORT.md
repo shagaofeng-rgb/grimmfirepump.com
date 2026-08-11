@@ -8,7 +8,7 @@ Publication target: `/news` only
 | Item | Previous behavior | v2 status |
 | --- | --- | --- |
 | `src/lib/news-automation.ts` | Google News search RSS, six-hour schedule, short template posts, external image probing | Replaced in the active path with trusted-source, source-grounded v2 rules and owned product imagery only. |
-| `vercel.json` `/api/cron/news` | `0 */6 * * *` | Replaced with `30 1 */2 * *` UTC, corresponding to 09:30 Asia/Manila every two days. |
+| `vercel.json` `/api/cron/news` | `0 */6 * * *` | Replaced with `30 1 * * *` UTC. The task checks daily and only publishes after the 48-hour publication interval has elapsed. |
 | `/api/webhook/send_article` and root POST rewrite | Could write automatic content to `/blog` | Retired. Endpoint returns 410 and does not write. |
 | Legacy Google News sources | Search aggregation and uncontrolled source domain results | Excluded from the v2 source set. |
 
@@ -20,7 +20,7 @@ Historical News URLs were not deleted. The 19 prior automated entries are retain
 2. Fetch only configured trusted source feeds. Current configured source: Data Center Dynamics RSS.
 3. Accept only public items dated within 90 days and from trusted source/feed domains.
 4. Match product, industry and scenario; data-center context prioritizes a complete EDJ system rather than a sewage or jockey-only product.
-5. Enforce one source reuse per 60 days, 48-hour publish interval, product/industry/scenario deduplication and a single article limit.
+5. Enforce 60-day deduplication of the same original source item or event, a 48-hour publish interval, product/industry/scenario deduplication and a single article limit. A trusted publisher may supply different source items over time.
 6. Generate an original English analysis of 1000-1600 words. The source is explicitly labelled industry context, never a GRIMM PUMP case study.
 7. Use a GRIMM-owned product image only; no source-site imagery is copied.
 8. Require source, word-count, image and quality checks before publishing.

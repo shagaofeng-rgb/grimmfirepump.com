@@ -200,7 +200,8 @@ export function getNewsConfig() {
   const dedupDays = Number(process.env.NEWS_DEDUP_DAYS || 60);
   const maxRetries = Number(process.env.NEWS_MAX_RETRIES || 3);
   const relevanceThreshold = Number(process.env.NEWS_RELEVANCE_THRESHOLD || 10);
-  const autoPublish = process.env.NEWS_AUTO_PUBLISH === "true";
+  // Publishing is automatic unless an operator explicitly pauses it with "false".
+  const autoPublish = process.env.NEWS_AUTO_PUBLISH !== "false";
   const allowedLanguages = (process.env.NEWS_ALLOWED_LANGUAGES || "en")
     .split(",")
     .map((item) => item.trim())
@@ -425,13 +426,11 @@ export async function collectAndPublishNews(limit = 1, options: { dryRun?: boole
     const candidateSlug = uniqueSlug(item.title, item.publishedAt);
     const duplicate = existing.some((article) => {
       const recent = Date.now() - Date.parse(article.createdAt) <= config.dedupDays * 24 * 60 * 60 * 1000;
-      return (
-        recent &&
+      return recent &&
         (article.sourceFingerprint === fingerprint ||
           article.contentHash === contentHash ||
           article.eventFingerprint === eventFingerprint ||
-          normalizeUrl(article.sourceCanonicalUrl) === normalizeUrl(item.canonicalUrl))
-      ) || (article.sourceName === item.sourceName && Date.now() - Date.parse(article.createdAt) < 60 * 24 * 60 * 60 * 1000);
+          normalizeUrl(article.sourceCanonicalUrl) === normalizeUrl(item.canonicalUrl));
     }) || existingSlugs.has(candidateSlug);
 
     if (duplicate) {
@@ -474,7 +473,7 @@ export async function collectAndPublishNews(limit = 1, options: { dryRun?: boole
 
       if (!article.quality?.passed) {
         rejected += 1;
-        await upsertStore(ARTICLES_STORE, { ...article, status: "review_required", failureReason: article.quality?.reason || "Quality gate failed." });
+        await upsertStore(ARTICLES_STORE, { ...article, status: "rejected", failureReason: article.quality?.reason || "Quality gate failed." });
         continue;
       }
       const status: NewsStatus = config.autoPublish ? "published" : "review_required";
@@ -539,7 +538,7 @@ async function buildArticle(item: FeedItem, relatedProducts: Array<{ slug: strin
   ].filter((fact) => fact.length > 12);
   const image = await resolveNewsImage(primaryProduct?.slug || "", productName);
   const slug = uniqueSlug(`${productName} ${industry} planning`, item.publishedAt);
-  const title = trimText(`${productName} planning for ${industry}: what project teams should confirm early`, 92);
+  const title = trimText(`${productName} planning for ${industry}: ${articleContextFromSource(item.title)}`, 92);
   const summary = trimText(`A buyer-focused engineering note on ${primaryKeyword} selection inputs for ${scenario}, prompted by a recent ${item.sourceName} industry update.`, 160);
   const body = buildOriginalAnalysis({ productName, primaryKeyword, industry, scenario, angle, knowledge, sourceName: item.sourceName, sourceDate: item.publishedAt.slice(0, 10), sourceSummary: cleanText(item.description || item.title) });
   const wordCount = body.join(" ").split(/\s+/).filter(Boolean).length;
@@ -739,6 +738,15 @@ function categoryForArticle(title: string) {
   if (lower.includes("diesel")) return "Diesel Fire Pump";
   if (lower.includes("water")) return "Water Supply";
   return "Fire Pump Industry";
+}
+
+function articleContextFromSource(sourceTitle: string) {
+  const title = cleanText(sourceTitle);
+  const capacity = title.match(/\b\d+(?:\.\d+)?\s*(?:gw|mw)\b/i)?.[0]?.toUpperCase();
+  if (capacity && /data cent(?:er|re)/i.test(title)) return `${capacity} data center power-planning context`;
+  if (/prefabricated data center power module/i.test(title)) return "prefabricated data center power-module context";
+  if (/data cent(?:er|re)/i.test(title)) return "data center project-planning context";
+  return "project teams should confirm early";
 }
 
 function fingerprintForSource(item: FeedItem) {
