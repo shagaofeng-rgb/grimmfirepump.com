@@ -237,14 +237,19 @@ export async function saveProductKnowledge(formData: FormData) {
 export async function saveNews(formData: FormData) {
   const now = new Date().toISOString();
   const id = text(formData, "id") || createId("news");
-  const existing = (await listCmsNews()).find((item) => item.id === id);
+  const allNews = await listCmsNews();
+  const existing = allNews.find((item) => item.id === id);
+  const requestedSlug = text(formData, "slug");
+  if (allNews.some((item) => item.id !== id && item.slug === requestedSlug)) {
+    throw new Error("An article with this URL slug already exists. Choose a unique slug before saving.");
+  }
   const item: CmsNews = {
     id,
     createdAt: existing?.createdAt || now,
     updatedAt: now,
     title: text(formData, "title"),
     subtitle: text(formData, "subtitle"),
-    slug: text(formData, "slug"),
+    slug: requestedSlug,
     category: text(formData, "category", "Industry News"),
     tags: tags(text(formData, "tags")),
     author: text(formData, "author", "GRIMM PUMP"),

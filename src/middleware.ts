@@ -44,7 +44,9 @@ async function verifySession(session: string | undefined, secret: string) {
 
 export async function middleware(request: NextRequest) {
   const host = (request.headers.get("host") || "").split(":")[0].toLowerCase();
-  if (host === "grimmfirepump.com") {
+  // Do not redirect a custom-webhook POST before its request body reaches the
+  // internal endpoint. GET requests on the bare domain keep the canonical redirect.
+  if (host === "grimmfirepump.com" && !(request.method === "POST" && request.nextUrl.pathname === "/")) {
     const target = request.nextUrl.clone();
     target.protocol = "https";
     target.host = "www.grimmfirepump.com";
@@ -52,6 +54,14 @@ export async function middleware(request: NextRequest) {
   }
 
   const pathname = request.nextUrl.pathname;
+  // The external publishing plugin verifies and posts to the site root when
+  // configured as a custom framework webhook. Keep GET / unchanged.
+  if (request.method === "POST" && pathname === "/") {
+    const target = request.nextUrl.clone();
+    target.pathname = "/api/webhook/send_article";
+    return NextResponse.rewrite(target);
+  }
+
   const productRedirect = productRedirects[pathname];
   if (productRedirect) {
     const target = request.nextUrl.clone();

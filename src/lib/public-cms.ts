@@ -155,7 +155,9 @@ export async function getPublicPosts() {
     .filter((item) => item.status === "published" && new Date(item.publishAt || item.createdAt).getTime() <= Date.now())
     .sort((a, b) => Number(Boolean(b.pinned)) - Number(Boolean(a.pinned)) || new Date(b.publishAt).getTime() - new Date(a.publishAt).getTime())
     .map(mapPost);
-  return cmsMapped;
+  // A legacy import once created two records with one slug. Keep public routes
+  // deterministic even if malformed historical data is encountered again.
+  return cmsMapped.filter((post, index, items) => items.findIndex((candidate) => candidate.slug === post.slug) === index);
 }
 
 export async function getPublicPost(slug: string) {

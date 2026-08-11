@@ -9,7 +9,7 @@ Publication target: `/news` only
 | --- | --- | --- |
 | `src/lib/news-automation.ts` | Google News search RSS, six-hour schedule, short template posts, external image probing | Replaced in the active path with trusted-source, source-grounded v2 rules and owned product imagery only. |
 | `vercel.json` `/api/cron/news` | `0 */6 * * *` | Replaced with `30 1 * * *` UTC. The task checks daily and only publishes after the 48-hour publication interval has elapsed. |
-| `/api/webhook/send_article` and root POST rewrite | Could write automatic content to `/blog` | Retired. Endpoint returns 410 and does not write. |
+| `/api/webhook/send_article` and root POST rewrite | Third-party Blog plugin delivery | Restored as a signed, idempotent Blog-only webhook. It accepts a verification POST without writing, publishes complete signed payloads to `/blog`, and does not affect News automation. |
 | Legacy Google News sources | Search aggregation and uncontrolled source domain results | Excluded from the v2 source set. |
 
 Historical News URLs were not deleted. The 19 prior automated entries are retained but marked `noindex` and removed from the v2 News list, RSS and Sitemap until editorial rewrite.
