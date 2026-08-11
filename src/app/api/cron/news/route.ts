@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { runNewsAutomation } from "@/lib/news-automation";
+import { runNewsPublish } from "@/lib/news-automation";
 import { revalidatePath, revalidateTag } from "next/cache";
 
 export const dynamic = "force-dynamic";
@@ -16,7 +16,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   const dryRun = new URL(request.url).searchParams.get("dryRun") === "1";
-  const result = await runNewsAutomation(dryRun ? "cron-dry-run" : "cron", { dryRun });
+  const result = await runNewsPublish(dryRun ? "legacy-cron-dry-run" : "legacy-cron", { dryRun });
   revalidateTag("news-articles");
   revalidateTag("sitemap-data");
   revalidatePath("/news");

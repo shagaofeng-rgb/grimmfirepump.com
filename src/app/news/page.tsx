@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
-import { StickyCta } from "@/components/sticky-cta";
 import { company } from "@/data/site";
 import { localizedAlternates } from "@/lib/i18n";
 import { listPublishedNews } from "@/lib/news-automation";
@@ -11,11 +10,11 @@ export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Fire Pump Industry News",
-  description: "Recent public fire protection, NFPA20, fire pump, data center and industrial water system news with GRIMM engineering analysis.",
+  description: "Independent editorial summaries of verified fire protection, data center and industrial fire-water industry updates.",
   alternates: localizedAlternates("/news"),
   openGraph: {
     title: "Fire Pump Industry News | GRIMM PUMP",
-    description: "Recent fire pump and fire protection news linked to real GRIMM pump products and engineering guidance.",
+    description: "Verified industry updates with source attribution and independent editorial analysis.",
     url: `${company.website}/news`,
   },
 };
@@ -30,9 +29,9 @@ export default async function NewsPage() {
         <section className="bg-[var(--navy-950)] text-white">
           <div className="container-shell py-14 md:py-18">
             <p className="text-sm font-bold text-orange-200">Industry news</p>
-            <h1 className="mt-3 max-w-4xl text-[38px] font-black leading-[1.08] md:text-[56px]">Fire pump industry news with product-level engineering context.</h1>
+            <h1 className="mt-3 max-w-4xl text-[38px] font-black leading-[1.08] md:text-[56px]">Verified fire protection and industrial water news.</h1>
             <p className="mt-6 max-w-3xl text-lg leading-8 text-slate-300">
-              Public industry updates are accepted only from configured trusted sources, then connected to real GRIMM products through an original buyer-focused engineering analysis. Historical URLs remain available but are not represented as current automated analysis.
+              Each update identifies its original source and date, then separates source facts from independent editorial analysis. News is not a product offer, project reference or company announcement.
             </p>
           </div>
         </section>
@@ -62,16 +61,12 @@ export default async function NewsPage() {
           ) : (
             <div className="rounded-lg border border-dashed border-slate-300 bg-white p-8">
               <h2 className="text-2xl font-black text-[var(--navy-950)]">New industry updates are being prepared.</h2>
-              <p className="mt-3 max-w-3xl leading-7 text-slate-600">
-                Browse our existing company updates and technical articles, or contact the team for a project-specific discussion.
-              </p>
-              <Link className="button button-primary mt-6" href="/blog">Read existing company updates</Link>
+              <p className="mt-3 max-w-3xl leading-7 text-slate-600">The next verified industry update will appear here after source and editorial checks are complete.</p>
             </div>
           )}
         </section>
       </main>
       <Footer />
-      <StickyCta />
     </>
   );
 }

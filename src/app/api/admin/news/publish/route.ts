@@ -1,1 +1,11 @@
-export { POST, dynamic } from "@/app/api/admin/news/collect/route";
+import { NextResponse } from "next/server";
+import { isAdminAuthenticated } from "@/lib/admin-auth";
+import { runNewsPublish } from "@/lib/news-automation";
+
+export const dynamic = "force-dynamic";
+
+export async function POST() {
+  if (!(await isAdminAuthenticated())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const result = await runNewsPublish("admin");
+  return NextResponse.json({ ok: result.ok, result }, { status: result.ok ? 200 : 500 });
+}

@@ -6,6 +6,7 @@ import { getProductFamily } from "@/lib/product-taxonomy";
 import { acquireTaskLock, createId, readStore, upsertStore, writeStore } from "@/lib/local-store";
 import { markSitemapDirty } from "@/lib/sitemap-dirty";
 import { unstable_cache } from "next/cache";
+import { getSiteNewsConfig, validateSiteNewsConfig, type SiteNewsConfig } from "@/lib/site-news-config";
 
 export type NewsStatus =
   | "discovered"
@@ -17,11 +18,15 @@ export type NewsStatus =
   | "review_required"
   | "scheduled"
   | "publishing"
+  | "frontend_verifying"
+  | "published_success"
+  | "retry_pending"
   | "published"
   | "failed"
   | "archived";
 
 export type NewsSource = {
+  siteId?: string;
   id: string;
   createdAt: string;
   updatedAt: string;
@@ -36,6 +41,8 @@ export type NewsSource = {
 };
 
 export type NewsArticle = {
+  siteId?: string;
+  contentType?: "news";
   id: string;
   createdAt: string;
   updatedAt: string;
@@ -52,6 +59,9 @@ export type NewsArticle = {
   sourceTitle: string;
   sourcePublishedAt: string;
   sourceFetchedAt: string;
+  sourceAuthor?: string;
+  imageLicenseStatus?: "owned-neutral" | "licensed" | "unknown";
+  editorialDisclaimer?: string;
   sourceFacts: string[];
   sourceFingerprint: string;
   eventFingerprint: string;
@@ -83,10 +93,11 @@ export type NewsArticle = {
 };
 
 export type NewsJob = {
+  siteId?: string;
   id: string;
   createdAt: string;
   updatedAt: string;
-  type: "collect" | "generate" | "publish" | "retry" | "daily-run";
+  type: "collect" | "generate" | "publish" | "retry" | "daily-run" | "ingest" | "compose-publish";
   status: "running" | "success" | "failed" | "skipped";
   startedAt: string;
   finishedAt?: string;
@@ -95,6 +106,7 @@ export type NewsJob = {
 };
 
 export type NewsPublicationAudit = {
+  siteId?: string;
   id: string;
   createdAt: string;
   updatedAt: string;
@@ -106,6 +118,52 @@ export type NewsPublicationAudit = {
   rejected: number;
   failed: number;
   status: "success" | "partial" | "failed";
+  message: string;
+};
+
+export type NewsCandidate = {
+  id: string;
+  siteId: string;
+  createdAt: string;
+  updatedAt: string;
+  state: "discovered" | "normalized" | "verified" | "scored" | "candidate" | "reserved_for_cycle" | "used" | "rejected" | "retry_pending";
+  rejectReason?: string;
+  title: string;
+  summary: string;
+  sourceName: string;
+  sourceFeedUrl: string;
+  sourceUrl: string;
+  normalizedUrl: string;
+  sourcePublishedAt: string;
+  sourceAuthor?: string;
+  language: string;
+  sourceDomain: string;
+  sourceTrustScore: number;
+  relevanceScore: number;
+  score: number;
+  urlHash: string;
+  titleHash: string;
+  contentFingerprint: string;
+  eventFingerprint: string;
+  imageUrl?: string;
+  imageLicenseStatus: "owned-neutral" | "licensed" | "unknown";
+  cycleKey?: string;
+  usedByArticleId?: string;
+};
+
+export type NewsDeliveryCheck = {
+  id: string;
+  siteId: string;
+  articleId: string;
+  slug: string;
+  createdAt: string;
+  updatedAt: string;
+  status: "passed" | "failed";
+  listHttpStatus: number;
+  detailHttpStatus: number;
+  rssHttpStatus: number;
+  sitemapHttpStatus: number;
+  checks: Record<string, boolean>;
   message: string;
 };
 
@@ -126,6 +184,9 @@ const ARTICLES_STORE = "news-articles.json";
 const SOURCES_STORE = "news-sources.json";
 const JOBS_STORE = "news-jobs.json";
 const AUDITS_STORE = "news-publication-audits.json";
+const CANDIDATES_STORE = "news-candidates.json";
+const DELIVERY_CHECKS_STORE = "news-delivery-checks.json";
+const SITE_ID = "grimm-firepump-global";
 
 const cachedNewsArticles = unstable_cache(
   () => readStore<NewsArticle[]>(ARTICLES_STORE, []),
@@ -193,7 +254,8 @@ const defaultBlockedNewsTerms = [
   "history of fire",
 ];
 
-export function getNewsConfig() {
+export function getNewsConfig(siteId = SITE_ID) {
+  const site = getSiteNewsConfig(siteId);
   const dailyTarget = 1;
   const lookbackHours = Number(process.env.NEWS_LOOKBACK_HOURS || 2160);
   const fallbackLookbackHours = 2160;
@@ -206,10 +268,8 @@ export function getNewsConfig() {
     .split(",")
     .map((item) => item.trim())
     .filter(Boolean);
-  const sourceWhitelist = (process.env.NEWS_TRUSTED_SOURCE_URLS || defaultSourceUrls.join(","))
-    .split(",")
-    .map((item) => item.trim())
-    .filter(Boolean);
+  const sourceWhitelist = site.sources.primaryWhitelist.map((source) => source.rssOrApiUrl);
+  const fallbackWhitelist = site.sources.fallbackWhitelist.map((source) => source.rssOrApiUrl);
   const sourceBlacklist = (process.env.NEWS_SOURCE_BLACKLIST || defaultBlockedNewsTerms.join(","))
     .split(",")
     .map((item) => item.trim().toLowerCase())
@@ -217,68 +277,69 @@ export function getNewsConfig() {
 
   return {
     dailyTarget: Number.isFinite(dailyTarget) ? dailyTarget : 1,
-    timezone: process.env.NEWS_TIMEZONE || "Asia/Manila",
+    site,
+    timezone: site.timezone,
     lookbackHours: Number.isFinite(lookbackHours) ? lookbackHours : 72,
     fallbackLookbackHours: Number.isFinite(fallbackLookbackHours) ? Math.max(lookbackHours, fallbackLookbackHours) : 504,
     dedupDays: Number.isFinite(dedupDays) ? Math.max(dedupDays, 60) : 60,
     maxRetries: Number.isFinite(maxRetries) ? maxRetries : 3,
     relevanceThreshold: Number.isFinite(relevanceThreshold) ? relevanceThreshold : 10,
     autoPublish,
-    allowedLanguages,
+    allowedLanguages: [site.publicationLanguage],
     sourceWhitelist,
+    fallbackWhitelist,
     sourceBlacklist,
     publishIntervalHours: 48,
     alertEmailConfigured: Boolean(process.env.NEWS_ALERT_EMAIL || process.env.RESEND_API_KEY),
   };
 }
 
-export async function listNewsArticles() {
+export async function listNewsArticles(siteId = SITE_ID) {
   const articles = await cachedNewsArticles();
   return articles
     .map((article) => normalizeStoredArticle(article))
+    .filter((article) => !article.siteId || article.siteId === siteId)
     .sort((a, b) => Date.parse(b.publishAt || b.createdAt) - Date.parse(a.publishAt || a.createdAt));
 }
 
-export async function listPublishedNews() {
+export async function listPublishedNews(siteId = SITE_ID) {
   const seenSlugs = new Set<string>();
-  return (await listNewsArticles()).filter((item) => {
-    if (item.status !== "published" || item.indexable !== true || item.generatedModel !== "grimm-news-v2" || seenSlugs.has(item.slug)) return false;
+  return (await listNewsArticles(siteId)).filter((item) => {
+    if (!(["published", "frontend_verifying", "published_success"] as NewsStatus[]).includes(item.status) || item.indexable !== true || item.generatedModel !== "grimm-news-v2" || seenSlugs.has(item.slug)) return false;
     seenSlugs.add(item.slug);
     return true;
   });
 }
 
-export async function getNewsArticle(slug: string) {
-  return (await listNewsArticles()).find(
-    (item) => item.slug === slug && item.status === "published",
+export async function getNewsArticle(slug: string, siteId = SITE_ID) {
+  return (await listNewsArticles(siteId)).find(
+    (item) => item.slug === slug && (["published", "frontend_verifying", "published_success"] as NewsStatus[]).includes(item.status),
   );
 }
 
-export async function listNewsSources() {
+export async function listNewsSources(siteId = SITE_ID) {
+  const config = validateSiteNewsConfig(siteId);
   const stored = await readStore<NewsSource[]>(SOURCES_STORE, []);
   const now = new Date().toISOString();
-  const configuredUrls = getNewsConfig().sourceWhitelist;
-  const configuredByUrl = new Map(stored.map((item) => [item.url, item]));
-  const manualSources = stored.filter((item) => isTrustedSourceUrl(item.url));
-  const configuredSources: NewsSource[] = configuredUrls.map((url, index) => {
+  const configuredDefinitions = [...config.sources.primaryWhitelist, ...config.sources.fallbackWhitelist];
+  const configuredByUrl = new Map(stored.filter((item) => !item.siteId || item.siteId === siteId).map((item) => [item.url, item]));
+  const configuredSources: NewsSource[] = configuredDefinitions.map((definition, index) => {
+    const url = definition.rssOrApiUrl;
     const existing = configuredByUrl.get(url);
     return existing || {
       id: `source_${hash(url).slice(0, 14)}`,
       createdAt: now,
       updatedAt: now,
-      name: sourceNameFromUrl(url) || `News Source ${index + 1}`,
+      siteId,
+      name: definition.domain || `News Source ${index + 1}`,
       url,
       type: "rss",
       enabled: true,
-      language: "en",
+      language: definition.allowedLanguages[0],
       lastStatus: "not_configured",
     };
   });
-  const deduped = new Map<string, NewsSource>();
-  for (const source of [...manualSources, ...configuredSources]) {
-    if (isTrustedSourceUrl(source.url)) deduped.set(normalizeUrl(source.url), source);
-  }
-  return [...deduped.values()];
+  return configuredSources;
 }
 
 export async function listNewsJobs() {
@@ -295,89 +356,180 @@ export async function getRelatedNewsForProduct(productSlug: string, limit = 3) {
     .slice(0, limit);
 }
 
-export async function runNewsAutomation(reason = "scheduled", options: { dryRun?: boolean } = {}) {
-  const release = await acquireTaskLock("news-automation", 12 * 60 * 1000);
-  if (!release) {
-    return {
-      ok: true,
-      skipped: true,
-      message: "News automation is already running. This invocation was skipped.",
-      stats: { published: 0, generated: 0 },
-    };
-  }
-
-  try {
-    const job = await startJob("daily-run", `News automation started by ${reason}.`);
-    const config = getNewsConfig();
-    const today = todayKey(config.timezone);
-    const publishedNews = await listPublishedNews();
-    const publishedToday = publishedNews.filter((item) => dateKey(item.publishAt || item.createdAt, config.timezone) === today).length;
-    const latestPublish = publishedNews[0]?.publishAt || publishedNews[0]?.createdAt;
-    const withinInterval = latestPublish && Date.now() - Date.parse(latestPublish) < config.publishIntervalHours * 60 * 60 * 1000;
-
-    try {
-      if (!options.dryRun && (publishedToday >= config.dailyTarget || withinInterval)) {
-        const audit = await saveAudit({
-          date: today,
-          target: config.dailyTarget,
-          published: publishedToday,
-          generated: 0,
-          duplicates: 0,
-          rejected: 0,
-          failed: 0,
-          status: "success",
-          message: "48-hour publication interval has not elapsed.",
-        });
-        await finishJob(job, "success", "48-hour publication interval has not elapsed.", { publishedToday, audit: audit.id });
-        return { ok: true, jobId: job.id, audit, stats: { publishedToday, generated: 0 } };
-      }
-
-      const result = await collectAndPublishNews(1, { dryRun: Boolean(options.dryRun) });
-      if (result.published) await markSitemapDirty("automated_news_published");
-      const audit = await saveAudit({
-        date: today,
-        target: 1,
-        published: publishedToday + result.published,
-        generated: result.generated,
-        duplicates: result.duplicates,
-        rejected: result.rejected,
-        failed: result.failed,
-        status:
-          publishedToday + result.published >= config.dailyTarget
-            ? "success"
-            : result.failed > 0 && result.generated === 0
-              ? "failed"
-              : "partial",
-        message: result.message,
-      });
-      const jobStatus = audit.status === "failed" ? "failed" : audit.status === "partial" ? "skipped" : "success";
-      await finishJob(job, jobStatus, result.message, { ...result, audit: audit.id });
-      if (audit.status === "partial" && result.published === 0) {
-        console.warn("News automation completed without a publishable item.", { reason, ...result });
-      }
-      return { ok: audit.status !== "failed", jobId: job.id, audit, stats: result };
-    } catch (error) {
-      const message = error instanceof Error ? error.message : "Unknown news automation error";
-      await finishJob(job, "failed", message, { failed: 1 });
-      const audit = await saveAudit({
-        date: today,
-        target: config.dailyTarget,
-        published: publishedToday,
-        generated: 0,
-        duplicates: 0,
-        rejected: 0,
-        failed: 1,
-        status: "failed",
-        message,
-      });
-      return { ok: false, jobId: job.id, audit, stats: { failed: 1 }, error: message };
-    }
-  } finally {
-    await release();
-  }
+export async function listNewsCandidates(siteId = SITE_ID) {
+  return (await readStore<NewsCandidate[]>(CANDIDATES_STORE, []))
+    .filter((candidate) => candidate.siteId === siteId)
+    .sort((a, b) => b.score - a.score || Date.parse(b.sourcePublishedAt) - Date.parse(a.sourcePublishedAt));
 }
 
-export async function collectAndPublishNews(limit = 1, options: { dryRun?: boolean } = {}) {
+export async function listNewsDeliveryChecks(siteId = SITE_ID) {
+  return (await readStore<NewsDeliveryCheck[]>(DELIVERY_CHECKS_STORE, []))
+    .filter((check) => check.siteId === siteId)
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+}
+
+function cycleKey(hours: number, now = Date.now()) {
+  return `${hours}h-${Math.floor(now / (hours * 60 * 60 * 1000))}`;
+}
+
+function sourceDefinitionFor(config: SiteNewsConfig, url: string) {
+  const host = new URL(url).hostname.replace(/^www\./, "").toLowerCase();
+  return [...config.sources.primaryWhitelist, ...config.sources.fallbackWhitelist].find((source) => host === source.domain || host.endsWith(`.${source.domain}`));
+}
+
+function candidateScore(item: FeedItem, sourceTrustScore: number) {
+  const text = `${item.title} ${item.description}`.toLowerCase();
+  const relevance = isHighIntentNews(item.title, item.description, item.sourceName) ? 30 : 0;
+  const buyerImpact = /(standard|regulation|code|data cent(?:er|re)|warehouse|oil|gas|industrial|supply|commission|testing|maintenance|fire protection)/.test(text) ? 20 : 6;
+  const ageHours = Math.max(0, (Date.now() - Date.parse(item.publishedAt)) / 3_600_000);
+  const freshness = ageHours <= 24 ? 15 : ageHours <= 72 ? 10 : ageHours <= 168 ? 4 : 0;
+  const verification = Math.round(sourceTrustScore * 0.15);
+  const productContext = /(fire pump|fire water|fire protection|data cent(?:er|re)|warehouse|industrial)/.test(text) ? 15 : 3;
+  const image = 5; // A neutral owned asset is used instead of unlicensed publisher imagery.
+  return { relevance, buyerImpact, freshness, verification, productContext, image, total: relevance + buyerImpact + freshness + verification + productContext + image };
+}
+
+/**
+ * 12-hour task. It only fetches, validates, de-duplicates, scores and persists
+ * candidates. It deliberately has no article composition, CMS, Sitemap or cache side effect.
+ */
+export async function runNewsIngest(reason = "scheduled", options: { siteId?: string; includeFallback?: boolean; dryRun?: boolean } = {}) {
+  const siteId = options.siteId || SITE_ID;
+  const config = validateSiteNewsConfig(siteId);
+  const release = await acquireTaskLock(`news:ingest:${siteId}:${cycleKey(config.news.ingestIntervalHours)}`, 11 * 60 * 60 * 1000);
+  if (!release) return { ok: true, skipped: true, message: "This site's ingest cycle is already running.", stats: { discovered: 0, candidates: 0 } };
+
+  const job = await startJob("ingest", `News ingest started by ${reason}.`, siteId);
+  try {
+    const allSources = await listNewsSources(siteId);
+    const primaryUrls = new Set(config.sources.primaryWhitelist.map((source) => source.rssOrApiUrl));
+    const sources = allSources.filter((source) => source.enabled && (options.includeFallback || primaryUrls.has(source.url)));
+    const [existingCandidates, existingArticles, products] = await Promise.all([listNewsCandidates(siteId), listNewsArticles(siteId), getPublicProducts()]);
+    let discovered = 0; let candidates = 0; let rejected = 0; let duplicates = 0; let failed = 0;
+    for (const source of sources) {
+      const definition = sourceDefinitionFor(config, source.url);
+      if (!definition) { rejected += 1; continue; }
+      const items = await fetchFeedItems(source);
+      for (const item of items) {
+        discovered += 1;
+        const normalizedUrl = normalizeUrl(item.canonicalUrl || item.link);
+        const sourceDefinition = sourceDefinitionFor(config, normalizedUrl);
+        const id = `candidate_${hash(`${siteId}|${normalizedUrl}`).slice(0, 24)}`;
+        const now = new Date().toISOString();
+        const base: NewsCandidate = {
+          id, siteId, createdAt: existingCandidates.find((candidate) => candidate.id === id)?.createdAt || now, updatedAt: now,
+          state: "discovered", title: cleanText(item.title), summary: cleanText(item.description), sourceName: item.sourceName,
+          sourceFeedUrl: source.url, sourceUrl: item.link, normalizedUrl, sourcePublishedAt: item.publishedAt,
+          language: item.language, sourceDomain: new URL(normalizedUrl).hostname, sourceTrustScore: sourceDefinition?.sourceTrustScore || 0,
+          relevanceScore: 0, score: 0, urlHash: hash(normalizedUrl), titleHash: hash(cleanText(item.title).toLowerCase()),
+          contentFingerprint: hash(`${cleanText(item.title)}|${cleanText(item.description)}`), eventFingerprint: fingerprintForEvent(item.title),
+          imageLicenseStatus: "owned-neutral", imageUrl: "",
+        };
+        if (!sourceDefinition || item.language !== config.publicationLanguage || !isWithinHours(item.publishedAt, options.includeFallback ? config.news.fallbackCandidateMaxAgeDays * 24 : config.news.candidateMaxAgeHours)) {
+          rejected += 1; if (!options.dryRun) await upsertStore(CANDIDATES_STORE, { ...base, state: "rejected", rejectReason: "Source, language or publication-age policy rejected this item." }); continue;
+        }
+        const duplicate = [...existingCandidates, ...existingArticles].some((record) => {
+          const source = "normalizedUrl" in record ? record.normalizedUrl : normalizeUrl(record.sourceCanonicalUrl || record.sourceUrl);
+          const event = "eventFingerprint" in record ? record.eventFingerprint : "";
+          const content = "contentFingerprint" in record ? record.contentFingerprint : record.contentHash;
+          return source === normalizedUrl || event === base.eventFingerprint || content === base.contentFingerprint;
+        });
+        if (duplicate) { duplicates += 1; if (!options.dryRun) await upsertStore(CANDIDATES_STORE, { ...base, state: "rejected", rejectReason: "Duplicate URL, event or content fingerprint." }); continue; }
+        const scored = candidateScore(item, sourceDefinition.sourceTrustScore);
+        const naturalProduct = rankProducts(item, products)[0];
+        const candidate: NewsCandidate = { ...base, state: scored.total >= config.news.minScore ? "candidate" : "rejected", rejectReason: scored.total >= config.news.minScore ? undefined : "Candidate score below site threshold.", relevanceScore: scored.relevance, score: scored.total, cycleKey: cycleKey(config.news.ingestIntervalHours) };
+        if (candidate.state === "candidate") candidates += 1; else rejected += 1;
+        if (!options.dryRun) await upsertStore(CANDIDATES_STORE, candidate);
+        void naturalProduct; // Product association is considered only during publish and never stored as an ingest-side link.
+      }
+    }
+    const message = `Ingest completed: discovered ${discovered}, candidate ${candidates}, rejected ${rejected}, duplicates ${duplicates}, failed ${failed}.`;
+    await finishJob(job, failed ? "failed" : "success", message, { discovered, candidates, rejected, duplicates, failed });
+    return { ok: !failed, stats: { discovered, candidates, rejected, duplicates, failed }, message };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown ingest failure";
+    await finishJob(job, "failed", message, { failed: 1 });
+    return { ok: false, stats: { failed: 1 }, message };
+  } finally { await release(); }
+}
+
+function candidateToFeedItem(candidate: NewsCandidate): FeedItem {
+  return { title: candidate.title, link: candidate.sourceUrl, canonicalUrl: candidate.normalizedUrl, description: candidate.summary, publishedAt: candidate.sourcePublishedAt, sourceName: candidate.sourceName, sourceFeedUrl: candidate.sourceFeedUrl, language: candidate.language };
+}
+
+async function verifyFrontendDelivery(site: SiteNewsConfig, article: NewsArticle) {
+  const base = (process.env.NEWS_FRONTEND_VERIFY_URL || site.siteUrl).replace(/\/$/, "");
+  const list = await fetch(`${base}${site.news.listRoute}`, { cache: "no-store" });
+  const detail = await fetch(`${base}${site.news.listRoute}/${article.slug}`, { cache: "no-store" });
+  const rss = await fetch(`${base}${site.news.rssRoute}`, { cache: "no-store" });
+  const sitemap = await fetch(`${base}${site.news.sitemapRoute}`, { cache: "no-store" });
+  const [listBody, detailBody, rssBody, sitemapBody] = await Promise.all([list.text(), detail.text(), rss.text(), sitemap.text()]);
+  const checks = {
+    listVisible: list.ok && listBody.includes(article.title) && listBody.includes(`/news/${article.slug}`),
+    detailVisible: detail.ok && detailBody.includes(article.title) && detailBody.includes(article.sourceName) && detailBody.includes("Editorial note"),
+    rssVisible: rss.ok && rssBody.includes(article.slug),
+    sitemapVisible: sitemap.ok && sitemapBody.includes(article.slug),
+    blogIsolated: !listBody.includes(`/blog/${article.slug}`),
+  };
+  return { status: Object.values(checks).every(Boolean) ? "passed" as const : "failed" as const, listHttpStatus: list.status, detailHttpStatus: detail.status, rssHttpStatus: rss.status, sitemapHttpStatus: sitemap.status, checks };
+}
+
+/** 48-hour task. A run is successful only after the public News list and detail verify. */
+export async function runNewsPublish(reason = "scheduled", options: { siteId?: string; dryRun?: boolean } = {}) {
+  const siteId = options.siteId || SITE_ID;
+  const config = validateSiteNewsConfig(siteId);
+  const release = await acquireTaskLock(`news:publish:${siteId}:${cycleKey(config.news.publishIntervalHours)}`, 47 * 60 * 60 * 1000);
+  if (!release) return { ok: true, skipped: true, message: "This site's publish cycle is already running.", stats: { published: 0 } };
+  const job = await startJob("compose-publish", `News publish started by ${reason}.`, siteId);
+  try {
+    const checks = await listNewsDeliveryChecks(siteId);
+    const lastSuccess = checks.find((check) => check.status === "passed");
+    if (!options.dryRun && lastSuccess && Date.now() - Date.parse(lastSuccess.createdAt) < config.news.publishIntervalHours * 3_600_000) {
+      const message = "48-hour publication interval has not elapsed since the last frontend-verified News article.";
+      await finishJob(job, "skipped", message, { published: 0 });
+      return { ok: true, skipped: true, message, stats: { published: 0 } };
+    }
+    let candidates = (await listNewsCandidates(siteId)).filter((candidate) => candidate.state === "candidate" && Date.now() - Date.parse(candidate.sourcePublishedAt) <= config.news.fallbackCandidateMaxAgeDays * 86_400_000);
+    if (!candidates.length) {
+      await runNewsIngest("publish-fallback", { siteId, includeFallback: true, dryRun: options.dryRun });
+      candidates = (await listNewsCandidates(siteId)).filter((candidate) => candidate.state === "candidate" && Date.now() - Date.parse(candidate.sourcePublishedAt) <= config.news.fallbackCandidateMaxAgeDays * 86_400_000);
+    }
+    const candidate = candidates[0];
+    if (!candidate) throw new Error("No compliant unused News candidate is available after fallback ingest.");
+    if (options.dryRun) return { ok: true, message: `Dry-run selected candidate ${candidate.id}.`, stats: { published: 0, candidate: candidate.id } };
+    await upsertStore(CANDIDATES_STORE, { ...candidate, state: "reserved_for_cycle", updatedAt: new Date().toISOString(), cycleKey: cycleKey(config.news.publishIntervalHours) });
+    const products = await getPublicProducts();
+    const product = rankProducts(candidateToFeedItem(candidate), products).slice(0, config.news.maxInternalProductLinks);
+    const article = await buildArticle(candidateToFeedItem(candidate), product, siteId);
+    const pending = { ...article, status: "frontend_verifying" as NewsStatus, publishAt: new Date().toISOString() };
+    await upsertStore(ARTICLES_STORE, pending);
+    const delivery = await verifyFrontendDelivery(config, pending);
+    const check: NewsDeliveryCheck = { id: createId("newsdelivery"), siteId, articleId: pending.id, slug: pending.slug, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), ...delivery, message: delivery.status === "passed" ? "Public News list, detail, RSS and News sitemap verified." : "Public frontend verification failed; publication requires retry." };
+    await upsertStore(DELIVERY_CHECKS_STORE, check);
+    if (delivery.status !== "passed") {
+      await upsertStore(ARTICLES_STORE, { ...pending, status: "retry_pending", failureReason: check.message, retries: pending.retries + 1 });
+      await finishJob(job, "failed", check.message, { published: 0, retries: pending.retries + 1 });
+      return { ok: false, message: check.message, stats: { published: 0 } };
+    }
+    await upsertStore(ARTICLES_STORE, { ...pending, status: "published_success" });
+    await upsertStore(CANDIDATES_STORE, { ...candidate, state: "used", updatedAt: new Date().toISOString(), usedByArticleId: pending.id });
+    await markSitemapDirty("frontend_verified_news_published");
+    await saveAudit({ siteId, date: new Date().toISOString().slice(0, 10), target: 1, published: 1, generated: 1, duplicates: 0, rejected: 0, failed: 0, status: "success", message: `Published and frontend-verified /news/${pending.slug}.` });
+    await finishJob(job, "success", `Published and frontend-verified /news/${pending.slug}.`, { published: 1, article: pending.id });
+    return { ok: true, message: `Published and frontend-verified /news/${pending.slug}.`, stats: { published: 1, article: pending.id } };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown publish failure";
+    await finishJob(job, "failed", message, { published: 0, failed: 1 });
+    return { ok: false, message, stats: { published: 0, failed: 1 } };
+  } finally { await release(); }
+}
+
+// Compatibility alias for old callers. It no longer fetches and publishes in one invocation.
+export async function runNewsAutomation(reason = "scheduled", options: { dryRun?: boolean } = {}) {
+  return runNewsPublish(reason, options);
+}
+
+async function legacyCollectAndPublishNews(limit = 1, options: { dryRun?: boolean } = {}) {
   const config = getNewsConfig();
   const sources = (await listNewsSources()).filter((source) => source.enabled && isTrustedSourceUrl(source.url));
   const products = await getPublicProducts();
@@ -522,7 +674,7 @@ async function fetchFeedItems(source: NewsSource): Promise<FeedItem[]> {
   }
 }
 
-async function buildArticle(item: FeedItem, relatedProducts: Array<{ slug: string; title: string; score: number }>): Promise<NewsArticle> {
+async function buildArticle(item: FeedItem, relatedProducts: Array<{ slug: string; title: string; score: number }>, siteId = SITE_ID): Promise<NewsArticle> {
   const now = new Date().toISOString();
   const primaryProduct = relatedProducts[0];
   const knowledge = getProductKnowledge(primaryProduct?.slug || "edj-fire-pump-set", primaryProduct?.title || "EDJ Fire Pump Set", "Fire Pump Systems");
@@ -538,20 +690,22 @@ async function buildArticle(item: FeedItem, relatedProducts: Array<{ slug: strin
   ].filter((fact) => fact.length > 12);
   const image = await resolveNewsImage(primaryProduct?.slug || "", productName);
   const slug = uniqueSlug(`${productName} ${industry} planning`, item.publishedAt);
-  const title = trimText(`${productName} planning for ${industry}: ${articleContextFromSource(item.title)}`, 92);
-  const summary = trimText(`A buyer-focused engineering note on ${primaryKeyword} selection inputs for ${scenario}, prompted by a recent ${item.sourceName} industry update.`, 160);
-  const body = buildOriginalAnalysis({ productName, primaryKeyword, industry, scenario, angle, knowledge, sourceName: item.sourceName, sourceDate: item.publishedAt.slice(0, 10), sourceSummary: cleanText(item.description || item.title) });
+  const title = trimText(cleanText(item.title), 92);
+  const summary = trimText(`An independently edited summary of a ${item.sourceName} update, with source facts and industry context for ${industry.toLowerCase()} readers.`, 160);
+  const body = buildEditorialNewsAnalysis({ industry, scenario, sourceName: item.sourceName, sourceDate: item.publishedAt.slice(0, 10), sourceSummary: cleanText(item.description || item.title) });
   const wordCount = body.join(" ").split(/\s+/).filter(Boolean).length;
   const quality = {
-    passed: wordCount >= 1000 && wordCount <= 1600,
+    passed: wordCount >= 700 && wordCount <= 1000,
     wordCount,
     titleSimilarity: 0,
     sourceReuseDays: 60,
-    reason: wordCount >= 1000 && wordCount <= 1600 ? "Passed source, originality, length and configuration checks." : "Generated analysis did not meet the 1000-1600 word requirement.",
+    reason: wordCount >= 700 && wordCount <= 1000 ? "Passed source, originality, length and configuration checks." : "Generated analysis did not meet the configured 700-1000 word requirement.",
   };
 
   return {
     id: createId("news"),
+    siteId,
+    contentType: "news",
     createdAt: now,
     updatedAt: now,
     status: "draft",
@@ -567,6 +721,9 @@ async function buildArticle(item: FeedItem, relatedProducts: Array<{ slug: strin
     sourceTitle: cleanText(item.title),
     sourcePublishedAt: item.publishedAt,
     sourceFetchedAt: now,
+    sourceAuthor: "",
+    imageLicenseStatus: "owned-neutral",
+    editorialDisclaimer: "This page is an independent editorial summary and analysis. Original reporting and factual claims remain attributable to the linked source.",
     sourceFacts,
     sourceFingerprint: fingerprintForSource(item),
     eventFingerprint: fingerprintForEvent(item.title),
@@ -594,6 +751,26 @@ async function buildArticle(item: FeedItem, relatedProducts: Array<{ slug: strin
     angle,
     quality,
   };
+}
+
+function buildEditorialNewsAnalysis(input: { industry: string; scenario: string; sourceName: string; sourceDate: string; sourceSummary: string }) {
+  const { industry, scenario, sourceName, sourceDate, sourceSummary } = input;
+  return [
+    "## What happened",
+    `${sourceName} published the linked update on ${sourceDate}. Its reported subject is: ${sourceSummary}. This News page does not reproduce the original report. It provides a short, independently edited industry summary for project teams following ${industry.toLowerCase()} activity. Readers should use the source link for the original wording, full context and any subsequent corrections from the publisher.`,
+    "## Facts and attribution",
+    `The factual basis for this page is limited to the source item identified above and its publication date. No claim is made that the reported organisation, facility or project uses GRIMM PUMP equipment. Where the original report describes plans, proposals, targets or estimates, those descriptions should be read as source-attributed information rather than as independently verified project completion or performance evidence.`,
+    "## Why the update matters",
+    `For teams responsible for ${scenario}, industry developments can affect the order in which technical interfaces are reviewed. A change in project activity, infrastructure planning, standards discussion or supply-chain conditions may create a need to revisit room allocation, water availability, electrical interfaces, access for installation, approval documentation and commissioning responsibilities. The relevant action is not to assume a standard equipment package; it is to verify the approved hydraulic and regulatory requirements for the specific project.`,
+    "## Editorial analysis",
+    `The broader signal from this update is that resilience planning is increasingly connected to ordinary engineering decisions made early in a project. When an industrial or critical facility is being planned, fire-water design, pump-room layout and controls should be coordinated with the design team before interfaces become fixed. The source does not establish a universal rule for every facility. Site conditions, applicable standards, water source, electrical supply, authority requirements and the approved specification remain decisive.`,
+    "## Practical questions for project teams",
+    `Project owners, consultants and EPC teams can use this kind of industry update as a prompt to check their own assumptions: What flow and pressure duty has been approved? Is the water source and suction condition documented? Which standards and authority requirements govern the site? Are controller interfaces, drainage, ventilation and maintenance access included in the room design? Are responsibilities for testing, installation and handover clearly assigned? These questions are project controls, not conclusions drawn from the source article.`,
+    "## Product context",
+    `This article does not contain a sales offer, quotation, performance promise or project reference. Where a related product page is shown elsewhere on the site, it is limited to one optional technical context link and does not alter the factual meaning of this News summary. Equipment selection must be based on the approved duty, configuration-specific documents and project requirements, rather than on a general industry article.`,
+    "## Source and editorial note",
+    `Original source: ${sourceName}; original publication date: ${sourceDate}. This page is an independent editorial summary and analysis prepared for industry readers. Original reporting, photographs and factual claims remain attributable to the linked source. GRIMM PUMP does not claim ownership of the source report and does not represent the source event as a company project, customer reference or product endorsement.`,
+  ];
 }
 
 async function resolveNewsImage(productSlug: string, topic: string) {
@@ -774,10 +951,11 @@ function uniqueSlug(title: string, date: string) {
   return `${base || "fire-pump-news"}-${date.slice(0, 10)}`;
 }
 
-async function startJob(type: NewsJob["type"], message: string) {
+async function startJob(type: NewsJob["type"], message: string, siteId = SITE_ID) {
   const now = new Date().toISOString();
   const job: NewsJob = {
     id: createId("newsjob"),
+    siteId,
     createdAt: now,
     updatedAt: now,
     type,
@@ -989,6 +1167,10 @@ function normalizeStoredArticle(article: NewsArticle): NewsArticle {
   const clean = (value: string) => cleanText(value).replace(sourceSuffix || /$a/, "").trim();
   return {
     ...article,
+    siteId: article.siteId || SITE_ID,
+    contentType: "news",
+    editorialDisclaimer: article.editorialDisclaimer || "This page is an independent editorial summary and analysis. Original reporting and factual claims remain attributable to the linked source.",
+    imageLicenseStatus: article.imageLicenseStatus || "owned-neutral",
     title: clean(article.title),
     summary: cleanText(article.summary),
     seoTitle: cleanText(article.seoTitle),

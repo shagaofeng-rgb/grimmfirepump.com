@@ -1,10 +1,7 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowRight } from "lucide-react";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
-import { StickyCta } from "@/components/sticky-cta";
 import { company } from "@/data/site";
 import { getNewsArticle, listPublishedNews } from "@/lib/news-automation";
 import { ArticleContent } from "@/components/article-content";
@@ -91,13 +88,7 @@ export default async function NewsDetailPage({ params }: NewsDetailProps) {
         <article className="container-shell max-w-4xl py-14 lg:py-20">
           <p className="eyebrow mb-4">{article.category}</p>
           <h1 className="article-title break-words text-3xl font-black leading-tight text-[var(--navy-950)] md:text-5xl">{article.title}</h1>
-          <div className="mt-5 flex flex-wrap gap-x-4 gap-y-2 text-sm font-bold text-slate-500">
-            <span>Published {(article.publishAt || article.sourcePublishedAt).slice(0, 10)}</span>
-            <span>Source: {article.sourceName}</span>
-            <a className="text-[var(--navy-800)] underline decoration-[var(--orange)] underline-offset-4" href={article.sourceUrl} target="_blank" rel="noreferrer">
-              View original source
-            </a>
-          </div>
+          <div className="mt-5 flex flex-wrap gap-x-4 gap-y-2 text-sm font-bold text-slate-500"><span>Editorial publication: {(article.publishAt || article.createdAt).slice(0, 10)}</span><span>Original publication: {article.sourcePublishedAt.slice(0, 10)}</span></div>
           <p className="article-content-copy mt-6 text-xl leading-9 text-slate-600">{article.summary}</p>
           <figure className="mt-10 overflow-hidden rounded-lg border border-slate-200 bg-slate-50">
             <img src={safeArticleImageUrl(article.coverImageUrl)} alt={article.coverImageAlt} className="aspect-[16/9] h-auto w-full object-cover" loading="eager" decoding="async" />
@@ -107,7 +98,16 @@ export default async function NewsDetailPage({ params }: NewsDetailProps) {
           </figure>
 
           <section className="mt-10 rounded-lg border border-slate-200 bg-slate-50 p-6">
-            <h2 className="text-xl font-black text-[var(--navy-950)]">Source facts used</h2>
+            <h2 className="text-xl font-black text-[var(--navy-950)]">Original source and editorial note</h2>
+            <dl className="mt-4 grid gap-2 text-sm leading-6 text-slate-700">
+              <div><dt className="inline font-black">Source: </dt><dd className="inline">{article.sourceName}</dd></div>
+              <div><dt className="inline font-black">Original date: </dt><dd className="inline">{article.sourcePublishedAt.slice(0, 10)}</dd></div>
+              {article.sourceAuthor ? <div><dt className="inline font-black">Author: </dt><dd className="inline">{article.sourceAuthor}</dd></div> : null}
+              <div><dt className="inline font-black">Image use: </dt><dd className="inline">{article.imageLicenseStatus || "owned-neutral"}</dd></div>
+              <div><a className="font-black text-[var(--navy-800)] underline decoration-[var(--orange)] underline-offset-4" href={article.sourceUrl} target="_blank" rel="noreferrer">Read the original source</a></div>
+            </dl>
+            <p className="article-content-copy mt-5 border-t border-slate-200 pt-5 text-sm leading-7 text-slate-600">{article.editorialDisclaimer || "This page is an independent editorial summary and analysis. Original reporting and factual claims remain attributable to the linked source."}</p>
+            <h3 className="mt-6 text-base font-black text-[var(--navy-950)]">Source facts used</h3>
             <ul className="mt-4 grid gap-3 text-sm leading-6 text-slate-700">
               {article.sourceFacts.map((fact) => (
                 <li key={fact} className="flex min-w-0 gap-3">
@@ -120,29 +120,9 @@ export default async function NewsDetailPage({ params }: NewsDetailProps) {
 
           <ArticleContent content={article.body} />
 
-          <section className="mt-12 rounded-lg border border-slate-200 p-6">
-            <h2 className="text-2xl font-black text-[var(--navy-950)]">Related GRIMM products</h2>
-            <div className="mt-5 grid gap-3">
-              {article.relatedProducts.map((product) => (
-                <Link key={product.slug} href={`/products/${product.slug}`} className="flex items-center justify-between gap-4 rounded-md bg-slate-50 px-4 py-3 text-sm font-black text-[var(--navy-900)] hover:bg-orange-50">
-                  <span>{product.title}</span>
-                  <ArrowRight size={16} className="text-[var(--orange)]" />
-                </Link>
-              ))}
-            </div>
-          </section>
-
-          <section className="mt-12 rounded-lg bg-[var(--navy-950)] p-7 text-white">
-            <h2 className="text-2xl font-black">Need to connect this topic to your project?</h2>
-            <p className="mt-3 max-w-2xl leading-7 text-slate-300">
-              Send the project country, flow, head, voltage and application. GRIMM can prepare pump package selection and quotation support.
-            </p>
-            <Link className="button button-primary mt-6" href="/contact">Ask an Engineer</Link>
-          </section>
         </article>
       </main>
       <Footer />
-      <StickyCta />
     </>
   );
 }
