@@ -317,6 +317,10 @@ const blogCategorySeeds: CmsBlogCategory[] = [
 // let short, unsourced legacy material compete with technical Blog content.
 const legacyBlogExclusions = new Set(posts.map((post) => post.slug));
 
+export function isLegacyImportedBlogSlug(slug: string) {
+  return legacyBlogExclusions.has(slug);
+}
+
 const downloadSeeds: DownloadAsset[] = downloads.map((item, index) => ({
   id: `down_${index + 1}`,
   createdAt: now(),

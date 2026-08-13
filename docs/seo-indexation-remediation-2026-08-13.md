@@ -22,7 +22,9 @@
 
 - The 21 records seeded from the former site's `news` export are not treated as
   authored Blog content. They are preserved in CMS storage for audit/recovery
-  but removed from public Blog lists, Blog sitemap, and indexation.
+  but removed from public Blog lists, Blog sitemap, and indexation. The public
+  read layer applies the same exclusion so a stale CMS cache cannot expose a
+  legacy record while the archival write is being refreshed.
 - New manual or webhook-created Blog records are unaffected because their slugs
   are not part of the legacy seed set.
 - Verified external industry coverage is published only through `/news` and
