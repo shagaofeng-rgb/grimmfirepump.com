@@ -21,8 +21,10 @@ export async function generateMetadata({ params }: LocalizedBlogDetailProps): Pr
   return {
     title: post.title,
     description: post.text,
-    alternates: localizedAlternates(path, locale),
-    robots: post.indexable ? { index: true, follow: true } : { index: false, follow: true },
+    alternates: localizedAlternates(path, "en"),
+    // Article bodies have not yet been translated. Avoid claiming they are
+    // locale-specific variants to crawlers while keeping them usable in the UI.
+    robots: { index: false, follow: true },
     openGraph: { title: post.title, description: post.text, images: [post.image] },
   };
 }

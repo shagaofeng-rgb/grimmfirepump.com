@@ -6,10 +6,12 @@ The public Sitemap is generated dynamically from published CMS records and stati
 
 - `/sitemaps/pages-1.xml`
 - `/sitemaps/products-1.xml`
-- `/sitemaps/posts-1.xml`
+- `/sitemaps/knowledge-1.xml`
 - `/sitemaps/categories-1.xml`
+- `/blog-sitemap.xml`
+- `/news-sitemap.xml`
 
-Each file is split before 45,000 URLs or 45 MB, leaving margin below Google's 50,000 URL and 50 MB limits. Draft, review, offline, archived, scheduled, noindex, parameterized and non-self-canonical records are excluded. `lastmod` comes from each record's real update or publish date; static pages use their recorded content update date.
+Each file is split before 45,000 URLs or 45 MB, leaving margin below Google's 50,000 URL and 50 MB limits. Draft, review, offline, archived, scheduled, noindex, parameterized and non-self-canonical records are excluded. Blog, News and knowledge URLs are kept in separate sitemap groups; no Blog or News detail URL is duplicated in the generic sitemap shards. `lastmod` comes from each record's real update or publish date; static pages use their recorded content update date.
 
 Content changes mark the Sitemap dirty and invalidate the public Sitemap routes. The Vercel Cron runs every three days, performs a consistency check, writes an atomically verified runtime snapshot, compares the current URL manifest with the previous one, records added/modified/removed URLs and optionally submits the Sitemap Index through the Google Search Console Sitemaps API.
 

@@ -312,17 +312,10 @@ const blogCategorySeeds: CmsBlogCategory[] = [
   { id: "blog_industry_news", createdAt: now(), updatedAt: now(), name: "Industry News", slug: "blog", sortOrder: 1, enabled: true },
 ];
 
-const legacyBlogExclusions = new Set([
-  "fire-aboard-uss-gerald-r-ford-injures-sailors-triggers-navy-investigation",
-  "why-choose-us2",
-  "why-choose-us",
-  "si-necesita-una-bomba-contra-incendios-o-no-sabe-c-mo-elegir-una-puede-ponerse-e",
-  "global-fire-pump-industry-growth-accelerates-amid-stricter-safety-regulations",
-  "trailer-type-fire-pump-truck-equipped-with-a-fire-monitor",
-  "dragon-boat-festival-2026-traditions-history-and-cultural-significance",
-  "professional-production-of-fire-pumps-and-water-supply-equipment",
-  "why-fire-pumps-are-essential-to-modern-fire-protection-systems",
-]);
+// These records are a one-time import of the former site's news feed, not
+// authored Blog posts. Keep them in the CMS for audit/recovery, but do not
+// let short, unsourced legacy material compete with technical Blog content.
+const legacyBlogExclusions = new Set(posts.map((post) => post.slug));
 
 const downloadSeeds: DownloadAsset[] = downloads.map((item, index) => ({
   id: `down_${index + 1}`,

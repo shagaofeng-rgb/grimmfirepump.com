@@ -16,7 +16,7 @@ const routes = [
   "/sitemap.xml",
   "/sitemaps/pages-1.xml",
   "/sitemaps/products-1.xml",
-  "/sitemaps/posts-1.xml",
+  "/sitemaps/knowledge-1.xml",
   "/sitemaps/categories-1.xml",
   "/robots.txt",
   "/news/rss.xml",

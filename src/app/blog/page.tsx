@@ -20,7 +20,7 @@ export default async function BlogPage() {
       title="Official GRIMM news and fire pump industry updates."
       text="Synchronized from the current GRIMM website, including company news, delivery updates, fire pump articles and industry application insights."
     >
-      <BlogSection items={posts} basePath="/blog" eyebrow="News Center" title="Official news and fire pump industry updates." />
+      <BlogSection items={posts} basePath="/blog" eyebrow="Technical Blog" title="Fire pump selection, engineering and maintenance guidance." />
     </SimplePage>
   );
 }

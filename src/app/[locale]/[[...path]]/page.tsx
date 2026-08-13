@@ -8,6 +8,7 @@ import { applications, certificates, company, downloads, knowledgePosts, product
 import { localizedSite } from "@/data/localized-site";
 import {
   isLocalizedLocale,
+  isLocalizedPathIndexable,
   isSupportedLocalizedPath,
   localizedAlternates,
   localizedLocales,
@@ -43,12 +44,13 @@ export async function generateMetadata({ params }: LocalizedPageProps): Promise<
 
   const content = localizedSite[locale];
   const page = content.pages[pagePath];
+  const indexable = isLocalizedPathIndexable(pagePath);
 
   return {
     title: pagePath === "/" ? content.home.title : page.title,
     description: page.text,
-    alternates: localizedAlternates(pagePath, locale),
-    robots: pagePath === "/search" ? { index: false, follow: true } : { index: true, follow: true },
+    alternates: localizedAlternates(pagePath, indexable ? locale : "en"),
+    robots: indexable ? { index: true, follow: true } : { index: false, follow: true },
     openGraph: {
       title: page.title,
       description: page.text,

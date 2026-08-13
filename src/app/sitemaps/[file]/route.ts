@@ -4,7 +4,7 @@ export const dynamic = "force-dynamic";
 
 export async function GET(_request: Request, context: { params: Promise<{ file: string }> }) {
   const { file } = await context.params;
-  if (!/^(pages|products|posts|categories)-\d+\.xml$/.test(file)) return new Response("Not found", { status: 404 });
+  if (!/^(pages|products|knowledge|categories)-\d+\.xml$/.test(file)) return new Response("Not found", { status: 404 });
   const bundle = await getCurrentSitemapBundle();
   const chunk = bundle.chunks.find((item) => item.fileName === file);
   if (!chunk) return new Response("Not found", { status: 404 });

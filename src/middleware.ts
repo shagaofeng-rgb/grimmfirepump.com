@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { legacyUrlDecision } from "@/lib/legacy-url-governance";
 
 const ADMIN_COOKIE_NAME = "grimm_admin_session";
 const localePattern = /^\/(es|ru|ar|fr|pt)(?:\/|$)/;
@@ -66,6 +67,16 @@ export async function middleware(request: NextRequest) {
   if (productRedirect) {
     const target = request.nextUrl.clone();
     target.pathname = productRedirect;
+    target.search = "";
+    return NextResponse.redirect(target, 301);
+  }
+  const legacyDecision = legacyUrlDecision(pathname);
+  if (legacyDecision?.kind === "gone") {
+    return new NextResponse("Gone", { status: 410, headers: { "cache-control": "public, max-age=86400" } });
+  }
+  if (legacyDecision?.kind === "redirect") {
+    const target = request.nextUrl.clone();
+    target.pathname = legacyDecision.destination;
     target.search = "";
     return NextResponse.redirect(target, 301);
   }

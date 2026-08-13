@@ -3,7 +3,7 @@ import path from "node:path";
 import { unstable_cache } from "next/cache";
 import { applications, company, knowledgePosts } from "@/data/site";
 import { listCmsNews, listCmsProducts, listManagedPages } from "@/lib/admin-cms";
-import { localizedLocales, localizedPath, supportedLocalizedPaths } from "@/lib/i18n";
+import { isLocalizedPathIndexable, localizedLocales, localizedPath, supportedLocalizedPaths } from "@/lib/i18n";
 import { acquireTaskLock, createId, readStore, writeStore } from "@/lib/local-store";
 import { listPublishedNews } from "@/lib/news-automation";
 import { submitSitemapToSearchConsole, type SearchConsoleSubmission } from "@/lib/search-console";
@@ -23,7 +23,7 @@ const MANIFEST_STORE = "sitemap-manifest.json";
 const RUNS_STORE = "sitemap-runs.json";
 const DIRTY_STORE = "sitemap-dirty.json";
 const STATIC_CONTENT_UPDATED_AT = "2026-07-10T00:00:00.000Z";
-const GROUPS: SitemapGroup[] = ["pages", "products", "posts", "categories"];
+const GROUPS: SitemapGroup[] = ["pages", "products", "knowledge", "categories"];
 
 export type SitemapManifest = {
   id: "sitemap_manifest";
@@ -136,7 +136,7 @@ async function buildSitemapBundleUncached(): Promise<SitemapBundle> {
 
   for (const locale of localizedLocales) {
     for (const pathname of supportedLocalizedPaths) {
-      if (pathname === "/search") continue;
+      if (!isLocalizedPathIndexable(pathname)) continue;
       add("pages", localizedPath(pathname, locale), STATIC_CONTENT_UPDATED_AT);
     }
   }
@@ -164,7 +164,7 @@ async function buildSitemapBundleUncached(): Promise<SitemapBundle> {
       skipped.push(`${pathname}: invalid slug`);
       continue;
     }
-    add("posts", pathname, post.updatedAt || post.publishAt || post.createdAt);
+    // Blog entries live only in /blog-sitemap.xml.
   }
 
   for (const article of automatedNews) {
@@ -173,10 +173,10 @@ async function buildSitemapBundleUncached(): Promise<SitemapBundle> {
       skipped.push(`${pathname}: invalid slug or scheduled`);
       continue;
     }
-    add("posts", pathname, article.updatedAt || article.publishAt || article.createdAt);
+    // News entries live only in /news-sitemap.xml.
   }
 
-  for (const post of knowledgePosts) add("posts", `/knowledge/${post.slug}`, post.date);
+  for (const post of knowledgePosts) add("knowledge", `/knowledge/${post.slug}`, post.date);
 
   const productDates = products.filter((item) => item.status === "published" && item.indexable).map((item) => item.updatedAt || item.createdAt);
   const blogDates = blogPosts.filter((item) => item.status === "published" && item.indexable).map((item) => item.updatedAt || item.publishAt);
@@ -191,7 +191,17 @@ async function buildSitemapBundleUncached(): Promise<SitemapBundle> {
 
   const entries = GROUPS.flatMap((group) => Array.from(maps.get(group)!.values()));
   const chunks = GROUPS.flatMap((group) => chunkSitemapEntries(group, Array.from(maps.get(group)!.values())));
-  return { origin: getSiteOrigin(), entries, chunks, indexXml: buildSitemapIndexXml(getSiteOrigin(), chunks), skipped, errors };
+  return {
+    origin: getSiteOrigin(),
+    entries,
+    chunks,
+    indexXml: buildSitemapIndexXml(getSiteOrigin(), chunks, [
+      { url: absoluteUrl("/blog-sitemap.xml"), lastModified: latestDate(blogDates) },
+      { url: absoluteUrl("/news-sitemap.xml"), lastModified: latestDate(newsDates) },
+    ]),
+    skipped,
+    errors,
+  };
 }
 
 export const buildSitemapBundle = unstable_cache(buildSitemapBundleUncached, ["sitemap-bundle-v3"], {

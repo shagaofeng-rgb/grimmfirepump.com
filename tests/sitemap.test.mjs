@@ -15,6 +15,7 @@ import {
   writeSitemapFilesAtomically,
 } from "../src/lib/sitemap-core.ts";
 import { submitSitemapToSearchConsole } from "../src/lib/search-console.ts";
+import { legacyUrlDecision } from "../src/lib/legacy-url-governance.ts";
 
 const entry = (url, lastModified = "2026-06-23T00:00:00.000Z") => ({ url, lastModified, group: "products" });
 
@@ -68,6 +69,22 @@ test("generates a valid Sitemap index", () => {
   const xml = buildSitemapIndexXml("https://www.grimmfirepump.com", chunks);
   assert.equal(validateSitemapXml(xml), true);
   assert.match(xml, /sitemaps\/products-1.xml/);
+});
+
+test("includes dedicated Blog and News sitemaps without adding duplicate URL entries", () => {
+  const chunks = chunkSitemapEntries("products", [entry("https://www.grimmfirepump.com/products/test")]);
+  const xml = buildSitemapIndexXml("https://www.grimmfirepump.com", chunks, [
+    { url: "https://www.grimmfirepump.com/blog-sitemap.xml" },
+    { url: "https://www.grimmfirepump.com/news-sitemap.xml" },
+  ]);
+  assert.match(xml, /blog-sitemap\.xml/);
+  assert.match(xml, /news-sitemap\.xml/);
+});
+
+test("applies reviewed legacy redirect and gone decisions", () => {
+  assert.deepEqual(legacyUrlDecision("/news/EDJFIREPUMP.html"), { kind: "redirect", destination: "/products/edj-fire-pump-set" });
+  assert.deepEqual(legacyUrlDecision("/NEWS/NEWS-DRAGON-BOAT-FESTIVAL-2026.HTML"), { kind: "gone" });
+  assert.equal(legacyUrlDecision("/not-a-legacy-url"), undefined);
 });
 
 test("prevents concurrent lock acquisition", async () => {

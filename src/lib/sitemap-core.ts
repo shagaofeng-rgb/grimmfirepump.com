@@ -1,7 +1,7 @@
 import { mkdir, open, readFile, rename, rm, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 
-export type SitemapGroup = "pages" | "products" | "posts" | "categories";
+export type SitemapGroup = "pages" | "products" | "knowledge" | "categories";
 
 export type SitemapEntry = {
   url: string;
@@ -77,12 +77,18 @@ export function buildUrlsetXml(entries: SitemapEntry[]) {
 export function buildSitemapIndexXml(
   origin: string,
   chunks: Array<Pick<SitemapChunk, "fileName" | "lastModified">>,
+  additionalSitemaps: Array<{ url: string; lastModified?: string }> = [],
 ) {
   const base = origin.replace(/\/$/, "");
-  const rows = chunks.map((chunk) => {
+  const chunkRows = chunks.map((chunk) => {
     const location = `${base}/sitemaps/${encodeURIComponent(chunk.fileName)}`;
     return `  <sitemap>\n    <loc>${escapeXml(location)}</loc>\n    <lastmod>${escapeXml(normalizeLastModified(chunk.lastModified))}</lastmod>\n  </sitemap>`;
   });
+  const additionalRows = additionalSitemaps.map(({ url, lastModified }) => {
+    const suffix = lastModified ? `\n    <lastmod>${escapeXml(normalizeLastModified(lastModified))}</lastmod>` : "";
+    return `  <sitemap>\n    <loc>${escapeXml(url)}</loc>${suffix}\n  </sitemap>`;
+  });
+  const rows = [...chunkRows, ...additionalRows];
   return `${XML_HEADER}\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${rows.join("\n")}\n</sitemapindex>\n`;
 }
 

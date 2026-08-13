@@ -22,6 +22,19 @@ export const supportedLocalizedPaths = [
 
 export type LocalizedPath = (typeof supportedLocalizedPaths)[number];
 
+// Only these routes have complete, human-reviewed localized body copy. Other
+// locale routes remain available for visitors but canonicalize to English until
+// their products, articles and supporting modules are translated end-to-end.
+export const localizedIndexablePaths = [
+  "/",
+  "/about",
+  "/factory",
+  "/testing",
+  "/certificates",
+  "/downloads",
+  "/contact",
+] as const;
+
 export function isLocalizedLocale(locale: string): locale is LocalizedLocale {
   return (localizedLocales as readonly string[]).includes(locale);
 }
@@ -35,6 +48,10 @@ export function isSupportedLocalizedPath(path: string): path is LocalizedPath {
   return (supportedLocalizedPaths as readonly string[]).includes(normalizeLocalizedPath(path));
 }
 
+export function isLocalizedPathIndexable(path: string) {
+  return (localizedIndexablePaths as readonly string[]).includes(normalizeLocalizedPath(path));
+}
+
 export function localizedPath(path: string, locale: SiteLocale = "en") {
   const normalizedPath = normalizeLocalizedPath(path);
   if (locale === "en") {
@@ -46,15 +63,18 @@ export function localizedPath(path: string, locale: SiteLocale = "en") {
 
 export function localizedAlternates(path: string, canonicalLocale: SiteLocale = "en") {
   const normalizedPath = normalizeLocalizedPath(path);
+  const includeLocalizedAlternates = isLocalizedPathIndexable(normalizedPath);
   return {
     canonical: localizedPath(normalizedPath, canonicalLocale),
     languages: {
       en: localizedPath(normalizedPath, "en"),
-      es: localizedPath(normalizedPath, "es"),
-      ru: localizedPath(normalizedPath, "ru"),
-      ar: localizedPath(normalizedPath, "ar"),
-      fr: localizedPath(normalizedPath, "fr"),
-      pt: localizedPath(normalizedPath, "pt"),
+      ...(includeLocalizedAlternates ? {
+        es: localizedPath(normalizedPath, "es"),
+        ru: localizedPath(normalizedPath, "ru"),
+        ar: localizedPath(normalizedPath, "ar"),
+        fr: localizedPath(normalizedPath, "fr"),
+        pt: localizedPath(normalizedPath, "pt"),
+      } : {}),
       "x-default": localizedPath(normalizedPath, "en"),
     },
   };
