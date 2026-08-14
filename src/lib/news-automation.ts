@@ -5,7 +5,6 @@ import { getProductKnowledge } from "@/lib/product-knowledge";
 import { getProductFamily } from "@/lib/product-taxonomy";
 import { acquireTaskLock, createId, readStore, upsertStore, writeStore } from "@/lib/local-store";
 import { markSitemapDirty } from "@/lib/sitemap-dirty";
-import { unstable_cache } from "next/cache";
 import { getSiteNewsConfig, validateSiteNewsConfig, type SiteNewsConfig } from "@/lib/site-news-config";
 
 export type NewsStatus =
@@ -188,12 +187,6 @@ const CANDIDATES_STORE = "news-candidates.json";
 const DELIVERY_CHECKS_STORE = "news-delivery-checks.json";
 const SITE_ID = "grimm-firepump-global";
 
-const cachedNewsArticles = unstable_cache(
-  () => readStore<NewsArticle[]>(ARTICLES_STORE, []),
-  ["public-news-articles-v1"],
-  { revalidate: 300, tags: ["news-articles"] },
-);
-
 const fallbackNewsImages = [
   {
     url: "/assets/products/diesel-fire-pump.webp",
@@ -295,7 +288,9 @@ export function getNewsConfig(siteId = SITE_ID) {
 }
 
 export async function listNewsArticles(siteId = SITE_ID) {
-  const articles = await cachedNewsArticles();
+  // A publish run writes an article and immediately validates it through the
+  // public routes. The former 5-minute data cache made those routes stale.
+  const articles = await readStore<NewsArticle[]>(ARTICLES_STORE, []);
   return articles
     .map((article) => normalizeStoredArticle(article))
     .filter((article) => !article.siteId || article.siteId === siteId)
@@ -474,6 +469,20 @@ async function verifyFrontendDelivery(site: SiteNewsConfig, article: NewsArticle
   return { status: Object.values(checks).every(Boolean) ? "passed" as const : "failed" as const, listHttpStatus: list.status, detailHttpStatus: detail.status, rssHttpStatus: rss.status, sitemapHttpStatus: sitemap.status, checks };
 }
 
+async function archiveSupersededRetryAttempts(siteId: string) {
+  const attempts = (await listNewsArticles(siteId)).filter((article) => article.status === "retry_pending");
+  if (!attempts.length) return 0;
+  const now = new Date().toISOString();
+  await Promise.all(attempts.map((article) => upsertStore(ARTICLES_STORE, {
+    ...article,
+    status: "archived" as NewsStatus,
+    indexable: false,
+    updatedAt: now,
+    failureReason: "Superseded after the public-verification cache defect was corrected; retained for audit.",
+  })));
+  return attempts.length;
+}
+
 /** 48-hour task. A run is successful only after the public News list and detail verify. */
 export async function runNewsPublish(reason = "scheduled", options: { siteId?: string; dryRun?: boolean } = {}) {
   const siteId = options.siteId || SITE_ID;
@@ -489,6 +498,7 @@ export async function runNewsPublish(reason = "scheduled", options: { siteId?: s
       await finishJob(job, "skipped", message, { published: 0 });
       return { ok: true, skipped: true, message, stats: { published: 0 } };
     }
+    const supersededRetries = options.dryRun ? 0 : await archiveSupersededRetryAttempts(siteId);
     let candidates = (await listNewsCandidates(siteId)).filter((candidate) => candidate.state === "candidate" && Date.now() - Date.parse(candidate.sourcePublishedAt) <= config.news.fallbackCandidateMaxAgeDays * 86_400_000);
     if (!candidates.length) {
       await runNewsIngest("publish-fallback", { siteId, includeFallback: true, dryRun: options.dryRun });
@@ -514,9 +524,10 @@ export async function runNewsPublish(reason = "scheduled", options: { siteId?: s
     await upsertStore(ARTICLES_STORE, { ...pending, status: "published_success" });
     await upsertStore(CANDIDATES_STORE, { ...candidate, state: "used", updatedAt: new Date().toISOString(), usedByArticleId: pending.id });
     await markSitemapDirty("frontend_verified_news_published");
-    await saveAudit({ siteId, date: new Date().toISOString().slice(0, 10), target: 1, published: 1, generated: 1, duplicates: 0, rejected: 0, failed: 0, status: "success", message: `Published and frontend-verified /news/${pending.slug}.` });
-    await finishJob(job, "success", `Published and frontend-verified /news/${pending.slug}.`, { published: 1, article: pending.id });
-    return { ok: true, message: `Published and frontend-verified /news/${pending.slug}.`, stats: { published: 1, article: pending.id } };
+    const message = `Published and frontend-verified /news/${pending.slug}.${supersededRetries ? ` Archived ${supersededRetries} superseded retry attempt(s).` : ""}`;
+    await saveAudit({ siteId, date: new Date().toISOString().slice(0, 10), target: 1, published: 1, generated: 1, duplicates: 0, rejected: 0, failed: 0, status: "success", message });
+    await finishJob(job, "success", message, { published: 1, article: pending.id, supersededRetries });
+    return { ok: true, message, stats: { published: 1, article: pending.id, supersededRetries } };
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown publish failure";
     await finishJob(job, "failed", message, { published: 0, failed: 1 });
@@ -553,7 +564,7 @@ async function buildArticle(item: FeedItem, relatedProducts: Array<{ slug: strin
     `GRIMM PUMP uses this public update only as industry context; it is not a GRIMM PUMP project reference.`,
   ].filter((fact) => fact.length > 12);
   const image = await resolveNewsImage(primaryProduct?.slug || "", productName);
-  const slug = uniqueSlug(`${productName} ${industry} planning`, item.publishedAt);
+  const slug = uniqueSlug(item.title, item.publishedAt);
   const title = trimText(cleanText(item.title), 92);
   const summary = trimText(`An independently edited summary of a ${item.sourceName} update, with source facts and industry context for ${industry.toLowerCase()} readers.`, 160);
   const body = buildEditorialNewsAnalysis({ industry, scenario, sourceName: item.sourceName, sourceDate: item.publishedAt.slice(0, 10), sourceSummary: cleanText(item.description || item.title) });
