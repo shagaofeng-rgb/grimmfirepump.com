@@ -454,10 +454,13 @@ function candidateToFeedItem(candidate: NewsCandidate): FeedItem {
 
 async function verifyFrontendDelivery(site: SiteNewsConfig, article: NewsArticle) {
   const base = (process.env.NEWS_FRONTEND_VERIFY_URL || site.siteUrl).replace(/\/$/, "");
-  const list = await fetch(`${base}${site.news.listRoute}`, { cache: "no-store" });
-  const detail = await fetch(`${base}${site.news.listRoute}/${article.slug}`, { cache: "no-store" });
-  const rss = await fetch(`${base}${site.news.rssRoute}`, { cache: "no-store" });
-  const sitemap = await fetch(`${base}${site.news.sitemapRoute}`, { cache: "no-store" });
+  const verifyQuery = `news_verify=${Date.now()}`;
+  // A unique query prevents a CDN-cached RSS/Sitemap response from being used
+  // as publication evidence. These are internal verification requests only.
+  const list = await fetch(`${base}${site.news.listRoute}?${verifyQuery}`, { cache: "no-store" });
+  const detail = await fetch(`${base}${site.news.listRoute}/${article.slug}?${verifyQuery}`, { cache: "no-store" });
+  const rss = await fetch(`${base}${site.news.rssRoute}?${verifyQuery}`, { cache: "no-store" });
+  const sitemap = await fetch(`${base}${site.news.sitemapRoute}?${verifyQuery}`, { cache: "no-store" });
   const [listBody, detailBody, rssBody, sitemapBody] = await Promise.all([list.text(), detail.text(), rss.text(), sitemap.text()]);
   const checks = {
     listVisible: list.ok && listBody.includes(article.title) && listBody.includes(`/news/${article.slug}`),
