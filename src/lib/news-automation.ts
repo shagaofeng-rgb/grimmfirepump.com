@@ -464,7 +464,7 @@ async function verifyFrontendDelivery(site: SiteNewsConfig, article: NewsArticle
   const [listBody, detailBody, rssBody, sitemapBody] = await Promise.all([list.text(), detail.text(), rss.text(), sitemap.text()]);
   const checks = {
     listVisible: list.ok && listBody.includes(article.title) && listBody.includes(`/news/${article.slug}`),
-    detailVisible: detail.ok && detailBody.includes(article.title) && detailBody.includes(article.sourceName) && detailBody.includes("Editorial note"),
+    detailVisible: detail.ok && detailBody.includes(article.title) && detailBody.includes(article.sourceName) && detailBody.toLowerCase().includes("editorial note"),
     rssVisible: rss.ok && rssBody.includes(article.slug),
     sitemapVisible: sitemap.ok && sitemapBody.includes(article.slug),
     blogIsolated: !listBody.includes(`/blog/${article.slug}`),
