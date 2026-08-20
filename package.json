@@ -10,8 +10,12 @@
     "lint": "tsc --noEmit",
     "audit:site": "node scripts/site-self-audit.mjs",
     "audit:deep": "node scripts/site-deep-audit.mjs",
+    "audit:products": "node --experimental-strip-types scripts/product-audit.mjs",
+    "news:sources:import": "node --experimental-strip-types scripts/import-news-sources.mjs",
+    "news:sources:validate": "node --experimental-strip-types scripts/validate-news-sources.mjs",
     "sitemap:generate": "node scripts/sitemap.mjs",
-    "test:sitemap": "node --test --experimental-strip-types tests/sitemap.test.mjs"
+    "test:sitemap": "node --test --experimental-strip-types tests/sitemap.test.mjs",
+    "test:news-sources": "node --test --experimental-strip-types tests/news-source-catalog.test.mjs"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",
@@ -26,13 +30,11 @@
     "react-dom": "19.0.0",
     "zod": "^4.1.13"
   },
-  "overrides": {
-    "postcss": "8.5.15"
-  },
+  "overrides": { "postcss": "8.5.15" },
   "devDependencies": {
     "@types/node": "^22.19.19",
     "@types/react": "^19.2.7",
-    "@types/react-dom": "^19.2.3",
+    "@types/react-dom": "^19.2.7",
     "tailwindcss": "^4.1.17",
     "typescript": "^5.9.3"
   }
