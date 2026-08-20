@@ -1,0 +1,49 @@
+name: News catalog and product validation
+
+on:
+  push:
+    branches: [codex/grimm-news-automation]
+    paths:
+      - "data/news/**"
+      - "data/products/**"
+      - "src/lib/news/**"
+      - "scripts/**"
+      - "tests/**"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/news-validation.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  validate:
+    if: "!contains(github.event.head_commit.message, '[skip news validation]')"
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/grimm-news-automation
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: node --version
+      - run: npm install
+      - run: npm run news:sources:import
+      - run: npm run news:sources:validate
+      - run: npm run news:sources:probe
+      - run: npm run audit:products
+      - run: npm run test:news-sources
+      - run: npm run test:news-quality
+      - run: npm run test:sitemap
+      - run: npm run typecheck
+      - run: npm run build
+      - name: Commit generated evidence
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/news/source-catalog.seed.* data/products/product-topic-profiles.json reports/
+          git diff --cached --quiet || git commit -m "Generate validation evidence [skip news validation]"
+          git push

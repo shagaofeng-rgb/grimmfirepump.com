@@ -1,0 +1,370 @@
+[
+  {
+    "id": "2-electric-plus-jockey-pump-set",
+    "slug": "2-electric-plus-jockey-pump-set",
+    "category": "Fire Series",
+    "productName": "2 Electric + jockey pump set",
+    "model": "Pump",
+    "currentUrl": "https://www.grimmfirepump.com/products/2-electric-plus-jockey-pump-set",
+    "shortDescription": "Flow: 5-400L/s\nHead: 3-15Bar\nCaliber: 65-250mm\nPressure: 0.3~1.5MPa\nSpeed: 740-2900r/min\nMaterial: HT200, SS304, Bronze",
+    "existingSpecifications": {
+      "specification_1": "Flow: 5-400L/s",
+      "specification_2": "Head: 3-15Bar",
+      "specification_3": "Caliber: 65-250mm",
+      "specification_4": "Pressure: 0.3~1.5MPa",
+      "specification_5": "Speed: 740-2900r/min",
+      "specification_6": "Material: HT200, SS304, Bronze",
+      "specification_7": "Caliber : 50-200mm",
+      "specification_8": "Flow : 100,200,300,500,750,1000…GPM",
+      "specification_9": "Head : 3,4,5,6,8,9,10…BAR",
+      "specification_10": "Power : 10,15,25,40,75,100,150…HP"
+    },
+    "existingImages": [
+      {
+        "src": "/assets/synced/products/2-electric-plus-jockey-pump-set.jpg",
+        "alt": "2 Electric + jockey pump set",
+        "ownership": "owned"
+      }
+    ],
+    "visibleApplications": [],
+    "visibleIndustries": [],
+    "downloads": [],
+    "missingFields": [],
+    "dataConfidence": "verified"
+  },
+  {
+    "id": "diesel-engine-long-shaft-fire-pump",
+    "slug": "diesel-engine-long-shaft-fire-pump",
+    "category": "Fire Series",
+    "productName": "Diesel Engine Long Shaft Fire Pump",
+    "currentUrl": "https://www.grimmfirepump.com/products/diesel-engine-long-shaft-fire-pump",
+    "shortDescription": "Flow: 0-200m³/h\nHead: 0-200m\nPower: 0.75-110KW\nVoltage: 12V or 24V\nFrequency: 50Hz/60Hz\nIf you want to get more product informationplease contact us!",
+    "existingSpecifications": {
+      "specification_1": "Flow: 0-200m³/h",
+      "specification_2": "Head: 0-200m",
+      "specification_3": "Power: 0.75-110KW"
+    },
+    "existingImages": [
+      {
+        "src": "/assets/synced/products/diesel-engine-long-shaft-fire-pump.png",
+        "alt": "Diesel Engine Long Shaft Fire Pump",
+        "ownership": "owned"
+      }
+    ],
+    "visibleApplications": [],
+    "visibleIndustries": [],
+    "downloads": [],
+    "missingFields": [
+      "modelOrSeries"
+    ],
+    "dataConfidence": "partial"
+  },
+  {
+    "id": "diesel-engine-fire-pump",
+    "slug": "diesel-engine-fire-pump",
+    "category": "Fire Series",
+    "productName": "Diesel engine fire pump",
+    "currentUrl": "https://www.grimmfirepump.com/products/diesel-engine-fire-pump",
+    "shortDescription": "Flow:200-20000 gpm\nHead:<18 bar\nSpeed:1500-1800 rpm\nBattery:12V or 24V",
+    "existingSpecifications": {
+      "specification_1": "Flow:200-20000 gpm",
+      "specification_2": "Head:<18 bar",
+      "specification_3": "Speed:1500-1800 rpm"
+    },
+    "existingImages": [
+      {
+        "src": "/assets/synced/products/diesel-engine-fire-pump.png",
+        "alt": "Diesel engine fire pump",
+        "ownership": "owned"
+      }
+    ],
+    "visibleApplications": [],
+    "visibleIndustries": [],
+    "downloads": [],
+    "missingFields": [
+      "modelOrSeries"
+    ],
+    "dataConfidence": "partial"
+  },
+  {
+    "id": "diesel-engine-irrigation-pump-trailer-type",
+    "slug": "diesel-engine-irrigation-pump-trailer-type",
+    "category": "Irrigation Series",
+    "productName": "Diesel engine irrigation pump trailer type",
+    "currentUrl": "https://www.grimmfirepump.com/products/diesel-engine-irrigation-pump-trailer-type",
+    "shortDescription": "Flow: 0-2000m³/h\nHead: 0-100m\nPower: 7.5-200HP\nSpeed: 1500-3000r/min\nCaliber: DN25-DN500\nIf you want to get more product information please contact us!",
+    "existingSpecifications": {
+      "specification_1": "Flow: 0-2000m³/h",
+      "specification_2": "Head: 0-100m",
+      "specification_3": "Power: 7.5-200HP",
+      "specification_4": "Speed: 1500-3000r/min",
+      "specification_5": "Caliber: DN25-DN500"
+    },
+    "existingImages": [
+      {
+        "src": "/assets/synced/products/diesel-engine-irrigation-pump-trailer-type.jpg",
+        "alt": "Diesel engine irrigation pump trailer type",
+        "ownership": "owned"
+      }
+    ],
+    "visibleApplications": [],
+    "visibleIndustries": [],
+    "downloads": [],
+    "missingFields": [
+      "modelOrSeries"
+    ],
+    "dataConfidence": "partial"
+  },
+  {
+    "id": "diesel-engine-plus-jockey-pump-set",
+    "slug": "diesel-engine-plus-jockey-pump-set",
+    "category": "Fire Series",
+    "productName": "Diesel engine + jockey pump set",
+    "model": "Pump",
+    "currentUrl": "https://www.grimmfirepump.com/products/diesel-engine-plus-jockey-pump-set",
+    "shortDescription": "Flow: 5-400L/s\nHead: 3-15Bar\nCaliber: 65-250mm\nPressure: 0.3~1.5MPa\nSpeed: 740-2900r/min\nMaterial: HT200, SS304, Bronze",
+    "existingSpecifications": {
+      "specification_1": "Flow: 5-400L/s",
+      "specification_2": "Head: 3-15Bar",
+      "specification_3": "Caliber: 65-250mm",
+      "specification_4": "Pressure: 0.3~1.5MPa",
+      "specification_5": "Speed: 740-2900r/min",
+      "specification_6": "Material: HT200, SS304, Bronze",
+      "specification_7": "Caliber : 50-200mm",
+      "specification_8": "Flow : 100,200,300,500,750,1000…GPM",
+      "specification_9": "Head : 3,4,5,6,8,9,10…BAR",
+      "specification_10": "Power : 10,15,25,40,75,100,150…HP"
+    },
+    "existingImages": [
+      {
+        "src": "/assets/synced/products/diesel-engine-plus-jockey-pump-set.jpg",
+        "alt": "Diesel engine + jockey pump set",
+        "ownership": "owned"
+      }
+    ],
+    "visibleApplications": [],
+    "visibleIndustries": [],
+    "downloads": [],
+    "missingFields": [],
+    "dataConfidence": "verified"
+  },
+  {
+    "id": "edj-fire-pump-set",
+    "slug": "edj-fire-pump-set",
+    "category": "Fire Series",
+    "productName": "EDJ Fire pump set",
+    "model": "Pump",
+    "currentUrl": "https://www.grimmfirepump.com/products/edj-fire-pump-set",
+    "shortDescription": "Flow: 5-400L/s\nHead: 3-15Bar\nCaliber: 65-250mm\nPressure: 0.3~1.5MPa\nSpeed: 740-2900r/min\nMaterial: HT200, SS304, Bronze",
+    "existingSpecifications": {
+      "specification_1": "Flow: 5-400L/s",
+      "specification_2": "Head: 3-15Bar",
+      "specification_3": "Caliber: 65-250mm",
+      "specification_4": "Pressure: 0.3~1.5MPa",
+      "specification_5": "Speed: 740-2900r/min",
+      "specification_6": "Material: HT200, SS304, Bronze",
+      "specification_7": "Caliber : 50-200mm",
+      "specification_8": "Flow : 100,200,300,500,750,1000…GPM",
+      "specification_9": "Head : 3,4,5,6,8,9,10…BAR",
+      "specification_10": "Power : 10,15,25,40,75,100,150…HP"
+    },
+    "existingImages": [
+      {
+        "src": "/assets/synced/products/edj-fire-pump-set.jpg",
+        "alt": "EDJ Fire pump set",
+        "ownership": "owned"
+      }
+    ],
+    "visibleApplications": [],
+    "visibleIndustries": [],
+    "downloads": [],
+    "missingFields": [],
+    "dataConfidence": "verified"
+  },
+  {
+    "id": "electric-long-shaft-fire-pump",
+    "slug": "electric-long-shaft-fire-pump",
+    "category": "Fire Series",
+    "productName": "Electric Long-Shaft Fire Pump",
+    "currentUrl": "https://www.grimmfirepump.com/products/electric-long-shaft-fire-pump",
+    "shortDescription": "Flow: 0-200m³/h\nHead: 0-200m\nPower: 0.75-110KW\nVoltage: 220-660V\nFrequency: 50Hz/60Hz\nIf you want to get more product informationplease contact us!",
+    "existingSpecifications": {
+      "specification_1": "Flow: 0-200m³/h",
+      "specification_2": "Head: 0-200m",
+      "specification_3": "Power: 0.75-110KW"
+    },
+    "existingImages": [
+      {
+        "src": "/assets/synced/products/electric-long-shaft-fire-pump.png",
+        "alt": "Electric Long-Shaft Fire Pump",
+        "ownership": "owned"
+      }
+    ],
+    "visibleApplications": [],
+    "visibleIndustries": [],
+    "downloads": [],
+    "missingFields": [
+      "modelOrSeries"
+    ],
+    "dataConfidence": "partial"
+  },
+  {
+    "id": "electric-horizontal-split-end-suction-pump",
+    "slug": "electric-horizontal-split-end-suction-pump",
+    "category": "Fire Series",
+    "productName": "Electric horizontal split end suction pump",
+    "currentUrl": "https://www.grimmfirepump.com/products/electric-horizontal-split-end-suction-pump",
+    "shortDescription": "Flow:50≤Q≤2000GPM\nHead:3<H≤25bar\nSpeed:1500-3550 rpm\nFrequency: 50HZ 60HZ",
+    "existingSpecifications": {
+      "specification_1": "Flow:50≤Q≤2000GPM",
+      "specification_2": "Head:3<H≤25bar",
+      "specification_3": "Speed:1500-3550 rpm"
+    },
+    "existingImages": [
+      {
+        "src": "/assets/synced/products/electric-horizontal-split-end-suction-pump.png",
+        "alt": "Electric horizontal split end suction pump",
+        "ownership": "owned"
+      }
+    ],
+    "visibleApplications": [],
+    "visibleIndustries": [],
+    "downloads": [],
+    "missingFields": [
+      "modelOrSeries"
+    ],
+    "dataConfidence": "partial"
+  },
+  {
+    "id": "frequency-conversion-water-supply-equipment",
+    "slug": "frequency-conversion-water-supply-equipment",
+    "category": "Water supply series",
+    "productName": "Frequency conversion water supply equipment",
+    "currentUrl": "https://www.grimmfirepump.com/products/frequency-conversion-water-supply-equipment",
+    "shortDescription": "Flow:0-1000 m3/h\nHead: 0-200m\nPower: 0.37-110kw\nPump Qty: 1-6 sets\nIf you want to get more product information please contact us!",
+    "existingSpecifications": {
+      "specification_1": "Flow:0-1000 m3/h",
+      "specification_2": "Head: 0-200m",
+      "specification_3": "Power: 0.37-110kw"
+    },
+    "existingImages": [
+      {
+        "src": "/assets/synced/products/frequency-conversion-water-supply-equipment.jpg",
+        "alt": "Frequency conversion water supply equipment",
+        "ownership": "owned"
+      }
+    ],
+    "visibleApplications": [],
+    "visibleIndustries": [],
+    "downloads": [],
+    "missingFields": [
+      "modelOrSeries"
+    ],
+    "dataConfidence": "partial"
+  },
+  {
+    "id": "horizontal-booster-pump-group",
+    "slug": "horizontal-booster-pump-group",
+    "category": "Water supply series",
+    "productName": "Horizontal booster pump group",
+    "currentUrl": "https://www.grimmfirepump.com/products/horizontal-booster-pump-group",
+    "shortDescription": "Flow:0-100m³/h\nHead: 0-200m\nPower: 0.37-11kw\nPump Qty: 1-4 sets\nFrequency: 50Hz/60Hz\nIf you want to get more product information please contact us!",
+    "existingSpecifications": {
+      "specification_1": "Flow:0-100m³/h",
+      "specification_2": "Head: 0-200m",
+      "specification_3": "Power: 0.37-11kw"
+    },
+    "existingImages": [
+      {
+        "src": "/assets/synced/products/horizontal-booster-pump-group.jpg",
+        "alt": "Horizontal booster pump group",
+        "ownership": "owned"
+      }
+    ],
+    "visibleApplications": [],
+    "visibleIndustries": [],
+    "downloads": [],
+    "missingFields": [
+      "modelOrSeries"
+    ],
+    "dataConfidence": "partial"
+  },
+  {
+    "id": "integrated-prefabricated-pump-station-frp",
+    "slug": "integrated-prefabricated-pump-station-frp",
+    "category": "Sewage series",
+    "productName": "Integrated prefabricated pump station FRP",
+    "model": "type",
+    "currentUrl": "https://www.grimmfirepump.com/products/integrated-prefabricated-pump-station-frp",
+    "shortDescription": "cylinder diameter : 1200--4200mm\nCylinder height : 2000-18000mm\npump power : 0.75kw-185kw\nDrainage volume ：Select according to requirements",
+    "existingSpecifications": {
+      "specification_1": "Sewage series"
+    },
+    "existingImages": [
+      {
+        "src": "/assets/synced/products/integrated-prefabricated-pump-station-frp.jpg",
+        "alt": "Integrated prefabricated pump station FRP",
+        "ownership": "owned"
+      }
+    ],
+    "visibleApplications": [],
+    "visibleIndustries": [],
+    "downloads": [],
+    "missingFields": [],
+    "dataConfidence": "verified"
+  },
+  {
+    "id": "submersible-sewage-pump",
+    "slug": "submersible-sewage-pump",
+    "category": "Sewage series",
+    "productName": "Submersible sewage pump",
+    "currentUrl": "https://www.grimmfirepump.com/products/submersible-sewage-pump",
+    "shortDescription": "Flow:2.0-9000 m3/h\nHead: 10-80m\nPower:0.37-355kw",
+    "existingSpecifications": {
+      "specification_1": "Flow:2.0-9000 m3/h",
+      "specification_2": "Head: 10-80m",
+      "specification_3": "Power:0.37-355kw"
+    },
+    "existingImages": [
+      {
+        "src": "/assets/synced/products/submersible-sewage-pump.png",
+        "alt": "Submersible sewage pump",
+        "ownership": "owned"
+      }
+    ],
+    "visibleApplications": [],
+    "visibleIndustries": [],
+    "downloads": [],
+    "missingFields": [
+      "modelOrSeries"
+    ],
+    "dataConfidence": "partial"
+  },
+  {
+    "id": "vertical-stainless-steel-multistage-pump-jockey-pump",
+    "slug": "vertical-stainless-steel-multistage-pump-jockey-pump",
+    "category": "Water supply series",
+    "productName": "Vertical stainless steel multistage pump（Jockey pump）",
+    "currentUrl": "https://www.grimmfirepump.com/products/vertical-stainless-steel-multistage-pump-jockey-pump",
+    "shortDescription": "Flow: 0-200m³/h\nHead: 0-200m\nPower: 0.75-110KW\nVoltage: 220-660V\nFrequency: 50Hz/60Hz\nIf you want to get more product informationplease contact us!",
+    "existingSpecifications": {
+      "specification_1": "Flow: 0-200m³/h",
+      "specification_2": "Head: 0-200m",
+      "specification_3": "Power: 0.75-110KW"
+    },
+    "existingImages": [
+      {
+        "src": "/assets/synced/products/vertical-stainless-steel-multistage-pump-jockey-pump.png",
+        "alt": "Vertical stainless steel multistage pump（Jockey pump）",
+        "ownership": "owned"
+      }
+    ],
+    "visibleApplications": [],
+    "visibleIndustries": [],
+    "downloads": [],
+    "missingFields": [
+      "modelOrSeries"
+    ],
+    "dataConfidence": "partial"
+  }
+]
