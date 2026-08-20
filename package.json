@@ -15,7 +15,8 @@
     "news:sources:validate": "node --experimental-strip-types scripts/validate-news-sources.mjs",
     "sitemap:generate": "node scripts/sitemap.mjs",
     "test:sitemap": "node --test --experimental-strip-types tests/sitemap.test.mjs",
-    "test:news-sources": "node --test --experimental-strip-types tests/news-source-catalog.test.mjs"
+    "test:news-sources": "node --test --experimental-strip-types tests/news-source-catalog.test.mjs",
+    "test:news-quality": "node --test --experimental-strip-types tests/news-quality-gates.test.mjs"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",
