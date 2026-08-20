@@ -30,7 +30,7 @@ jobs:
           node-version: 22
           cache: npm
       - run: node --version
-      - run: npm ci
+      - run: npm install
       - run: npm run news:sources:import
       - run: npm run news:sources:validate
       - run: npm run news:sources:probe
