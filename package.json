@@ -13,6 +13,7 @@
     "audit:products": "node --experimental-strip-types scripts/product-audit.mjs",
     "news:sources:import": "node --experimental-strip-types scripts/import-news-sources.mjs",
     "news:sources:validate": "node --experimental-strip-types scripts/validate-news-sources.mjs",
+    "news:sources:probe": "node --experimental-strip-types scripts/probe-news-sources.mjs",
     "sitemap:generate": "node scripts/sitemap.mjs",
     "test:sitemap": "node --test --experimental-strip-types tests/sitemap.test.mjs",
     "test:news-sources": "node --test --experimental-strip-types tests/news-source-catalog.test.mjs",
