@@ -1,0 +1,496 @@
+[
+  {
+    "productId": "2-electric-plus-jockey-pump-set",
+    "productName": "2 Electric + jockey pump set",
+    "category": "Fire Series",
+    "primaryKeywords": [
+      "2 Electric + jockey pump set",
+      "Fire Series"
+    ],
+    "secondaryKeywords": [],
+    "longTailKeywords": [],
+    "industries": [],
+    "applicationScenarios": [],
+    "buyerRoles": [
+      "EPC contractor",
+      "fire protection engineer",
+      "project procurement"
+    ],
+    "painPoints": [
+      "configuration evidence",
+      "project-specific selection"
+    ],
+    "selectionFactors": [
+      "flow",
+      "pressure",
+      "driver",
+      "water source",
+      "local code"
+    ],
+    "approvedFactSources": [
+      "src/data/synced-content.json",
+      "https://www.grimmfirepump.com/products/2-electric-plus-jockey-pump-set"
+    ],
+    "prohibitedClaims": [
+      "unverified certifications",
+      "unverified performance",
+      "customer and project claims"
+    ]
+  },
+  {
+    "productId": "diesel-engine-long-shaft-fire-pump",
+    "productName": "Diesel Engine Long Shaft Fire Pump",
+    "category": "Fire Series",
+    "primaryKeywords": [
+      "Diesel Engine Long Shaft Fire Pump",
+      "Fire Series"
+    ],
+    "secondaryKeywords": [],
+    "longTailKeywords": [],
+    "industries": [],
+    "applicationScenarios": [],
+    "buyerRoles": [
+      "EPC contractor",
+      "fire protection engineer",
+      "project procurement"
+    ],
+    "painPoints": [
+      "configuration evidence",
+      "project-specific selection"
+    ],
+    "selectionFactors": [
+      "flow",
+      "pressure",
+      "driver",
+      "water source",
+      "local code"
+    ],
+    "approvedFactSources": [
+      "src/data/synced-content.json",
+      "https://www.grimmfirepump.com/products/diesel-engine-long-shaft-fire-pump"
+    ],
+    "prohibitedClaims": [
+      "unverified certifications",
+      "unverified performance",
+      "customer and project claims"
+    ]
+  },
+  {
+    "productId": "diesel-engine-fire-pump",
+    "productName": "Diesel engine fire pump",
+    "category": "Fire Series",
+    "primaryKeywords": [
+      "Diesel engine fire pump",
+      "Fire Series"
+    ],
+    "secondaryKeywords": [],
+    "longTailKeywords": [],
+    "industries": [],
+    "applicationScenarios": [],
+    "buyerRoles": [
+      "EPC contractor",
+      "fire protection engineer",
+      "project procurement"
+    ],
+    "painPoints": [
+      "configuration evidence",
+      "project-specific selection"
+    ],
+    "selectionFactors": [
+      "flow",
+      "pressure",
+      "driver",
+      "water source",
+      "local code"
+    ],
+    "approvedFactSources": [
+      "src/data/synced-content.json",
+      "https://www.grimmfirepump.com/products/diesel-engine-fire-pump"
+    ],
+    "prohibitedClaims": [
+      "unverified certifications",
+      "unverified performance",
+      "customer and project claims"
+    ]
+  },
+  {
+    "productId": "diesel-engine-irrigation-pump-trailer-type",
+    "productName": "Diesel engine irrigation pump trailer type",
+    "category": "Irrigation Series",
+    "primaryKeywords": [
+      "Diesel engine irrigation pump trailer type",
+      "Irrigation Series"
+    ],
+    "secondaryKeywords": [],
+    "longTailKeywords": [],
+    "industries": [],
+    "applicationScenarios": [],
+    "buyerRoles": [
+      "EPC contractor",
+      "fire protection engineer",
+      "project procurement"
+    ],
+    "painPoints": [
+      "configuration evidence",
+      "project-specific selection"
+    ],
+    "selectionFactors": [
+      "flow",
+      "pressure",
+      "driver",
+      "water source",
+      "local code"
+    ],
+    "approvedFactSources": [
+      "src/data/synced-content.json",
+      "https://www.grimmfirepump.com/products/diesel-engine-irrigation-pump-trailer-type"
+    ],
+    "prohibitedClaims": [
+      "unverified certifications",
+      "unverified performance",
+      "customer and project claims"
+    ]
+  },
+  {
+    "productId": "diesel-engine-plus-jockey-pump-set",
+    "productName": "Diesel engine + jockey pump set",
+    "category": "Fire Series",
+    "primaryKeywords": [
+      "Diesel engine + jockey pump set",
+      "Fire Series"
+    ],
+    "secondaryKeywords": [],
+    "longTailKeywords": [],
+    "industries": [],
+    "applicationScenarios": [],
+    "buyerRoles": [
+      "EPC contractor",
+      "fire protection engineer",
+      "project procurement"
+    ],
+    "painPoints": [
+      "configuration evidence",
+      "project-specific selection"
+    ],
+    "selectionFactors": [
+      "flow",
+      "pressure",
+      "driver",
+      "water source",
+      "local code"
+    ],
+    "approvedFactSources": [
+      "src/data/synced-content.json",
+      "https://www.grimmfirepump.com/products/diesel-engine-plus-jockey-pump-set"
+    ],
+    "prohibitedClaims": [
+      "unverified certifications",
+      "unverified performance",
+      "customer and project claims"
+    ]
+  },
+  {
+    "productId": "edj-fire-pump-set",
+    "productName": "EDJ Fire pump set",
+    "category": "Fire Series",
+    "primaryKeywords": [
+      "EDJ Fire pump set",
+      "Fire Series"
+    ],
+    "secondaryKeywords": [],
+    "longTailKeywords": [],
+    "industries": [],
+    "applicationScenarios": [],
+    "buyerRoles": [
+      "EPC contractor",
+      "fire protection engineer",
+      "project procurement"
+    ],
+    "painPoints": [
+      "configuration evidence",
+      "project-specific selection"
+    ],
+    "selectionFactors": [
+      "flow",
+      "pressure",
+      "driver",
+      "water source",
+      "local code"
+    ],
+    "approvedFactSources": [
+      "src/data/synced-content.json",
+      "https://www.grimmfirepump.com/products/edj-fire-pump-set"
+    ],
+    "prohibitedClaims": [
+      "unverified certifications",
+      "unverified performance",
+      "customer and project claims"
+    ]
+  },
+  {
+    "productId": "electric-long-shaft-fire-pump",
+    "productName": "Electric Long-Shaft Fire Pump",
+    "category": "Fire Series",
+    "primaryKeywords": [
+      "Electric Long-Shaft Fire Pump",
+      "Fire Series"
+    ],
+    "secondaryKeywords": [],
+    "longTailKeywords": [],
+    "industries": [],
+    "applicationScenarios": [],
+    "buyerRoles": [
+      "EPC contractor",
+      "fire protection engineer",
+      "project procurement"
+    ],
+    "painPoints": [
+      "configuration evidence",
+      "project-specific selection"
+    ],
+    "selectionFactors": [
+      "flow",
+      "pressure",
+      "driver",
+      "water source",
+      "local code"
+    ],
+    "approvedFactSources": [
+      "src/data/synced-content.json",
+      "https://www.grimmfirepump.com/products/electric-long-shaft-fire-pump"
+    ],
+    "prohibitedClaims": [
+      "unverified certifications",
+      "unverified performance",
+      "customer and project claims"
+    ]
+  },
+  {
+    "productId": "electric-horizontal-split-end-suction-pump",
+    "productName": "Electric horizontal split end suction pump",
+    "category": "Fire Series",
+    "primaryKeywords": [
+      "Electric horizontal split end suction pump",
+      "Fire Series"
+    ],
+    "secondaryKeywords": [],
+    "longTailKeywords": [],
+    "industries": [],
+    "applicationScenarios": [],
+    "buyerRoles": [
+      "EPC contractor",
+      "fire protection engineer",
+      "project procurement"
+    ],
+    "painPoints": [
+      "configuration evidence",
+      "project-specific selection"
+    ],
+    "selectionFactors": [
+      "flow",
+      "pressure",
+      "driver",
+      "water source",
+      "local code"
+    ],
+    "approvedFactSources": [
+      "src/data/synced-content.json",
+      "https://www.grimmfirepump.com/products/electric-horizontal-split-end-suction-pump"
+    ],
+    "prohibitedClaims": [
+      "unverified certifications",
+      "unverified performance",
+      "customer and project claims"
+    ]
+  },
+  {
+    "productId": "frequency-conversion-water-supply-equipment",
+    "productName": "Frequency conversion water supply equipment",
+    "category": "Water supply series",
+    "primaryKeywords": [
+      "Frequency conversion water supply equipment",
+      "Water supply series"
+    ],
+    "secondaryKeywords": [],
+    "longTailKeywords": [],
+    "industries": [],
+    "applicationScenarios": [],
+    "buyerRoles": [
+      "EPC contractor",
+      "fire protection engineer",
+      "project procurement"
+    ],
+    "painPoints": [
+      "configuration evidence",
+      "project-specific selection"
+    ],
+    "selectionFactors": [
+      "flow",
+      "pressure",
+      "driver",
+      "water source",
+      "local code"
+    ],
+    "approvedFactSources": [
+      "src/data/synced-content.json",
+      "https://www.grimmfirepump.com/products/frequency-conversion-water-supply-equipment"
+    ],
+    "prohibitedClaims": [
+      "unverified certifications",
+      "unverified performance",
+      "customer and project claims"
+    ]
+  },
+  {
+    "productId": "horizontal-booster-pump-group",
+    "productName": "Horizontal booster pump group",
+    "category": "Water supply series",
+    "primaryKeywords": [
+      "Horizontal booster pump group",
+      "Water supply series"
+    ],
+    "secondaryKeywords": [],
+    "longTailKeywords": [],
+    "industries": [],
+    "applicationScenarios": [],
+    "buyerRoles": [
+      "EPC contractor",
+      "fire protection engineer",
+      "project procurement"
+    ],
+    "painPoints": [
+      "configuration evidence",
+      "project-specific selection"
+    ],
+    "selectionFactors": [
+      "flow",
+      "pressure",
+      "driver",
+      "water source",
+      "local code"
+    ],
+    "approvedFactSources": [
+      "src/data/synced-content.json",
+      "https://www.grimmfirepump.com/products/horizontal-booster-pump-group"
+    ],
+    "prohibitedClaims": [
+      "unverified certifications",
+      "unverified performance",
+      "customer and project claims"
+    ]
+  },
+  {
+    "productId": "integrated-prefabricated-pump-station-frp",
+    "productName": "Integrated prefabricated pump station FRP",
+    "category": "Sewage series",
+    "primaryKeywords": [
+      "Integrated prefabricated pump station FRP",
+      "Sewage series"
+    ],
+    "secondaryKeywords": [],
+    "longTailKeywords": [],
+    "industries": [],
+    "applicationScenarios": [],
+    "buyerRoles": [
+      "EPC contractor",
+      "fire protection engineer",
+      "project procurement"
+    ],
+    "painPoints": [
+      "configuration evidence",
+      "project-specific selection"
+    ],
+    "selectionFactors": [
+      "flow",
+      "pressure",
+      "driver",
+      "water source",
+      "local code"
+    ],
+    "approvedFactSources": [
+      "src/data/synced-content.json",
+      "https://www.grimmfirepump.com/products/integrated-prefabricated-pump-station-frp"
+    ],
+    "prohibitedClaims": [
+      "unverified certifications",
+      "unverified performance",
+      "customer and project claims"
+    ]
+  },
+  {
+    "productId": "submersible-sewage-pump",
+    "productName": "Submersible sewage pump",
+    "category": "Sewage series",
+    "primaryKeywords": [
+      "Submersible sewage pump",
+      "Sewage series"
+    ],
+    "secondaryKeywords": [],
+    "longTailKeywords": [],
+    "industries": [],
+    "applicationScenarios": [],
+    "buyerRoles": [
+      "EPC contractor",
+      "fire protection engineer",
+      "project procurement"
+    ],
+    "painPoints": [
+      "configuration evidence",
+      "project-specific selection"
+    ],
+    "selectionFactors": [
+      "flow",
+      "pressure",
+      "driver",
+      "water source",
+      "local code"
+    ],
+    "approvedFactSources": [
+      "src/data/synced-content.json",
+      "https://www.grimmfirepump.com/products/submersible-sewage-pump"
+    ],
+    "prohibitedClaims": [
+      "unverified certifications",
+      "unverified performance",
+      "customer and project claims"
+    ]
+  },
+  {
+    "productId": "vertical-stainless-steel-multistage-pump-jockey-pump",
+    "productName": "Vertical stainless steel multistage pump（Jockey pump）",
+    "category": "Water supply series",
+    "primaryKeywords": [
+      "Vertical stainless steel multistage pump（Jockey pump）",
+      "Water supply series"
+    ],
+    "secondaryKeywords": [],
+    "longTailKeywords": [],
+    "industries": [],
+    "applicationScenarios": [],
+    "buyerRoles": [
+      "EPC contractor",
+      "fire protection engineer",
+      "project procurement"
+    ],
+    "painPoints": [
+      "configuration evidence",
+      "project-specific selection"
+    ],
+    "selectionFactors": [
+      "flow",
+      "pressure",
+      "driver",
+      "water source",
+      "local code"
+    ],
+    "approvedFactSources": [
+      "src/data/synced-content.json",
+      "https://www.grimmfirepump.com/products/vertical-stainless-steel-multistage-pump-jockey-pump"
+    ],
+    "prohibitedClaims": [
+      "unverified certifications",
+      "unverified performance",
+      "customer and project claims"
+    ]
+  }
+]

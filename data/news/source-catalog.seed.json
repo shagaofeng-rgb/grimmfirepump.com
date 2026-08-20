@@ -1,0 +1,6602 @@
+[
+  {
+    "id": "grimm-source-001",
+    "ordinal": 1,
+    "name": "NFPA Today Blog",
+    "url": "https://www.nfpa.org/news-blogs-and-articles/blogs",
+    "domain": "nfpa.org",
+    "sourceGroup": "fire-protection-life-safety",
+    "industryTags": [
+      "fire",
+      "protection",
+      "life",
+      "safety"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "A",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-002",
+    "ordinal": 2,
+    "name": "SFPE Fire Protection Engineering Magazine",
+    "url": "https://www.sfpe.org/publications/fpemagazine",
+    "domain": "sfpe.org",
+    "sourceGroup": "fire-protection-life-safety",
+    "industryTags": [
+      "fire",
+      "protection",
+      "life",
+      "safety"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "A",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-003",
+    "ordinal": 3,
+    "name": "Fire Safety Search",
+    "url": "https://firesafetysearch.com",
+    "domain": "firesafetysearch.com",
+    "sourceGroup": "fire-protection-life-safety",
+    "industryTags": [
+      "fire",
+      "protection",
+      "life",
+      "safety"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-004",
+    "ordinal": 4,
+    "name": "International Fire Buyer",
+    "url": "https://firebuyer.com",
+    "domain": "firebuyer.com",
+    "sourceGroup": "fire-protection-life-safety",
+    "industryTags": [
+      "fire",
+      "protection",
+      "life",
+      "safety"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-005",
+    "ordinal": 5,
+    "name": "Anvil Fire Engineering Blog",
+    "url": "https://blog.anvil-fire.com",
+    "domain": "blog.anvil-fire.com",
+    "sourceGroup": "fire-protection-life-safety",
+    "industryTags": [
+      "fire",
+      "protection",
+      "life",
+      "safety"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-006",
+    "ordinal": 6,
+    "name": "Fire Engineering Magazine",
+    "url": "https://www.fireengineering.com",
+    "domain": "fireengineering.com",
+    "sourceGroup": "fire-protection-life-safety",
+    "industryTags": [
+      "fire",
+      "protection",
+      "life",
+      "safety"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-007",
+    "ordinal": 7,
+    "name": "Fire Protection Contractor (FPC) Magazine",
+    "url": "https://www.fpcmag.com",
+    "domain": "fpcmag.com",
+    "sourceGroup": "fire-protection-life-safety",
+    "industryTags": [
+      "fire",
+      "protection",
+      "life",
+      "safety"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-008",
+    "ordinal": 8,
+    "name": "Fire Apparatus & Emergency Equipment",
+    "url": "https://www.fireapparatusmagazine.com",
+    "domain": "fireapparatusmagazine.com",
+    "sourceGroup": "fire-protection-life-safety",
+    "industryTags": [
+      "fire",
+      "protection",
+      "life",
+      "safety"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-009",
+    "ordinal": 9,
+    "name": "Fire & Rescue International",
+    "url": "https://apfire.com",
+    "domain": "apfire.com",
+    "sourceGroup": "fire-protection-life-safety",
+    "industryTags": [
+      "fire",
+      "protection",
+      "life",
+      "safety"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-010",
+    "ordinal": 10,
+    "name": "Industrial Fire World",
+    "url": "https://www.industrialfireworld.com",
+    "domain": "industrialfireworld.com",
+    "sourceGroup": "fire-protection-life-safety",
+    "industryTags": [
+      "fire",
+      "protection",
+      "life",
+      "safety"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-011",
+    "ordinal": 11,
+    "name": "Fire Safety Journal (Elsevier)",
+    "url": "https://www.sciencedirect.com/journal/fire-safety-journal",
+    "domain": "sciencedirect.com",
+    "sourceGroup": "fire-protection-life-safety",
+    "industryTags": [
+      "fire",
+      "protection",
+      "life",
+      "safety"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-012",
+    "ordinal": 12,
+    "name": "Fire Technology (Springer)",
+    "url": "https://www.springer.com/journal/10694",
+    "domain": "springer.com",
+    "sourceGroup": "fire-protection-life-safety",
+    "industryTags": [
+      "fire",
+      "protection",
+      "life",
+      "safety"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-013",
+    "ordinal": 13,
+    "name": "NFPA Journal",
+    "url": "https://www.nfpa.org/news-blogs-and-articles/nfpa-journal",
+    "domain": "nfpa.org",
+    "sourceGroup": "fire-protection-life-safety",
+    "industryTags": [
+      "fire",
+      "protection",
+      "life",
+      "safety"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "A",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-014",
+    "ordinal": 14,
+    "name": "European Fire Safety Alliance",
+    "url": "https://www.europeanfiresafetyalliance.org",
+    "domain": "europeanfiresafetyalliance.org",
+    "sourceGroup": "fire-protection-life-safety",
+    "industryTags": [
+      "fire",
+      "protection",
+      "life",
+      "safety"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-015",
+    "ordinal": 15,
+    "name": "Fire Industry Association (FIA UK)",
+    "url": "https://www.fia.uk.com/news.html",
+    "domain": "fia.uk.com",
+    "sourceGroup": "fire-protection-life-safety",
+    "industryTags": [
+      "fire",
+      "protection",
+      "life",
+      "safety"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-016",
+    "ordinal": 16,
+    "name": "National Fire Sprinkler Association (NFSA)",
+    "url": "https://nfsa.org/blog",
+    "domain": "nfsa.org",
+    "sourceGroup": "fire-protection-life-safety",
+    "industryTags": [
+      "fire",
+      "protection",
+      "life",
+      "safety"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "A",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-017",
+    "ordinal": 17,
+    "name": "American Fire Sprinkler Association (AFSA)",
+    "url": "https://www.firesprinkler.org",
+    "domain": "firesprinkler.org",
+    "sourceGroup": "fire-protection-life-safety",
+    "industryTags": [
+      "fire",
+      "protection",
+      "life",
+      "safety"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "A",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-018",
+    "ordinal": 18,
+    "name": "British Automatic Fire Sprinkler Association (BAFSA)",
+    "url": "https://www.bafsa.org.uk",
+    "domain": "bafsa.org.uk",
+    "sourceGroup": "fire-protection-life-safety",
+    "industryTags": [
+      "fire",
+      "protection",
+      "life",
+      "safety"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "A",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-019",
+    "ordinal": 19,
+    "name": "Canadian Automatic Sprinkler Association (CASA)",
+    "url": "https://www.casa-firesprinkler.org",
+    "domain": "casa-firesprinkler.org",
+    "sourceGroup": "fire-protection-life-safety",
+    "industryTags": [
+      "fire",
+      "protection",
+      "life",
+      "safety"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-020",
+    "ordinal": 20,
+    "name": "Fire Protection Association (FPA)",
+    "url": "https://www.thefpa.co.uk",
+    "domain": "thefpa.co.uk",
+    "sourceGroup": "fire-protection-life-safety",
+    "industryTags": [
+      "fire",
+      "protection",
+      "life",
+      "safety"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-021",
+    "ordinal": 21,
+    "name": "Fire Middle East Magazine",
+    "url": "https://www.firemiddleeastmag.com",
+    "domain": "firemiddleeastmag.com",
+    "sourceGroup": "fire-protection-life-safety",
+    "industryTags": [
+      "fire",
+      "protection",
+      "life",
+      "safety"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-022",
+    "ordinal": 22,
+    "name": "Asia Pacific Fire Magazine",
+    "url": "https://apfire.com",
+    "domain": "apfire.com",
+    "sourceGroup": "fire-protection-life-safety",
+    "industryTags": [
+      "fire",
+      "protection",
+      "life",
+      "safety"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-023",
+    "ordinal": 23,
+    "name": "Fire Safety Matters (FSM)",
+    "url": "https://www.fsrmagazine.com",
+    "domain": "fsrmagazine.com",
+    "sourceGroup": "fire-protection-life-safety",
+    "industryTags": [
+      "fire",
+      "protection",
+      "life",
+      "safety"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-024",
+    "ordinal": 24,
+    "name": "Gulf Fire Magazine",
+    "url": "https://gulffire.mdmintelligence.com",
+    "domain": "gulffire.mdmintelligence.com",
+    "sourceGroup": "fire-protection-life-safety",
+    "industryTags": [
+      "fire",
+      "protection",
+      "life",
+      "safety"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-025",
+    "ordinal": 25,
+    "name": "Fire Equipment Digest",
+    "url": "https://www.fedigest.com",
+    "domain": "fedigest.com",
+    "sourceGroup": "fire-protection-life-safety",
+    "industryTags": [
+      "fire",
+      "protection",
+      "life",
+      "safety"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-026",
+    "ordinal": 26,
+    "name": "Fire Product Search",
+    "url": "https://fireproductsearch.com",
+    "domain": "fireproductsearch.com",
+    "sourceGroup": "fire-protection-life-safety",
+    "industryTags": [
+      "fire",
+      "protection",
+      "life",
+      "safety"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-027",
+    "ordinal": 27,
+    "name": "Fire Marshals Association",
+    "url": "https://www.firemarshals.org",
+    "domain": "firemarshals.org",
+    "sourceGroup": "fire-protection-life-safety",
+    "industryTags": [
+      "fire",
+      "protection",
+      "life",
+      "safety"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-028",
+    "ordinal": 28,
+    "name": "International Association of Fire Chiefs (IAFC)",
+    "url": "https://www.iafc.org",
+    "domain": "iafc.org",
+    "sourceGroup": "fire-protection-life-safety",
+    "industryTags": [
+      "fire",
+      "protection",
+      "life",
+      "safety"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "A",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-029",
+    "ordinal": 29,
+    "name": "Fire Protection Research Foundation",
+    "url": "https://www.nfpa.org/education-and-research/research/fire-protection-research-foundation",
+    "domain": "nfpa.org",
+    "sourceGroup": "fire-protection-life-safety",
+    "industryTags": [
+      "fire",
+      "protection",
+      "life",
+      "safety"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "A",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-030",
+    "ordinal": 30,
+    "name": "Fire Chiefs Association",
+    "url": "https://www.firechiefs.org",
+    "domain": "firechiefs.org",
+    "sourceGroup": "fire-protection-life-safety",
+    "industryTags": [
+      "fire",
+      "protection",
+      "life",
+      "safety"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-031",
+    "ordinal": 31,
+    "name": "Fire Trade Supplies Blog",
+    "url": "https://www.firetradesupplies.com/blogs/news",
+    "domain": "firetradesupplies.com",
+    "sourceGroup": "fire-protection-life-safety",
+    "industryTags": [
+      "fire",
+      "protection",
+      "life",
+      "safety"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-032",
+    "ordinal": 32,
+    "name": "FM Global Newsroom",
+    "url": "https://www.fmglobal.com/newsroom",
+    "domain": "fmglobal.com",
+    "sourceGroup": "fire-protection-life-safety",
+    "industryTags": [
+      "fire",
+      "protection",
+      "life",
+      "safety"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "A",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-033",
+    "ordinal": 33,
+    "name": "UL Solutions Fire & Life Safety",
+    "url": "https://www.ul.com/services/fire-and-life-safety",
+    "domain": "ul.com",
+    "sourceGroup": "fire-protection-life-safety",
+    "industryTags": [
+      "fire",
+      "protection",
+      "life",
+      "safety"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "A",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-034",
+    "ordinal": 34,
+    "name": "Life Safety Digest",
+    "url": "https://www.fcia.org/articles/life-safety-digest",
+    "domain": "fcia.org",
+    "sourceGroup": "fire-protection-life-safety",
+    "industryTags": [
+      "fire",
+      "protection",
+      "life",
+      "safety"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-035",
+    "ordinal": 35,
+    "name": "WUI Wildfire & Building Safety",
+    "url": "https://www.readyforwildfire.org",
+    "domain": "readyforwildfire.org",
+    "sourceGroup": "fire-protection-life-safety",
+    "industryTags": [
+      "fire",
+      "protection",
+      "life",
+      "safety"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-036",
+    "ordinal": 36,
+    "name": "High-Rise Fire Safety Journal",
+    "url": "https://www.highrisefiresafety.com",
+    "domain": "highrisefiresafety.com",
+    "sourceGroup": "fire-protection-life-safety",
+    "industryTags": [
+      "fire",
+      "protection",
+      "life",
+      "safety"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-037",
+    "ordinal": 37,
+    "name": "Society of Fire Protection Engineers (SFPE) News",
+    "url": "https://www.sfpe.org/news",
+    "domain": "sfpe.org",
+    "sourceGroup": "fire-protection-life-safety",
+    "industryTags": [
+      "fire",
+      "protection",
+      "life",
+      "safety"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "A",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-038",
+    "ordinal": 38,
+    "name": "Fire Safety Science News (IAFSS)",
+    "url": "https://iafss.org",
+    "domain": "iafss.org",
+    "sourceGroup": "fire-protection-life-safety",
+    "industryTags": [
+      "fire",
+      "protection",
+      "life",
+      "safety"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-039",
+    "ordinal": 39,
+    "name": "Institution of Fire Engineers (IFE)",
+    "url": "https://www.ife.org.uk",
+    "domain": "ife.org.uk",
+    "sourceGroup": "fire-protection-life-safety",
+    "industryTags": [
+      "fire",
+      "protection",
+      "life",
+      "safety"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-040",
+    "ordinal": 40,
+    "name": "Australian Fire Protection Association (FPAA)",
+    "url": "https://www.fpaa.com.au",
+    "domain": "fpaa.com.au",
+    "sourceGroup": "fire-protection-life-safety",
+    "industryTags": [
+      "fire",
+      "protection",
+      "life",
+      "safety"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-041",
+    "ordinal": 41,
+    "name": "Fire Safety Today Portal",
+    "url": "https://www.firesafetytoday.com",
+    "domain": "firesafetytoday.com",
+    "sourceGroup": "fire-protection-life-safety",
+    "industryTags": [
+      "fire",
+      "protection",
+      "life",
+      "safety"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-042",
+    "ordinal": 42,
+    "name": "Emergency Services Times",
+    "url": "https://www.emergencyservicestimes.com",
+    "domain": "emergencyservicestimes.com",
+    "sourceGroup": "fire-protection-life-safety",
+    "industryTags": [
+      "fire",
+      "protection",
+      "life",
+      "safety"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-043",
+    "ordinal": 43,
+    "name": "International Fire Protection Magazine",
+    "url": "https://iffmag.mdmintelligence.com",
+    "domain": "iffmag.mdmintelligence.com",
+    "sourceGroup": "fire-protection-life-safety",
+    "industryTags": [
+      "fire",
+      "protection",
+      "life",
+      "safety"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-044",
+    "ordinal": 44,
+    "name": "Sprinkler Age Magazine",
+    "url": "https://sprinklerage.com",
+    "domain": "sprinklerage.com",
+    "sourceGroup": "fire-protection-life-safety",
+    "industryTags": [
+      "fire",
+      "protection",
+      "life",
+      "safety"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-045",
+    "ordinal": 45,
+    "name": "Fire Chief Magazine",
+    "url": "https://www.firerescue1.com/fire-chief",
+    "domain": "firerescue1.com",
+    "sourceGroup": "fire-protection-life-safety",
+    "industryTags": [
+      "fire",
+      "protection",
+      "life",
+      "safety"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-046",
+    "ordinal": 46,
+    "name": "Fire Systems & Safety Forum",
+    "url": "https://www.firesafetyforum.com",
+    "domain": "firesafetyforum.com",
+    "sourceGroup": "fire-protection-life-safety",
+    "industryTags": [
+      "fire",
+      "protection",
+      "life",
+      "safety"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-047",
+    "ordinal": 47,
+    "name": "Commercial Fire Safety Blog",
+    "url": "https://www.commercialfiresafety.com",
+    "domain": "commercialfiresafety.com",
+    "sourceGroup": "fire-protection-life-safety",
+    "industryTags": [
+      "fire",
+      "protection",
+      "life",
+      "safety"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-048",
+    "ordinal": 48,
+    "name": "Industrial Hazard Control News",
+    "url": "https://www.hazardcontrolnews.com",
+    "domain": "hazardcontrolnews.com",
+    "sourceGroup": "fire-protection-life-safety",
+    "industryTags": [
+      "fire",
+      "protection",
+      "life",
+      "safety"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-049",
+    "ordinal": 49,
+    "name": "Fire Hydrant & Water Supply Systems Journal",
+    "url": "https://www.firewaterjournal.org",
+    "domain": "firewaterjournal.org",
+    "sourceGroup": "fire-protection-life-safety",
+    "industryTags": [
+      "fire",
+      "protection",
+      "life",
+      "safety"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-050",
+    "ordinal": 50,
+    "name": "Fire Prevention & Building Codes Portal",
+    "url": "https://www.buildingcodefire.com",
+    "domain": "buildingcodefire.com",
+    "sourceGroup": "fire-protection-life-safety",
+    "industryTags": [
+      "fire",
+      "protection",
+      "life",
+      "safety"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-051",
+    "ordinal": 51,
+    "name": "Special Hazard Fire Suppression Association",
+    "url": "https://www.shfsa.org",
+    "domain": "shfsa.org",
+    "sourceGroup": "fire-protection-life-safety",
+    "industryTags": [
+      "fire",
+      "protection",
+      "life",
+      "safety"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-052",
+    "ordinal": 52,
+    "name": "Fire Inspection & Testing Monthly",
+    "url": "https://www.fireinspectionmonthly.com",
+    "domain": "fireinspectionmonthly.com",
+    "sourceGroup": "fire-protection-life-safety",
+    "industryTags": [
+      "fire",
+      "protection",
+      "life",
+      "safety"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-053",
+    "ordinal": 53,
+    "name": "Automatic Sprinkler System News",
+    "url": "https://www.sprinklernews.com",
+    "domain": "sprinklernews.com",
+    "sourceGroup": "fire-protection-life-safety",
+    "industryTags": [
+      "fire",
+      "protection",
+      "life",
+      "safety"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-054",
+    "ordinal": 54,
+    "name": "Fire Protection Systems World",
+    "url": "https://www.fireprotectionsystems.org",
+    "domain": "fireprotectionsystems.org",
+    "sourceGroup": "fire-protection-life-safety",
+    "industryTags": [
+      "fire",
+      "protection",
+      "life",
+      "safety"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-055",
+    "ordinal": 55,
+    "name": "Code Red Safety Blog",
+    "url": "https://www.coderedsafety.com/blog",
+    "domain": "coderedsafety.com",
+    "sourceGroup": "fire-protection-life-safety",
+    "industryTags": [
+      "fire",
+      "protection",
+      "life",
+      "safety"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-056",
+    "ordinal": 56,
+    "name": "Total Safety Industrial News",
+    "url": "https://www.totalsafety.com/news",
+    "domain": "totalsafety.com",
+    "sourceGroup": "fire-protection-life-safety",
+    "industryTags": [
+      "fire",
+      "protection",
+      "life",
+      "safety"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-057",
+    "ordinal": 57,
+    "name": "Fire Safety Inspection Portal",
+    "url": "https://www.firesafetyinspection.org",
+    "domain": "firesafetyinspection.org",
+    "sourceGroup": "fire-protection-life-safety",
+    "industryTags": [
+      "fire",
+      "protection",
+      "life",
+      "safety"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-058",
+    "ordinal": 58,
+    "name": "Fire Safety Engineering Online",
+    "url": "https://www.fseonline.co.uk",
+    "domain": "fseonline.co.uk",
+    "sourceGroup": "fire-protection-life-safety",
+    "industryTags": [
+      "fire",
+      "protection",
+      "life",
+      "safety"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-059",
+    "ordinal": 59,
+    "name": "Global Fire Prevention News",
+    "url": "https://www.globalfirenews.com",
+    "domain": "globalfirenews.com",
+    "sourceGroup": "fire-protection-life-safety",
+    "industryTags": [
+      "fire",
+      "protection",
+      "life",
+      "safety"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-060",
+    "ordinal": 60,
+    "name": "Industrial Disaster Prevention Network",
+    "url": "https://www.disasterprevention.org",
+    "domain": "disasterprevention.org",
+    "sourceGroup": "fire-protection-life-safety",
+    "industryTags": [
+      "fire",
+      "protection",
+      "life",
+      "safety"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-061",
+    "ordinal": 61,
+    "name": "Pumps & Systems Magazine",
+    "url": "https://www.pumpsandsystems.com",
+    "domain": "pumpsandsystems.com",
+    "sourceGroup": "pump-fluid-handling",
+    "industryTags": [
+      "pump",
+      "fluid",
+      "handling"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-062",
+    "ordinal": 62,
+    "name": "Fluid Handling Magazine",
+    "url": "https://fluidhandlingmag.com",
+    "domain": "fluidhandlingmag.com",
+    "sourceGroup": "pump-fluid-handling",
+    "industryTags": [
+      "pump",
+      "fluid",
+      "handling"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-063",
+    "ordinal": 63,
+    "name": "World Pumps Journal",
+    "url": "https://www.worldpumps.com",
+    "domain": "worldpumps.com",
+    "sourceGroup": "pump-fluid-handling",
+    "industryTags": [
+      "pump",
+      "fluid",
+      "handling"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-064",
+    "ordinal": 64,
+    "name": "PumpWorks Technical Blog",
+    "url": "https://www.pumpworks.com/blog",
+    "domain": "pumpworks.com",
+    "sourceGroup": "pump-fluid-handling",
+    "industryTags": [
+      "pump",
+      "fluid",
+      "handling"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-065",
+    "ordinal": 65,
+    "name": "Crane's Fluid Connection Blog",
+    "url": "https://blog.craneengineering.net",
+    "domain": "blog.craneengineering.net",
+    "sourceGroup": "pump-fluid-handling",
+    "industryTags": [
+      "pump",
+      "fluid",
+      "handling"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-066",
+    "ordinal": 66,
+    "name": "Pump Industry Magazine",
+    "url": "https://www.pumpindustry.com.au",
+    "domain": "pumpindustry.com.au",
+    "sourceGroup": "pump-fluid-handling",
+    "industryTags": [
+      "pump",
+      "fluid",
+      "handling"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-067",
+    "ordinal": 67,
+    "name": "Valve Magazine",
+    "url": "https://www.valvemagazine.com",
+    "domain": "valvemagazine.com",
+    "sourceGroup": "pump-fluid-handling",
+    "industryTags": [
+      "pump",
+      "fluid",
+      "handling"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-068",
+    "ordinal": 68,
+    "name": "Fluid Power Journal",
+    "url": "https://fluidpowerjournal.com",
+    "domain": "fluidpowerjournal.com",
+    "sourceGroup": "pump-fluid-handling",
+    "industryTags": [
+      "pump",
+      "fluid",
+      "handling"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-069",
+    "ordinal": 69,
+    "name": "Hydraulics & Pneumatics",
+    "url": "https://www.hydraulicspneumatics.com",
+    "domain": "hydraulicspneumatics.com",
+    "sourceGroup": "pump-fluid-handling",
+    "industryTags": [
+      "pump",
+      "fluid",
+      "handling"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-070",
+    "ordinal": 70,
+    "name": "Pump School",
+    "url": "https://www.pumpschool.com",
+    "domain": "pumpschool.com",
+    "sourceGroup": "pump-fluid-handling",
+    "industryTags": [
+      "pump",
+      "fluid",
+      "handling"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-071",
+    "ordinal": 71,
+    "name": "Pump Engineer Magazine",
+    "url": "https://pumps-engineer.com",
+    "domain": "pumps-engineer.com",
+    "sourceGroup": "pump-fluid-handling",
+    "industryTags": [
+      "pump",
+      "fluid",
+      "handling"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-072",
+    "ordinal": 72,
+    "name": "Hydrocarbon Processing (Pump Section)",
+    "url": "https://www.hydrocarbonprocessing.com",
+    "domain": "hydrocarbonprocessing.com",
+    "sourceGroup": "pump-fluid-handling",
+    "industryTags": [
+      "pump",
+      "fluid",
+      "handling"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-073",
+    "ordinal": 73,
+    "name": "Process Heating & Cooling",
+    "url": "https://www.process-heating.com",
+    "domain": "process-heating.com",
+    "sourceGroup": "pump-fluid-handling",
+    "industryTags": [
+      "pump",
+      "fluid",
+      "handling"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-074",
+    "ordinal": 74,
+    "name": "Chemical Engineering Magazine",
+    "url": "https://www.chemengonline.com",
+    "domain": "chemengonline.com",
+    "sourceGroup": "pump-fluid-handling",
+    "industryTags": [
+      "pump",
+      "fluid",
+      "handling"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-075",
+    "ordinal": 75,
+    "name": "Processing Magazine",
+    "url": "https://www.processingmagazine.com",
+    "domain": "processingmagazine.com",
+    "sourceGroup": "pump-fluid-handling",
+    "industryTags": [
+      "pump",
+      "fluid",
+      "handling"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-076",
+    "ordinal": 76,
+    "name": "Flow Control Magazine",
+    "url": "https://www.flowcontrolnetwork.com",
+    "domain": "flowcontrolnetwork.com",
+    "sourceGroup": "pump-fluid-handling",
+    "industryTags": [
+      "pump",
+      "fluid",
+      "handling"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-077",
+    "ordinal": 77,
+    "name": "Valve World Technology",
+    "url": "https://www.valve-world.net",
+    "domain": "valve-world.net",
+    "sourceGroup": "pump-fluid-handling",
+    "industryTags": [
+      "pump",
+      "fluid",
+      "handling"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-078",
+    "ordinal": 78,
+    "name": "Valve World Americas",
+    "url": "https://valve-world-americas.net",
+    "domain": "valve-world-americas.net",
+    "sourceGroup": "pump-fluid-handling",
+    "industryTags": [
+      "pump",
+      "fluid",
+      "handling"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-079",
+    "ordinal": 79,
+    "name": "Empowering Pumps & Equipment",
+    "url": "https://empoweringpumps.com",
+    "domain": "empoweringpumps.com",
+    "sourceGroup": "pump-fluid-handling",
+    "industryTags": [
+      "pump",
+      "fluid",
+      "handling"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-080",
+    "ordinal": 80,
+    "name": "Fluid Handling International",
+    "url": "https://www.fluidhandlingmag.com",
+    "domain": "fluidhandlingmag.com",
+    "sourceGroup": "pump-fluid-handling",
+    "industryTags": [
+      "pump",
+      "fluid",
+      "handling"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-081",
+    "ordinal": 81,
+    "name": "Pump Fundamentals Portal",
+    "url": "https://www.pumpfundamentals.com",
+    "domain": "pumpfundamentals.com",
+    "sourceGroup": "pump-fluid-handling",
+    "industryTags": [
+      "pump",
+      "fluid",
+      "handling"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-082",
+    "ordinal": 82,
+    "name": "Diesel & Gas Turbine Worldwide",
+    "url": "https://www.dieselgasturbine.com",
+    "domain": "dieselgasturbine.com",
+    "sourceGroup": "pump-fluid-handling",
+    "industryTags": [
+      "pump",
+      "fluid",
+      "handling"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-083",
+    "ordinal": 83,
+    "name": "Compressors & Pumping Machinery",
+    "url": "https://www.compressormachinery.com",
+    "domain": "compressormachinery.com",
+    "sourceGroup": "pump-fluid-handling",
+    "industryTags": [
+      "pump",
+      "fluid",
+      "handling"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-084",
+    "ordinal": 84,
+    "name": "Hydraulic Institute Technical Articles",
+    "url": "https://www.pumps.org",
+    "domain": "pumps.org",
+    "sourceGroup": "pump-fluid-handling",
+    "industryTags": [
+      "pump",
+      "fluid",
+      "handling"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "A",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-085",
+    "ordinal": 85,
+    "name": "Europump Technical News",
+    "url": "https://europump.net",
+    "domain": "europump.net",
+    "sourceGroup": "pump-fluid-handling",
+    "industryTags": [
+      "pump",
+      "fluid",
+      "handling"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "A",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-086",
+    "ordinal": 86,
+    "name": "Submersible Pump Systems News",
+    "url": "https://www.submersiblepumps.org",
+    "domain": "submersiblepumps.org",
+    "sourceGroup": "pump-fluid-handling",
+    "industryTags": [
+      "pump",
+      "fluid",
+      "handling"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-087",
+    "ordinal": 87,
+    "name": "Industrial Piping & Valves Blog",
+    "url": "https://www.industrialpiping.org",
+    "domain": "industrialpiping.org",
+    "sourceGroup": "pump-fluid-handling",
+    "industryTags": [
+      "pump",
+      "fluid",
+      "handling"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-088",
+    "ordinal": 88,
+    "name": "Machine Design (Fluid Power)",
+    "url": "https://www.machinedesign.com/mechanical-motion-systems/fluid-power",
+    "domain": "machinedesign.com",
+    "sourceGroup": "pump-fluid-handling",
+    "industryTags": [
+      "pump",
+      "fluid",
+      "handling"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-089",
+    "ordinal": 89,
+    "name": "Plant Engineering Magazine",
+    "url": "https://www.plantengineering.com",
+    "domain": "plantengineering.com",
+    "sourceGroup": "pump-fluid-handling",
+    "industryTags": [
+      "pump",
+      "fluid",
+      "handling"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-090",
+    "ordinal": 90,
+    "name": "Maintenance Technology Journal",
+    "url": "https://www.maintenancetechnology.com",
+    "domain": "maintenancetechnology.com",
+    "sourceGroup": "pump-fluid-handling",
+    "industryTags": [
+      "pump",
+      "fluid",
+      "handling"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-091",
+    "ordinal": 91,
+    "name": "Efficient Plant Magazine",
+    "url": "https://www.efficientplantmag.com",
+    "domain": "efficientplantmag.com",
+    "sourceGroup": "pump-fluid-handling",
+    "industryTags": [
+      "pump",
+      "fluid",
+      "handling"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-092",
+    "ordinal": 92,
+    "name": "Maintenance Sales Engineering Blog",
+    "url": "https://www.mrose.com/blog",
+    "domain": "mrose.com",
+    "sourceGroup": "pump-fluid-handling",
+    "industryTags": [
+      "pump",
+      "fluid",
+      "handling"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-093",
+    "ordinal": 93,
+    "name": "Pump Systems Matter",
+    "url": "https://www.pumpsystemsmatter.org",
+    "domain": "pumpsystemsmatter.org",
+    "sourceGroup": "pump-fluid-handling",
+    "industryTags": [
+      "pump",
+      "fluid",
+      "handling"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-094",
+    "ordinal": 94,
+    "name": "Impeller & Centrifugal Pump Technology",
+    "url": "https://www.centrifugalpumps.org",
+    "domain": "centrifugalpumps.org",
+    "sourceGroup": "pump-fluid-handling",
+    "industryTags": [
+      "pump",
+      "fluid",
+      "handling"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-095",
+    "ordinal": 95,
+    "name": "Fluid Engineering Forum",
+    "url": "https://www.fluidengineering.org",
+    "domain": "fluidengineering.org",
+    "sourceGroup": "pump-fluid-handling",
+    "industryTags": [
+      "pump",
+      "fluid",
+      "handling"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-096",
+    "ordinal": 96,
+    "name": "Industrial Motor & Pump Control",
+    "url": "https://www.motorcontroltech.com",
+    "domain": "motorcontroltech.com",
+    "sourceGroup": "pump-fluid-handling",
+    "industryTags": [
+      "pump",
+      "fluid",
+      "handling"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-097",
+    "ordinal": 97,
+    "name": "Variable Speed Drive Pumping Systems",
+    "url": "https://www.vfdpumps.com",
+    "domain": "vfdpumps.com",
+    "sourceGroup": "pump-fluid-handling",
+    "industryTags": [
+      "pump",
+      "fluid",
+      "handling"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-098",
+    "ordinal": 98,
+    "name": "Mechanical Seals & Packing Journal",
+    "url": "https://www.sealingtech.org",
+    "domain": "sealingtech.org",
+    "sourceGroup": "pump-fluid-handling",
+    "industryTags": [
+      "pump",
+      "fluid",
+      "handling"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-099",
+    "ordinal": 99,
+    "name": "Piping Design & Engineering",
+    "url": "https://www.piping-designer.com",
+    "domain": "piping-designer.com",
+    "sourceGroup": "pump-fluid-handling",
+    "industryTags": [
+      "pump",
+      "fluid",
+      "handling"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-100",
+    "ordinal": 100,
+    "name": "Pumping System Optimization Digest",
+    "url": "https://www.pumpsystemoptimization.org",
+    "domain": "pumpsystemoptimization.org",
+    "sourceGroup": "pump-fluid-handling",
+    "industryTags": [
+      "pump",
+      "fluid",
+      "handling"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-101",
+    "ordinal": 101,
+    "name": "Applied Fluid Dynamics Today",
+    "url": "https://www.fluiddynamics.org",
+    "domain": "fluiddynamics.org",
+    "sourceGroup": "pump-fluid-handling",
+    "industryTags": [
+      "pump",
+      "fluid",
+      "handling"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-102",
+    "ordinal": 102,
+    "name": "Industrial Engine Technology",
+    "url": "https://www.industrialengines.org",
+    "domain": "industrialengines.org",
+    "sourceGroup": "pump-fluid-handling",
+    "industryTags": [
+      "pump",
+      "fluid",
+      "handling"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-103",
+    "ordinal": 103,
+    "name": "Heavy Mechanical Systems Journal",
+    "url": "https://www.heavymechanicals.com",
+    "domain": "heavymechanicals.com",
+    "sourceGroup": "pump-fluid-handling",
+    "industryTags": [
+      "pump",
+      "fluid",
+      "handling"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-104",
+    "ordinal": 104,
+    "name": "Fluid Motion Engineering",
+    "url": "https://www.fluidmotion.org",
+    "domain": "fluidmotion.org",
+    "sourceGroup": "pump-fluid-handling",
+    "industryTags": [
+      "pump",
+      "fluid",
+      "handling"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-105",
+    "ordinal": 105,
+    "name": "High Pressure Systems Online",
+    "url": "https://www.highpressuresystems.com",
+    "domain": "highpressuresystems.com",
+    "sourceGroup": "pump-fluid-handling",
+    "industryTags": [
+      "pump",
+      "fluid",
+      "handling"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-106",
+    "ordinal": 106,
+    "name": "Industrial Fluid Mechanics",
+    "url": "https://www.fluidmechanics.org",
+    "domain": "fluidmechanics.org",
+    "sourceGroup": "pump-fluid-handling",
+    "industryTags": [
+      "pump",
+      "fluid",
+      "handling"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-107",
+    "ordinal": 107,
+    "name": "Pressure Vessel & Piping Engineering",
+    "url": "https://www.pveng.com",
+    "domain": "pveng.com",
+    "sourceGroup": "pump-fluid-handling",
+    "industryTags": [
+      "pump",
+      "fluid",
+      "handling"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-108",
+    "ordinal": 108,
+    "name": "Valve & Actuator Technology",
+    "url": "https://www.actuatortech.com",
+    "domain": "actuatortech.com",
+    "sourceGroup": "pump-fluid-handling",
+    "industryTags": [
+      "pump",
+      "fluid",
+      "handling"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-109",
+    "ordinal": 109,
+    "name": "Industrial Flow Measurement",
+    "url": "https://www.flowmeasurement.org",
+    "domain": "flowmeasurement.org",
+    "sourceGroup": "pump-fluid-handling",
+    "industryTags": [
+      "pump",
+      "fluid",
+      "handling"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-110",
+    "ordinal": 110,
+    "name": "Centrifugal Pump Maintenance Blog",
+    "url": "https://www.pumpmaintenance.org",
+    "domain": "pumpmaintenance.org",
+    "sourceGroup": "pump-fluid-handling",
+    "industryTags": [
+      "pump",
+      "fluid",
+      "handling"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-111",
+    "ordinal": 111,
+    "name": "Diesel Engine Drive Systems",
+    "url": "https://www.dieseldrives.org",
+    "domain": "dieseldrives.org",
+    "sourceGroup": "pump-fluid-handling",
+    "industryTags": [
+      "pump",
+      "fluid",
+      "handling"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-112",
+    "ordinal": 112,
+    "name": "Emergency Power & Engine Controls",
+    "url": "https://www.enginecontrols.org",
+    "domain": "enginecontrols.org",
+    "sourceGroup": "pump-fluid-handling",
+    "industryTags": [
+      "pump",
+      "fluid",
+      "handling"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-113",
+    "ordinal": 113,
+    "name": "Industrial Water Pumping Tech",
+    "url": "https://www.waterpumping.org",
+    "domain": "waterpumping.org",
+    "sourceGroup": "pump-fluid-handling",
+    "industryTags": [
+      "pump",
+      "fluid",
+      "handling"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-114",
+    "ordinal": 114,
+    "name": "Industrial Instrumentation & Controls",
+    "url": "https://www.controlglobal.com",
+    "domain": "controlglobal.com",
+    "sourceGroup": "pump-fluid-handling",
+    "industryTags": [
+      "pump",
+      "fluid",
+      "handling"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-115",
+    "ordinal": 115,
+    "name": "Motion System Design",
+    "url": "https://www.motionsystemdesign.com",
+    "domain": "motionsystemdesign.com",
+    "sourceGroup": "pump-fluid-handling",
+    "industryTags": [
+      "pump",
+      "fluid",
+      "handling"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-116",
+    "ordinal": 116,
+    "name": "Power Transmission Engineering",
+    "url": "https://www.powertransmission.com",
+    "domain": "powertransmission.com",
+    "sourceGroup": "pump-fluid-handling",
+    "industryTags": [
+      "pump",
+      "fluid",
+      "handling"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-117",
+    "ordinal": 117,
+    "name": "Industrial Machinery Digest",
+    "url": "https://industrialmachinerydigest.com",
+    "domain": "industrialmachinerydigest.com",
+    "sourceGroup": "pump-fluid-handling",
+    "industryTags": [
+      "pump",
+      "fluid",
+      "handling"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-118",
+    "ordinal": 118,
+    "name": "Maintenance & Asset Management",
+    "url": "https://www.assetmanagement.org",
+    "domain": "assetmanagement.org",
+    "sourceGroup": "pump-fluid-handling",
+    "industryTags": [
+      "pump",
+      "fluid",
+      "handling"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-119",
+    "ordinal": 119,
+    "name": "Reliability Web",
+    "url": "https://reliabilityweb.com",
+    "domain": "reliabilityweb.com",
+    "sourceGroup": "pump-fluid-handling",
+    "industryTags": [
+      "pump",
+      "fluid",
+      "handling"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-120",
+    "ordinal": 120,
+    "name": "Plant Services Magazine",
+    "url": "https://www.plantservices.com",
+    "domain": "plantservices.com",
+    "sourceGroup": "pump-fluid-handling",
+    "industryTags": [
+      "pump",
+      "fluid",
+      "handling"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-121",
+    "ordinal": 121,
+    "name": "Consulting-Specifying Engineer (CSE)",
+    "url": "https://www.csemag.com",
+    "domain": "csemag.com",
+    "sourceGroup": "mep-building-codes",
+    "industryTags": [
+      "mep",
+      "building",
+      "codes"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-122",
+    "ordinal": 122,
+    "name": "Building Design + Construction (BD+C)",
+    "url": "https://www.bdcnetwork.com",
+    "domain": "bdcnetwork.com",
+    "sourceGroup": "mep-building-codes",
+    "industryTags": [
+      "mep",
+      "building",
+      "codes"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-123",
+    "ordinal": 123,
+    "name": "Engineering News-Record (ENR)",
+    "url": "https://www.enr.com",
+    "domain": "enr.com",
+    "sourceGroup": "mep-building-codes",
+    "industryTags": [
+      "mep",
+      "building",
+      "codes"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-124",
+    "ordinal": 124,
+    "name": "Plumbing & Mechanical (PM) Engineer",
+    "url": "https://www.pmengineer.com",
+    "domain": "pmengineer.com",
+    "sourceGroup": "mep-building-codes",
+    "industryTags": [
+      "mep",
+      "building",
+      "codes"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-125",
+    "ordinal": 125,
+    "name": "HPAC Engineering",
+    "url": "https://www.hpac.com",
+    "domain": "hpac.com",
+    "sourceGroup": "mep-building-codes",
+    "industryTags": [
+      "mep",
+      "building",
+      "codes"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-126",
+    "ordinal": 126,
+    "name": "NY Engineers MEP Blog",
+    "url": "https://www.ny-engineers.com/blog",
+    "domain": "ny-engineers.com",
+    "sourceGroup": "mep-building-codes",
+    "industryTags": [
+      "mep",
+      "building",
+      "codes"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-127",
+    "ordinal": 127,
+    "name": "Construction Dive",
+    "url": "https://www.constructiondive.com",
+    "domain": "constructiondive.com",
+    "sourceGroup": "mep-building-codes",
+    "industryTags": [
+      "mep",
+      "building",
+      "codes"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-128",
+    "ordinal": 128,
+    "name": "ASHRAE Journal",
+    "url": "https://www.ashrae.org/technical-resources/ashrae-journal",
+    "domain": "ashrae.org",
+    "sourceGroup": "mep-building-codes",
+    "industryTags": [
+      "mep",
+      "building",
+      "codes"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "A",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-129",
+    "ordinal": 129,
+    "name": "ASPE Plumbing Engineer Magazine",
+    "url": "https://www.aspe.org/pipeline",
+    "domain": "aspe.org",
+    "sourceGroup": "mep-building-codes",
+    "industryTags": [
+      "mep",
+      "building",
+      "codes"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "A",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-130",
+    "ordinal": 130,
+    "name": "International Code Council (ICC) News",
+    "url": "https://www.iccsafe.org/about/periodicals",
+    "domain": "iccsafe.org",
+    "sourceGroup": "mep-building-codes",
+    "industryTags": [
+      "mep",
+      "building",
+      "codes"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "A",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-131",
+    "ordinal": 131,
+    "name": "NIST Buildings and Construction",
+    "url": "https://www.nist.gov/buildings-and-construction",
+    "domain": "nist.gov",
+    "sourceGroup": "mep-building-codes",
+    "industryTags": [
+      "mep",
+      "building",
+      "codes"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "A",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-132",
+    "ordinal": 132,
+    "name": "Building Green",
+    "url": "https://www.buildinggreen.com",
+    "domain": "buildinggreen.com",
+    "sourceGroup": "mep-building-codes",
+    "industryTags": [
+      "mep",
+      "building",
+      "codes"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-133",
+    "ordinal": 133,
+    "name": "Building Operating Management",
+    "url": "https://www.facilitiesnet.com/bom",
+    "domain": "facilitiesnet.com",
+    "sourceGroup": "mep-building-codes",
+    "industryTags": [
+      "mep",
+      "building",
+      "codes"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-134",
+    "ordinal": 134,
+    "name": "Architectural Record",
+    "url": "https://www.architecturalrecord.com",
+    "domain": "architecturalrecord.com",
+    "sourceGroup": "mep-building-codes",
+    "industryTags": [
+      "mep",
+      "building",
+      "codes"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-135",
+    "ordinal": 135,
+    "name": "Building Safety Journal",
+    "url": "https://www.iccsafe.org/building-safety-journal",
+    "domain": "iccsafe.org",
+    "sourceGroup": "mep-building-codes",
+    "industryTags": [
+      "mep",
+      "building",
+      "codes"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "A",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-136",
+    "ordinal": 136,
+    "name": "MEP Middle East",
+    "url": "https://www.mepmiddleeast.com",
+    "domain": "mepmiddleeast.com",
+    "sourceGroup": "mep-building-codes",
+    "industryTags": [
+      "mep",
+      "building",
+      "codes"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-137",
+    "ordinal": 137,
+    "name": "Building Services Engineering (BSE)",
+    "url": "https://www.buildingservicesng.com",
+    "domain": "buildingservicesng.com",
+    "sourceGroup": "mep-building-codes",
+    "industryTags": [
+      "mep",
+      "building",
+      "codes"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-138",
+    "ordinal": 138,
+    "name": "CIBSE Journal (UK MEP)",
+    "url": "https://www.cibsejournal.com",
+    "domain": "cibsejournal.com",
+    "sourceGroup": "mep-building-codes",
+    "industryTags": [
+      "mep",
+      "building",
+      "codes"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-139",
+    "ordinal": 139,
+    "name": "Plumbing Engineer Magazine",
+    "url": "https://www.plumbingengineer.com",
+    "domain": "plumbingengineer.com",
+    "sourceGroup": "mep-building-codes",
+    "industryTags": [
+      "mep",
+      "building",
+      "codes"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-140",
+    "ordinal": 140,
+    "name": "PM Plumbing & Mechanical Mag",
+    "url": "https://www.pmmag.com",
+    "domain": "pmmag.com",
+    "sourceGroup": "mep-building-codes",
+    "industryTags": [
+      "mep",
+      "building",
+      "codes"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-141",
+    "ordinal": 141,
+    "name": "Reeves MEP Design Articles",
+    "url": "https://www.reevesmep.com/articles",
+    "domain": "reevesmep.com",
+    "sourceGroup": "mep-building-codes",
+    "industryTags": [
+      "mep",
+      "building",
+      "codes"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-142",
+    "ordinal": 142,
+    "name": "Mechanical Hub",
+    "url": "https://mechanical-hub.com",
+    "domain": "mechanical-hub.com",
+    "sourceGroup": "mep-building-codes",
+    "industryTags": [
+      "mep",
+      "building",
+      "codes"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-143",
+    "ordinal": 143,
+    "name": "Commercial Construction & Renovation",
+    "url": "https://www.ccr-mag.com",
+    "domain": "ccr-mag.com",
+    "sourceGroup": "mep-building-codes",
+    "industryTags": [
+      "mep",
+      "building",
+      "codes"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-144",
+    "ordinal": 144,
+    "name": "High-Rise Building Design Journal",
+    "url": "https://www.highrisedesign.org",
+    "domain": "highrisedesign.org",
+    "sourceGroup": "mep-building-codes",
+    "industryTags": [
+      "mep",
+      "building",
+      "codes"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-145",
+    "ordinal": 145,
+    "name": "Tall Buildings & Urban Habitat (CTBUH)",
+    "url": "https://www.ctbuh.org/news",
+    "domain": "ctbuh.org",
+    "sourceGroup": "mep-building-codes",
+    "industryTags": [
+      "mep",
+      "building",
+      "codes"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-146",
+    "ordinal": 146,
+    "name": "USGBC / LEED News",
+    "url": "https://www.usgbc.org/news",
+    "domain": "usgbc.org",
+    "sourceGroup": "mep-building-codes",
+    "industryTags": [
+      "mep",
+      "building",
+      "codes"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-147",
+    "ordinal": 147,
+    "name": "Smart Buildings Magazine",
+    "url": "https://smartbuildingsmagazine.com",
+    "domain": "smartbuildingsmagazine.com",
+    "sourceGroup": "mep-building-codes",
+    "industryTags": [
+      "mep",
+      "building",
+      "codes"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-148",
+    "ordinal": 148,
+    "name": "Building Systems Design",
+    "url": "https://www.buildingsystemsdesign.org",
+    "domain": "buildingsystemsdesign.org",
+    "sourceGroup": "mep-building-codes",
+    "industryTags": [
+      "mep",
+      "building",
+      "codes"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-149",
+    "ordinal": 149,
+    "name": "Architectural Engineering Institute (AEI)",
+    "url": "https://www.asce.org/communities/institutes-and-technical-groups/architectural-engineering-institute",
+    "domain": "asce.org",
+    "sourceGroup": "mep-building-codes",
+    "industryTags": [
+      "mep",
+      "building",
+      "codes"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-150",
+    "ordinal": 150,
+    "name": "Plumbing Systems & Design",
+    "url": "https://www.plumbingsystems.org",
+    "domain": "plumbingsystems.org",
+    "sourceGroup": "mep-building-codes",
+    "industryTags": [
+      "mep",
+      "building",
+      "codes"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-151",
+    "ordinal": 151,
+    "name": "Commercial Fire & Water Piping",
+    "url": "https://www.firewaterpiping.org",
+    "domain": "firewaterpiping.org",
+    "sourceGroup": "mep-building-codes",
+    "industryTags": [
+      "mep",
+      "building",
+      "codes"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-152",
+    "ordinal": 152,
+    "name": "Infrastructure & Building Design",
+    "url": "https://www.infrastructuredesign.org",
+    "domain": "infrastructuredesign.org",
+    "sourceGroup": "mep-building-codes",
+    "industryTags": [
+      "mep",
+      "building",
+      "codes"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-153",
+    "ordinal": 153,
+    "name": "MEP Systems Online",
+    "url": "https://www.mepsystems.org",
+    "domain": "mepsystems.org",
+    "sourceGroup": "mep-building-codes",
+    "industryTags": [
+      "mep",
+      "building",
+      "codes"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-154",
+    "ordinal": 154,
+    "name": "Urban Infrastructure & Safety",
+    "url": "https://www.urbaninfrastructure.org",
+    "domain": "urbaninfrastructure.org",
+    "sourceGroup": "mep-building-codes",
+    "industryTags": [
+      "mep",
+      "building",
+      "codes"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-155",
+    "ordinal": 155,
+    "name": "Facility Maintenance Decisions",
+    "url": "https://www.facilitiesnet.com/fmd",
+    "domain": "facilitiesnet.com",
+    "sourceGroup": "mep-building-codes",
+    "industryTags": [
+      "mep",
+      "building",
+      "codes"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-156",
+    "ordinal": 156,
+    "name": "Mechanical Contractor Magazine",
+    "url": "https://www.mcaa.org/news",
+    "domain": "mcaa.org",
+    "sourceGroup": "mep-building-codes",
+    "industryTags": [
+      "mep",
+      "building",
+      "codes"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-157",
+    "ordinal": 157,
+    "name": "Building Hydraulics Engineering",
+    "url": "https://www.buildinghydraulics.org",
+    "domain": "buildinghydraulics.org",
+    "sourceGroup": "mep-building-codes",
+    "industryTags": [
+      "mep",
+      "building",
+      "codes"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-158",
+    "ordinal": 158,
+    "name": "Construction Executive",
+    "url": "https://constructionexec.com",
+    "domain": "constructionexec.com",
+    "sourceGroup": "mep-building-codes",
+    "industryTags": [
+      "mep",
+      "building",
+      "codes"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-159",
+    "ordinal": 159,
+    "name": "Construction Specifier",
+    "url": "https://www.constructionspecifier.com",
+    "domain": "constructionspecifier.com",
+    "sourceGroup": "mep-building-codes",
+    "industryTags": [
+      "mep",
+      "building",
+      "codes"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-160",
+    "ordinal": 160,
+    "name": "Building Engineer Magazine",
+    "url": "https://cabe.org.uk/page/building_engineer",
+    "domain": "cabe.org.uk",
+    "sourceGroup": "mep-building-codes",
+    "industryTags": [
+      "mep",
+      "building",
+      "codes"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-161",
+    "ordinal": 161,
+    "name": "Engineered Systems Magazine",
+    "url": "https://www.esmagazine.com",
+    "domain": "esmagazine.com",
+    "sourceGroup": "mep-building-codes",
+    "industryTags": [
+      "mep",
+      "building",
+      "codes"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-162",
+    "ordinal": 162,
+    "name": "Supply House Times (Plumbing & Mechanical)",
+    "url": "https://www.supplyht.com",
+    "domain": "supplyht.com",
+    "sourceGroup": "mep-building-codes",
+    "industryTags": [
+      "mep",
+      "building",
+      "codes"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-163",
+    "ordinal": 163,
+    "name": "PHCPPros (Plumbing, Heating, Cooling, Piping)",
+    "url": "https://www.phcppros.com",
+    "domain": "phcppros.com",
+    "sourceGroup": "mep-building-codes",
+    "industryTags": [
+      "mep",
+      "building",
+      "codes"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-164",
+    "ordinal": 164,
+    "name": "Building Services Contractor",
+    "url": "https://www.bscai.org",
+    "domain": "bscai.org",
+    "sourceGroup": "mep-building-codes",
+    "industryTags": [
+      "mep",
+      "building",
+      "codes"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-165",
+    "ordinal": 165,
+    "name": "MEP Engineering Times",
+    "url": "https://www.mepengtimes.com",
+    "domain": "mepengtimes.com",
+    "sourceGroup": "mep-building-codes",
+    "industryTags": [
+      "mep",
+      "building",
+      "codes"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-166",
+    "ordinal": 166,
+    "name": "Modern Building Protection",
+    "url": "https://www.modernbuilding.org",
+    "domain": "modernbuilding.org",
+    "sourceGroup": "mep-building-codes",
+    "industryTags": [
+      "mep",
+      "building",
+      "codes"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-167",
+    "ordinal": 167,
+    "name": "Commercial Property MEP Journal",
+    "url": "https://www.property-mep.com",
+    "domain": "property-mep.com",
+    "sourceGroup": "mep-building-codes",
+    "industryTags": [
+      "mep",
+      "building",
+      "codes"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-168",
+    "ordinal": 168,
+    "name": "Fire Engineering & MEP Integration",
+    "url": "https://www.mepfire.org",
+    "domain": "mepfire.org",
+    "sourceGroup": "mep-building-codes",
+    "industryTags": [
+      "mep",
+      "building",
+      "codes"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-169",
+    "ordinal": 169,
+    "name": "High-Performance Buildings Magazine",
+    "url": "https://www.hpbmagazine.org",
+    "domain": "hpbmagazine.org",
+    "sourceGroup": "mep-building-codes",
+    "industryTags": [
+      "mep",
+      "building",
+      "codes"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-170",
+    "ordinal": 170,
+    "name": "Building Codes & Standards Monthly",
+    "url": "https://www.buildingcodesmonthly.com",
+    "domain": "buildingcodesmonthly.com",
+    "sourceGroup": "mep-building-codes",
+    "industryTags": [
+      "mep",
+      "building",
+      "codes"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-171",
+    "ordinal": 171,
+    "name": "Urban Construction & Safety",
+    "url": "https://www.urbanconstruction.org",
+    "domain": "urbanconstruction.org",
+    "sourceGroup": "mep-building-codes",
+    "industryTags": [
+      "mep",
+      "building",
+      "codes"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-172",
+    "ordinal": 172,
+    "name": "Facilities Operations & Engineering",
+    "url": "https://www.facilityops.org",
+    "domain": "facilityops.org",
+    "sourceGroup": "mep-building-codes",
+    "industryTags": [
+      "mep",
+      "building",
+      "codes"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-173",
+    "ordinal": 173,
+    "name": "Commercial Plumbing Today",
+    "url": "https://www.commercialplumbingtoday.com",
+    "domain": "commercialplumbingtoday.com",
+    "sourceGroup": "mep-building-codes",
+    "industryTags": [
+      "mep",
+      "building",
+      "codes"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-174",
+    "ordinal": 174,
+    "name": "Mechanical Estimating & Design",
+    "url": "https://www.mechanicaldesign.org",
+    "domain": "mechanicaldesign.org",
+    "sourceGroup": "mep-building-codes",
+    "industryTags": [
+      "mep",
+      "building",
+      "codes"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-175",
+    "ordinal": 175,
+    "name": "Infrastructure Engineering Tech",
+    "url": "https://www.infrastructuretech.org",
+    "domain": "infrastructuretech.org",
+    "sourceGroup": "mep-building-codes",
+    "industryTags": [
+      "mep",
+      "building",
+      "codes"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-176",
+    "ordinal": 176,
+    "name": "Architectural Safety Systems",
+    "url": "https://www.architecturalsafety.org",
+    "domain": "architecturalsafety.org",
+    "sourceGroup": "mep-building-codes",
+    "industryTags": [
+      "mep",
+      "building",
+      "codes"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-177",
+    "ordinal": 177,
+    "name": "MEP Project Management Review",
+    "url": "https://www.mepprojects.org",
+    "domain": "mepprojects.org",
+    "sourceGroup": "mep-building-codes",
+    "industryTags": [
+      "mep",
+      "building",
+      "codes"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-178",
+    "ordinal": 178,
+    "name": "Building Emergency Infrastructure",
+    "url": "https://www.emergencyinfrastructure.org",
+    "domain": "emergencyinfrastructure.org",
+    "sourceGroup": "mep-building-codes",
+    "industryTags": [
+      "mep",
+      "building",
+      "codes"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-179",
+    "ordinal": 179,
+    "name": "Commercial High-Rise Safety",
+    "url": "https://www.highrisesafety.org",
+    "domain": "highrisesafety.org",
+    "sourceGroup": "mep-building-codes",
+    "industryTags": [
+      "mep",
+      "building",
+      "codes"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-180",
+    "ordinal": 180,
+    "name": "Smart Fire Safety in Buildings",
+    "url": "https://www.smartfiresafety.org",
+    "domain": "smartfiresafety.org",
+    "sourceGroup": "mep-building-codes",
+    "industryTags": [
+      "mep",
+      "building",
+      "codes"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-181",
+    "ordinal": 181,
+    "name": "Water & Wastes Digest (WWD)",
+    "url": "https://www.wwdmag.com",
+    "domain": "wwdmag.com",
+    "sourceGroup": "water-infrastructure",
+    "industryTags": [
+      "water",
+      "infrastructure"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-182",
+    "ordinal": 182,
+    "name": "Water World Magazine",
+    "url": "https://www.waterworld.com",
+    "domain": "waterworld.com",
+    "sourceGroup": "water-infrastructure",
+    "industryTags": [
+      "water",
+      "infrastructure"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-183",
+    "ordinal": 183,
+    "name": "Water Technology Online",
+    "url": "https://www.watertechonline.com",
+    "domain": "watertechonline.com",
+    "sourceGroup": "water-infrastructure",
+    "industryTags": [
+      "water",
+      "infrastructure"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-184",
+    "ordinal": 184,
+    "name": "Water Environment & Technology (WE&T)",
+    "url": "https://www.wef.org/magazine",
+    "domain": "wef.org",
+    "sourceGroup": "water-infrastructure",
+    "industryTags": [
+      "water",
+      "infrastructure"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "A",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-185",
+    "ordinal": 185,
+    "name": "American Water Works Association (AWWA)",
+    "url": "https://www.awwa.org",
+    "domain": "awwa.org",
+    "sourceGroup": "water-infrastructure",
+    "industryTags": [
+      "water",
+      "infrastructure"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "A",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-186",
+    "ordinal": 186,
+    "name": "International Water Association (IWA)",
+    "url": "https://iwa-network.org",
+    "domain": "iwa-network.org",
+    "sourceGroup": "water-infrastructure",
+    "industryTags": [
+      "water",
+      "infrastructure"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "A",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-187",
+    "ordinal": 187,
+    "name": "Smart Water Magazine",
+    "url": "https://smartwatermagazine.com",
+    "domain": "smartwatermagazine.com",
+    "sourceGroup": "water-infrastructure",
+    "industryTags": [
+      "water",
+      "infrastructure"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-188",
+    "ordinal": 188,
+    "name": "Water World International",
+    "url": "https://www.waterworld.com/international",
+    "domain": "waterworld.com",
+    "sourceGroup": "water-infrastructure",
+    "industryTags": [
+      "water",
+      "infrastructure"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-189",
+    "ordinal": 189,
+    "name": "Water & Wastewater Asia",
+    "url": "https://waterwastewaterasia.com",
+    "domain": "waterwastewaterasia.com",
+    "sourceGroup": "water-infrastructure",
+    "industryTags": [
+      "water",
+      "infrastructure"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-190",
+    "ordinal": 190,
+    "name": "Industrial Water World",
+    "url": "https://www.industrialwaterworld.com",
+    "domain": "industrialwaterworld.com",
+    "sourceGroup": "water-infrastructure",
+    "industryTags": [
+      "water",
+      "infrastructure"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-191",
+    "ordinal": 191,
+    "name": "Desalination & Water Reuse",
+    "url": "https://www.desalination.biz",
+    "domain": "desalination.biz",
+    "sourceGroup": "water-infrastructure",
+    "industryTags": [
+      "water",
+      "infrastructure"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-192",
+    "ordinal": 192,
+    "name": "Global Water Intelligence (GWI)",
+    "url": "https://www.globalwaterintel.com",
+    "domain": "globalwaterintel.com",
+    "sourceGroup": "water-infrastructure",
+    "industryTags": [
+      "water",
+      "infrastructure"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-193",
+    "ordinal": 193,
+    "name": "Water Online",
+    "url": "https://www.wateronline.com",
+    "domain": "wateronline.com",
+    "sourceGroup": "water-infrastructure",
+    "industryTags": [
+      "water",
+      "infrastructure"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-194",
+    "ordinal": 194,
+    "name": "Municipal Water Leader",
+    "url": "https://municipalwaterleader.com",
+    "domain": "municipalwaterleader.com",
+    "sourceGroup": "water-infrastructure",
+    "industryTags": [
+      "water",
+      "infrastructure"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-195",
+    "ordinal": 195,
+    "name": "Water Well Journal",
+    "url": "https://waterwelljournal.com",
+    "domain": "waterwelljournal.com",
+    "sourceGroup": "water-infrastructure",
+    "industryTags": [
+      "water",
+      "infrastructure"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-196",
+    "ordinal": 196,
+    "name": "Irrigation Today",
+    "url": "https://www.irrigationtoday.org",
+    "domain": "irrigationtoday.org",
+    "sourceGroup": "water-infrastructure",
+    "industryTags": [
+      "water",
+      "infrastructure"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-197",
+    "ordinal": 197,
+    "name": "Pump & Water Systems Engineering",
+    "url": "https://www.watersystemsengineering.com",
+    "domain": "watersystemsengineering.com",
+    "sourceGroup": "water-infrastructure",
+    "industryTags": [
+      "water",
+      "infrastructure"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-198",
+    "ordinal": 198,
+    "name": "Clean Water Technology Portal",
+    "url": "https://www.cleanwatertech.org",
+    "domain": "cleanwatertech.org",
+    "sourceGroup": "water-infrastructure",
+    "industryTags": [
+      "water",
+      "infrastructure"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-199",
+    "ordinal": 199,
+    "name": "Water Resources Management",
+    "url": "https://www.waterresources.org",
+    "domain": "waterresources.org",
+    "sourceGroup": "water-infrastructure",
+    "industryTags": [
+      "water",
+      "infrastructure"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-200",
+    "ordinal": 200,
+    "name": "Industrial Wastewater Treatment",
+    "url": "https://www.industrialwastewater.org",
+    "domain": "industrialwastewater.org",
+    "sourceGroup": "water-infrastructure",
+    "industryTags": [
+      "water",
+      "infrastructure"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-201",
+    "ordinal": 201,
+    "name": "High Pressure Water Jetting & Pumping",
+    "url": "https://www.waterjetting.org",
+    "domain": "waterjetting.org",
+    "sourceGroup": "water-infrastructure",
+    "industryTags": [
+      "water",
+      "infrastructure"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-202",
+    "ordinal": 202,
+    "name": "Municipal Infrastructure News",
+    "url": "https://www.municipalinfrastructure.com",
+    "domain": "municipalinfrastructure.com",
+    "sourceGroup": "water-infrastructure",
+    "industryTags": [
+      "water",
+      "infrastructure"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-203",
+    "ordinal": 203,
+    "name": "Water Infrastructure Network",
+    "url": "https://www.waterinfrastructure.org",
+    "domain": "waterinfrastructure.org",
+    "sourceGroup": "water-infrastructure",
+    "industryTags": [
+      "water",
+      "infrastructure"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-204",
+    "ordinal": 204,
+    "name": "Fluid Conservation & Control",
+    "url": "https://www.fluidcontrol.org",
+    "domain": "fluidcontrol.org",
+    "sourceGroup": "water-infrastructure",
+    "industryTags": [
+      "water",
+      "infrastructure"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-205",
+    "ordinal": 205,
+    "name": "Water Mains & Pressure Piping",
+    "url": "https://www.waterpipes.org",
+    "domain": "waterpipes.org",
+    "sourceGroup": "water-infrastructure",
+    "industryTags": [
+      "water",
+      "infrastructure"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-206",
+    "ordinal": 206,
+    "name": "Urban Water Supply Journal",
+    "url": "https://www.urbanwater.org",
+    "domain": "urbanwater.org",
+    "sourceGroup": "water-infrastructure",
+    "industryTags": [
+      "water",
+      "infrastructure"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-207",
+    "ordinal": 207,
+    "name": "Water Engineering & Management",
+    "url": "https://www.waterengineer.org",
+    "domain": "waterengineer.org",
+    "sourceGroup": "water-infrastructure",
+    "industryTags": [
+      "water",
+      "infrastructure"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-208",
+    "ordinal": 208,
+    "name": "Emergency Water Supply & Relief",
+    "url": "https://www.emergencywater.org",
+    "domain": "emergencywater.org",
+    "sourceGroup": "water-infrastructure",
+    "industryTags": [
+      "water",
+      "infrastructure"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-209",
+    "ordinal": 209,
+    "name": "Water Pump & Station Design",
+    "url": "https://www.pumpstations.org",
+    "domain": "pumpstations.org",
+    "sourceGroup": "water-infrastructure",
+    "industryTags": [
+      "water",
+      "infrastructure"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-210",
+    "ordinal": 210,
+    "name": "Subsurface Water Technology",
+    "url": "https://www.subsurfacewater.org",
+    "domain": "subsurfacewater.org",
+    "sourceGroup": "water-infrastructure",
+    "industryTags": [
+      "water",
+      "infrastructure"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-211",
+    "ordinal": 211,
+    "name": "Environmental Protection Online",
+    "url": "https://eponline.com",
+    "domain": "eponline.com",
+    "sourceGroup": "water-infrastructure",
+    "industryTags": [
+      "water",
+      "infrastructure"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-212",
+    "ordinal": 212,
+    "name": "Water Quality Products (WQP)",
+    "url": "https://www.wqpmag.com",
+    "domain": "wqpmag.com",
+    "sourceGroup": "water-infrastructure",
+    "industryTags": [
+      "water",
+      "infrastructure"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-213",
+    "ordinal": 213,
+    "name": "World Water Magazine",
+    "url": "https://www.worldwater.org",
+    "domain": "worldwater.org",
+    "sourceGroup": "water-infrastructure",
+    "industryTags": [
+      "water",
+      "infrastructure"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-214",
+    "ordinal": 214,
+    "name": "Asian Water Journal",
+    "url": "https://www.asianwater.com.my",
+    "domain": "asianwater.com.my",
+    "sourceGroup": "water-infrastructure",
+    "industryTags": [
+      "water",
+      "infrastructure"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-215",
+    "ordinal": 215,
+    "name": "African Water & Sanitation",
+    "url": "https://www.africanwater.org",
+    "domain": "africanwater.org",
+    "sourceGroup": "water-infrastructure",
+    "industryTags": [
+      "water",
+      "infrastructure"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-216",
+    "ordinal": 216,
+    "name": "Water Utility Management International",
+    "url": "https://www.iwapublishing.com",
+    "domain": "iwapublishing.com",
+    "sourceGroup": "water-infrastructure",
+    "industryTags": [
+      "water",
+      "infrastructure"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "A",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-217",
+    "ordinal": 217,
+    "name": "Industrial Water Treatment",
+    "url": "https://www.industrialwater.org",
+    "domain": "industrialwater.org",
+    "sourceGroup": "water-infrastructure",
+    "industryTags": [
+      "water",
+      "infrastructure"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-218",
+    "ordinal": 218,
+    "name": "Pipeline & Gas Journal (Water Pipeline Section)",
+    "url": "https://pgj.pipeline-gassolutions.com",
+    "domain": "pgj.pipeline-gassolutions.com",
+    "sourceGroup": "water-infrastructure",
+    "industryTags": [
+      "water",
+      "infrastructure"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-219",
+    "ordinal": 219,
+    "name": "Trenchless Technology",
+    "url": "https://trenchlesstechnology.com",
+    "domain": "trenchlesstechnology.com",
+    "sourceGroup": "water-infrastructure",
+    "industryTags": [
+      "water",
+      "infrastructure"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-220",
+    "ordinal": 220,
+    "name": "Underground Infrastructure Magazine",
+    "url": "https://undergroundinfrastructure.com",
+    "domain": "undergroundinfrastructure.com",
+    "sourceGroup": "water-infrastructure",
+    "industryTags": [
+      "water",
+      "infrastructure"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-221",
+    "ordinal": 221,
+    "name": "Water Storage & Reservoir Tech",
+    "url": "https://www.waterstorage.org",
+    "domain": "waterstorage.org",
+    "sourceGroup": "water-infrastructure",
+    "industryTags": [
+      "water",
+      "infrastructure"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-222",
+    "ordinal": 222,
+    "name": "Hydrotech Engineering Portal",
+    "url": "https://www.hydrotech.org",
+    "domain": "hydrotech.org",
+    "sourceGroup": "water-infrastructure",
+    "industryTags": [
+      "water",
+      "infrastructure"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-223",
+    "ordinal": 223,
+    "name": "Fluid Pressure Management",
+    "url": "https://www.pressuremanagement.org",
+    "domain": "pressuremanagement.org",
+    "sourceGroup": "water-infrastructure",
+    "industryTags": [
+      "water",
+      "infrastructure"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-224",
+    "ordinal": 224,
+    "name": "Fire & Water Supply Integration",
+    "url": "https://www.firewatersupply.org",
+    "domain": "firewatersupply.org",
+    "sourceGroup": "water-infrastructure",
+    "industryTags": [
+      "water",
+      "infrastructure"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-225",
+    "ordinal": 225,
+    "name": "Water Network UK & Europe",
+    "url": "https://thewaternetwork.com",
+    "domain": "thewaternetwork.com",
+    "sourceGroup": "water-infrastructure",
+    "industryTags": [
+      "water",
+      "infrastructure"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-226",
+    "ordinal": 226,
+    "name": "Water Filtration & Pumping",
+    "url": "https://www.waterfiltration.org",
+    "domain": "waterfiltration.org",
+    "sourceGroup": "water-infrastructure",
+    "industryTags": [
+      "water",
+      "infrastructure"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-227",
+    "ordinal": 227,
+    "name": "Water Loss Control Digest",
+    "url": "https://www.waterlosscontrol.org",
+    "domain": "waterlosscontrol.org",
+    "sourceGroup": "water-infrastructure",
+    "industryTags": [
+      "water",
+      "infrastructure"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-228",
+    "ordinal": 228,
+    "name": "Industrial Utility Systems",
+    "url": "https://www.industrialutilities.org",
+    "domain": "industrialutilities.org",
+    "sourceGroup": "water-infrastructure",
+    "industryTags": [
+      "water",
+      "infrastructure"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-229",
+    "ordinal": 229,
+    "name": "Stormwater Solutions",
+    "url": "https://www.estormwater.com",
+    "domain": "estormwater.com",
+    "sourceGroup": "water-infrastructure",
+    "industryTags": [
+      "water",
+      "infrastructure"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-230",
+    "ordinal": 230,
+    "name": "Coastal & Flood Protection Water Tech",
+    "url": "https://www.floodprotection.org",
+    "domain": "floodprotection.org",
+    "sourceGroup": "water-infrastructure",
+    "industryTags": [
+      "water",
+      "infrastructure"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-231",
+    "ordinal": 231,
+    "name": "Mining Water Management",
+    "url": "https://www.miningwater.org",
+    "domain": "miningwater.org",
+    "sourceGroup": "water-infrastructure",
+    "industryTags": [
+      "water",
+      "infrastructure"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-232",
+    "ordinal": 232,
+    "name": "Power Plant Water Systems",
+    "url": "https://www.powerwater.org",
+    "domain": "powerwater.org",
+    "sourceGroup": "water-infrastructure",
+    "industryTags": [
+      "water",
+      "infrastructure"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-233",
+    "ordinal": 233,
+    "name": "Food & Beverage Water Tech",
+    "url": "https://www.foodwater.org",
+    "domain": "foodwater.org",
+    "sourceGroup": "water-infrastructure",
+    "industryTags": [
+      "water",
+      "infrastructure"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-234",
+    "ordinal": 234,
+    "name": "Chemical Process Water",
+    "url": "https://www.processwater.org",
+    "domain": "processwater.org",
+    "sourceGroup": "water-infrastructure",
+    "industryTags": [
+      "water",
+      "infrastructure"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-235",
+    "ordinal": 235,
+    "name": "Pharmaceutical Pure Water",
+    "url": "https://www.purewatertech.org",
+    "domain": "purewatertech.org",
+    "sourceGroup": "water-infrastructure",
+    "industryTags": [
+      "water",
+      "infrastructure"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-236",
+    "ordinal": 236,
+    "name": "Agricultural Pumping & Flow",
+    "url": "https://www.agpumping.org",
+    "domain": "agpumping.org",
+    "sourceGroup": "water-infrastructure",
+    "industryTags": [
+      "water",
+      "infrastructure"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-237",
+    "ordinal": 237,
+    "name": "Heavy Duty Water Systems",
+    "url": "https://www.heavywater.org",
+    "domain": "heavywater.org",
+    "sourceGroup": "water-infrastructure",
+    "industryTags": [
+      "water",
+      "infrastructure"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-238",
+    "ordinal": 238,
+    "name": "Municipal Pump Station Tech",
+    "url": "https://www.municipalpumps.org",
+    "domain": "municipalpumps.org",
+    "sourceGroup": "water-infrastructure",
+    "industryTags": [
+      "water",
+      "infrastructure"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-239",
+    "ordinal": 239,
+    "name": "Water Asset Management International",
+    "url": "https://www.waterassetmanagement.com",
+    "domain": "waterassetmanagement.com",
+    "sourceGroup": "water-infrastructure",
+    "industryTags": [
+      "water",
+      "infrastructure"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-240",
+    "ordinal": 240,
+    "name": "Water System Reliability Digest",
+    "url": "https://www.waterreliability.org",
+    "domain": "waterreliability.org",
+    "sourceGroup": "water-infrastructure",
+    "industryTags": [
+      "water",
+      "infrastructure"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-241",
+    "ordinal": 241,
+    "name": "Occupational Health & Safety (OH&S)",
+    "url": "https://ohsonline.com",
+    "domain": "ohsonline.com",
+    "sourceGroup": "industrial-safety-oil-gas-mining",
+    "industryTags": [
+      "industrial",
+      "safety",
+      "mining"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-242",
+    "ordinal": 242,
+    "name": "Safety+Health Magazine (NSC)",
+    "url": "https://www.safetyandhealthmagazine.com",
+    "domain": "safetyandhealthmagazine.com",
+    "sourceGroup": "industrial-safety-oil-gas-mining",
+    "industryTags": [
+      "industrial",
+      "safety",
+      "mining"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-243",
+    "ordinal": 243,
+    "name": "EHS Today",
+    "url": "https://www.ehstoday.com",
+    "domain": "ehstoday.com",
+    "sourceGroup": "industrial-safety-oil-gas-mining",
+    "industryTags": [
+      "industrial",
+      "safety",
+      "mining"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-244",
+    "ordinal": 244,
+    "name": "Oil & Gas Journal",
+    "url": "https://www.ogj.com",
+    "domain": "ogj.com",
+    "sourceGroup": "industrial-safety-oil-gas-mining",
+    "industryTags": [
+      "industrial",
+      "safety",
+      "mining"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-245",
+    "ordinal": 245,
+    "name": "Offshore Magazine",
+    "url": "https://www.offshore-mag.com",
+    "domain": "offshore-mag.com",
+    "sourceGroup": "industrial-safety-oil-gas-mining",
+    "industryTags": [
+      "industrial",
+      "safety",
+      "mining"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-246",
+    "ordinal": 246,
+    "name": "Hydrocarbon Processing",
+    "url": "https://www.hydrocarbonprocessing.com",
+    "domain": "hydrocarbonprocessing.com",
+    "sourceGroup": "industrial-safety-oil-gas-mining",
+    "industryTags": [
+      "industrial",
+      "safety",
+      "mining"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-247",
+    "ordinal": 247,
+    "name": "World Oil",
+    "url": "https://www.worldoil.com",
+    "domain": "worldoil.com",
+    "sourceGroup": "industrial-safety-oil-gas-mining",
+    "industryTags": [
+      "industrial",
+      "safety",
+      "mining"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-248",
+    "ordinal": 248,
+    "name": "Mining Magazine",
+    "url": "https://www.miningmagazine.com",
+    "domain": "miningmagazine.com",
+    "sourceGroup": "industrial-safety-oil-gas-mining",
+    "industryTags": [
+      "industrial",
+      "safety",
+      "mining"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-249",
+    "ordinal": 249,
+    "name": "Mining Engineering Magazine",
+    "url": "https://me.smenet.org",
+    "domain": "me.smenet.org",
+    "sourceGroup": "industrial-safety-oil-gas-mining",
+    "industryTags": [
+      "industrial",
+      "safety",
+      "mining"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-250",
+    "ordinal": 250,
+    "name": "FacilitiesNet (Maintenance & Ops)",
+    "url": "https://www.facilitiesnet.com",
+    "domain": "facilitiesnet.com",
+    "sourceGroup": "industrial-safety-oil-gas-mining",
+    "industryTags": [
+      "industrial",
+      "safety",
+      "mining"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-251",
+    "ordinal": 251,
+    "name": "Industrial Safety & Hygiene News (ISHN)",
+    "url": "https://www.ishn.com",
+    "domain": "ishn.com",
+    "sourceGroup": "industrial-safety-oil-gas-mining",
+    "industryTags": [
+      "industrial",
+      "safety",
+      "mining"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-252",
+    "ordinal": 252,
+    "name": "Industrial Safety Equipment Mag",
+    "url": "https://www.industrialsafety.org",
+    "domain": "industrialsafety.org",
+    "sourceGroup": "industrial-safety-oil-gas-mining",
+    "industryTags": [
+      "industrial",
+      "safety",
+      "mining"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-253",
+    "ordinal": 253,
+    "name": "Petroleum Economist",
+    "url": "https://www.petroleum-economist.com",
+    "domain": "petroleum-economist.com",
+    "sourceGroup": "industrial-safety-oil-gas-mining",
+    "industryTags": [
+      "industrial",
+      "safety",
+      "mining"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-254",
+    "ordinal": 254,
+    "name": "Energy Institute News",
+    "url": "https://www.energyinst.org",
+    "domain": "energyinst.org",
+    "sourceGroup": "industrial-safety-oil-gas-mining",
+    "industryTags": [
+      "industrial",
+      "safety",
+      "mining"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-255",
+    "ordinal": 255,
+    "name": "Chemical Engineering Progress (CEP / AIChE)",
+    "url": "https://www.aiche.org/cep",
+    "domain": "aiche.org",
+    "sourceGroup": "industrial-safety-oil-gas-mining",
+    "industryTags": [
+      "industrial",
+      "safety",
+      "mining"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-256",
+    "ordinal": 256,
+    "name": "Power Engineering Magazine",
+    "url": "https://www.power-eng.com",
+    "domain": "power-eng.com",
+    "sourceGroup": "industrial-safety-oil-gas-mining",
+    "industryTags": [
+      "industrial",
+      "safety",
+      "mining"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-257",
+    "ordinal": 257,
+    "name": "Power Magazine",
+    "url": "https://www.powermag.com",
+    "domain": "powermag.com",
+    "sourceGroup": "industrial-safety-oil-gas-mining",
+    "industryTags": [
+      "industrial",
+      "safety",
+      "mining"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-258",
+    "ordinal": 258,
+    "name": "Marine Link / Maritime Reporter",
+    "url": "https://www.marinelink.com",
+    "domain": "marinelink.com",
+    "sourceGroup": "industrial-safety-oil-gas-mining",
+    "industryTags": [
+      "industrial",
+      "safety",
+      "mining"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-259",
+    "ordinal": 259,
+    "name": "Offshore Technology",
+    "url": "https://www.offshore-technology.com",
+    "domain": "offshore-technology.com",
+    "sourceGroup": "industrial-safety-oil-gas-mining",
+    "industryTags": [
+      "industrial",
+      "safety",
+      "mining"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-260",
+    "ordinal": 260,
+    "name": "Mining Technology",
+    "url": "https://www.mining-technology.com",
+    "domain": "mining-technology.com",
+    "sourceGroup": "industrial-safety-oil-gas-mining",
+    "industryTags": [
+      "industrial",
+      "safety",
+      "mining"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-261",
+    "ordinal": 261,
+    "name": "Airport Business & Infrastructure",
+    "url": "https://www.aviationpros.com",
+    "domain": "aviationpros.com",
+    "sourceGroup": "industrial-safety-oil-gas-mining",
+    "industryTags": [
+      "industrial",
+      "safety",
+      "mining"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-262",
+    "ordinal": 262,
+    "name": "Ports & Harbors Magazine",
+    "url": "https://www.iaphworldports.org",
+    "domain": "iaphworldports.org",
+    "sourceGroup": "industrial-safety-oil-gas-mining",
+    "industryTags": [
+      "industrial",
+      "safety",
+      "mining"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-263",
+    "ordinal": 263,
+    "name": "Logistics Management (Warehouse Safety)",
+    "url": "https://www.logisticsmgmt.com",
+    "domain": "logisticsmgmt.com",
+    "sourceGroup": "industrial-safety-oil-gas-mining",
+    "industryTags": [
+      "industrial",
+      "safety",
+      "mining"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-264",
+    "ordinal": 264,
+    "name": "Modern Materials Handling",
+    "url": "https://www.mmh.com",
+    "domain": "mmh.com",
+    "sourceGroup": "industrial-safety-oil-gas-mining",
+    "industryTags": [
+      "industrial",
+      "safety",
+      "mining"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-265",
+    "ordinal": 265,
+    "name": "Facility Executive Magazine",
+    "url": "https://facilityexecutive.com",
+    "domain": "facilityexecutive.com",
+    "sourceGroup": "industrial-safety-oil-gas-mining",
+    "industryTags": [
+      "industrial",
+      "safety",
+      "mining"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-266",
+    "ordinal": 266,
+    "name": "Industrial Fire Engineering Journal",
+    "url": "https://www.industrialfireengineering.org",
+    "domain": "industrialfireengineering.org",
+    "sourceGroup": "industrial-safety-oil-gas-mining",
+    "industryTags": [
+      "industrial",
+      "safety",
+      "mining"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-267",
+    "ordinal": 267,
+    "name": "Hazardous Area Sector News",
+    "url": "https://www.hazardousareas.org",
+    "domain": "hazardousareas.org",
+    "sourceGroup": "industrial-safety-oil-gas-mining",
+    "industryTags": [
+      "industrial",
+      "safety",
+      "mining"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-268",
+    "ordinal": 268,
+    "name": "Chemical Hazards & Safety",
+    "url": "https://www.chemicalhazards.org",
+    "domain": "chemicalhazards.org",
+    "sourceGroup": "industrial-safety-oil-gas-mining",
+    "industryTags": [
+      "industrial",
+      "safety",
+      "mining"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-269",
+    "ordinal": 269,
+    "name": "Refinery & Petrochemical Safety",
+    "url": "https://www.refinerysafety.org",
+    "domain": "refinerysafety.org",
+    "sourceGroup": "industrial-safety-oil-gas-mining",
+    "industryTags": [
+      "industrial",
+      "safety",
+      "mining"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-270",
+    "ordinal": 270,
+    "name": "Mine Fire Protection & Water Supply",
+    "url": "https://www.minefiresafety.org",
+    "domain": "minefiresafety.org",
+    "sourceGroup": "industrial-safety-oil-gas-mining",
+    "industryTags": [
+      "industrial",
+      "safety",
+      "mining"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-271",
+    "ordinal": 271,
+    "name": "Off-Grid Diesel Equipment & Generators",
+    "url": "https://www.offgridpower.org",
+    "domain": "offgridpower.org",
+    "sourceGroup": "industrial-safety-oil-gas-mining",
+    "industryTags": [
+      "industrial",
+      "safety",
+      "mining"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-272",
+    "ordinal": 272,
+    "name": "Marine Fire Systems Journal",
+    "url": "https://www.marinefiresystems.org",
+    "domain": "marinefiresystems.org",
+    "sourceGroup": "industrial-safety-oil-gas-mining",
+    "industryTags": [
+      "industrial",
+      "safety",
+      "mining"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-273",
+    "ordinal": 273,
+    "name": "Port Infrastructure & Safety",
+    "url": "https://www.portsafety.org",
+    "domain": "portsafety.org",
+    "sourceGroup": "industrial-safety-oil-gas-mining",
+    "industryTags": [
+      "industrial",
+      "safety",
+      "mining"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-274",
+    "ordinal": 274,
+    "name": "Fuel & Diesel Power Systems",
+    "url": "https://www.dieselpowertech.org",
+    "domain": "dieselpowertech.org",
+    "sourceGroup": "industrial-safety-oil-gas-mining",
+    "industryTags": [
+      "industrial",
+      "safety",
+      "mining"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-275",
+    "ordinal": 275,
+    "name": "Heavy Industrial Infrastructure",
+    "url": "https://www.heavyindustry.org",
+    "domain": "heavyindustry.org",
+    "sourceGroup": "industrial-safety-oil-gas-mining",
+    "industryTags": [
+      "industrial",
+      "safety",
+      "mining"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-276",
+    "ordinal": 276,
+    "name": "Energy Plant Safety & Fire",
+    "url": "https://www.energyplant.org",
+    "domain": "energyplant.org",
+    "sourceGroup": "industrial-safety-oil-gas-mining",
+    "industryTags": [
+      "industrial",
+      "safety",
+      "mining"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-277",
+    "ordinal": 277,
+    "name": "Industrial Emergency Response Digest",
+    "url": "https://www.industrialemergency.org",
+    "domain": "industrialemergency.org",
+    "sourceGroup": "industrial-safety-oil-gas-mining",
+    "industryTags": [
+      "industrial",
+      "safety",
+      "mining"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-278",
+    "ordinal": 278,
+    "name": "Oil & Gas Fire Protection News",
+    "url": "https://www.oilgasfire.org",
+    "domain": "oilgasfire.org",
+    "sourceGroup": "industrial-safety-oil-gas-mining",
+    "industryTags": [
+      "industrial",
+      "safety",
+      "mining"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-279",
+    "ordinal": 279,
+    "name": "Explosive Environment Engineering",
+    "url": "https://www.atexfiresafety.org",
+    "domain": "atexfiresafety.org",
+    "sourceGroup": "industrial-safety-oil-gas-mining",
+    "industryTags": [
+      "industrial",
+      "safety",
+      "mining"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-280",
+    "ordinal": 280,
+    "name": "Warehouse Fire Protection Tech",
+    "url": "https://www.warehousefire.org",
+    "domain": "warehousefire.org",
+    "sourceGroup": "industrial-safety-oil-gas-mining",
+    "industryTags": [
+      "industrial",
+      "safety",
+      "mining"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-281",
+    "ordinal": 281,
+    "name": "Aviation & Airport Safety Engineering",
+    "url": "https://www.airportsafety.org",
+    "domain": "airportsafety.org",
+    "sourceGroup": "industrial-safety-oil-gas-mining",
+    "industryTags": [
+      "industrial",
+      "safety",
+      "mining"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-282",
+    "ordinal": 282,
+    "name": "Thermal Power Plant Engineering",
+    "url": "https://www.powerplanttech.org",
+    "domain": "powerplanttech.org",
+    "sourceGroup": "industrial-safety-oil-gas-mining",
+    "industryTags": [
+      "industrial",
+      "safety",
+      "mining"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-283",
+    "ordinal": 283,
+    "name": "Petrochemical Infrastructure Journal",
+    "url": "https://www.petrochem.org",
+    "domain": "petrochem.org",
+    "sourceGroup": "industrial-safety-oil-gas-mining",
+    "industryTags": [
+      "industrial",
+      "safety",
+      "mining"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-284",
+    "ordinal": 284,
+    "name": "Off-Grid Industrial Water Supply",
+    "url": "https://www.offgridwater.org",
+    "domain": "offgridwater.org",
+    "sourceGroup": "industrial-safety-oil-gas-mining",
+    "industryTags": [
+      "industrial",
+      "safety",
+      "mining"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-285",
+    "ordinal": 285,
+    "name": "Disaster Relief & Emergency Equipment",
+    "url": "https://www.reliefequipment.org",
+    "domain": "reliefequipment.org",
+    "sourceGroup": "industrial-safety-oil-gas-mining",
+    "industryTags": [
+      "industrial",
+      "safety",
+      "mining"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-286",
+    "ordinal": 286,
+    "name": "Heavy Equipment Maintenance Today",
+    "url": "https://www.heavyequipmenttech.org",
+    "domain": "heavyequipmenttech.org",
+    "sourceGroup": "industrial-safety-oil-gas-mining",
+    "industryTags": [
+      "industrial",
+      "safety",
+      "mining"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-287",
+    "ordinal": 287,
+    "name": "Industrial Facility Protection",
+    "url": "https://www.facilityprotection.org",
+    "domain": "facilityprotection.org",
+    "sourceGroup": "industrial-safety-oil-gas-mining",
+    "industryTags": [
+      "industrial",
+      "safety",
+      "mining"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-288",
+    "ordinal": 288,
+    "name": "Fuel Tank & Engine Piping Safety",
+    "url": "https://www.fuelpiping.org",
+    "domain": "fuelpiping.org",
+    "sourceGroup": "industrial-safety-oil-gas-mining",
+    "industryTags": [
+      "industrial",
+      "safety",
+      "mining"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-289",
+    "ordinal": 289,
+    "name": "Heavy Duty Diesel Engine Journal",
+    "url": "https://www.heavydiesels.org",
+    "domain": "heavydiesels.org",
+    "sourceGroup": "industrial-safety-oil-gas-mining",
+    "industryTags": [
+      "industrial",
+      "safety",
+      "mining"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-290",
+    "ordinal": 290,
+    "name": "Remote Site Infrastructure",
+    "url": "https://www.remotesitesafety.org",
+    "domain": "remotesitesafety.org",
+    "sourceGroup": "industrial-safety-oil-gas-mining",
+    "industryTags": [
+      "industrial",
+      "safety",
+      "mining"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-291",
+    "ordinal": 291,
+    "name": "Manufacturing Plant Engineering",
+    "url": "https://www.plantengineeringtech.org",
+    "domain": "plantengineeringtech.org",
+    "sourceGroup": "industrial-safety-oil-gas-mining",
+    "industryTags": [
+      "industrial",
+      "safety",
+      "mining"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-292",
+    "ordinal": 292,
+    "name": "High Hazard Facility Design",
+    "url": "https://www.highhazard.org",
+    "domain": "highhazard.org",
+    "sourceGroup": "industrial-safety-oil-gas-mining",
+    "industryTags": [
+      "industrial",
+      "safety",
+      "mining"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-293",
+    "ordinal": 293,
+    "name": "Gas Turbine & Engine Fire Systems",
+    "url": "https://www.turbinesafety.org",
+    "domain": "turbinesafety.org",
+    "sourceGroup": "industrial-safety-oil-gas-mining",
+    "industryTags": [
+      "industrial",
+      "safety",
+      "mining"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-294",
+    "ordinal": 294,
+    "name": "Industrial Disaster Resilience",
+    "url": "https://www.industrialresilience.org",
+    "domain": "industrialresilience.org",
+    "sourceGroup": "industrial-safety-oil-gas-mining",
+    "industryTags": [
+      "industrial",
+      "safety",
+      "mining"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-295",
+    "ordinal": 295,
+    "name": "Pipeline Safety & Pumping",
+    "url": "https://www.pipelinesafety.org",
+    "domain": "pipelinesafety.org",
+    "sourceGroup": "industrial-safety-oil-gas-mining",
+    "industryTags": [
+      "industrial",
+      "safety",
+      "mining"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-296",
+    "ordinal": 296,
+    "name": "Marine & Offshore Fire Engineering",
+    "url": "https://www.offshorefire.org",
+    "domain": "offshorefire.org",
+    "sourceGroup": "industrial-safety-oil-gas-mining",
+    "industryTags": [
+      "industrial",
+      "safety",
+      "mining"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "B",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-297",
+    "ordinal": 297,
+    "name": "Mining Water & Fire Infrastructure",
+    "url": "https://www.mininginfrastructure.org",
+    "domain": "mininginfrastructure.org",
+    "sourceGroup": "industrial-safety-oil-gas-mining",
+    "industryTags": [
+      "industrial",
+      "safety",
+      "mining"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-298",
+    "ordinal": 298,
+    "name": "Energy Infrastructure Resilience",
+    "url": "https://www.energyresilience.org",
+    "domain": "energyresilience.org",
+    "sourceGroup": "industrial-safety-oil-gas-mining",
+    "industryTags": [
+      "industrial",
+      "safety",
+      "mining"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-299",
+    "ordinal": 299,
+    "name": "High Risk Industrial Operations",
+    "url": "https://www.highriskops.org",
+    "domain": "highriskops.org",
+    "sourceGroup": "industrial-safety-oil-gas-mining",
+    "industryTags": [
+      "industrial",
+      "safety",
+      "mining"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  },
+  {
+    "id": "grimm-source-300",
+    "ordinal": 300,
+    "name": "Global Industrial Safety Review",
+    "url": "https://www.industrialsafetyreview.org",
+    "domain": "industrialsafetyreview.org",
+    "sourceGroup": "industrial-safety-oil-gas-mining",
+    "industryTags": [
+      "industrial",
+      "safety",
+      "mining"
+    ],
+    "discoveryMethod": [
+      "rss",
+      "sitemap",
+      "public-page"
+    ],
+    "tier": "C",
+    "active": true,
+    "validationStatus": "pending",
+    "useCount": 0
+  }
+]
