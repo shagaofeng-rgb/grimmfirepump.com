@@ -27,8 +27,9 @@ jobs:
           ref: codex/grimm-news-automation
       - uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version: 22
           cache: npm
+      - run: node --version
       - run: npm ci
       - run: npm run news:sources:import
       - run: npm run news:sources:validate
