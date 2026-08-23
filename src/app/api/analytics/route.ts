@@ -38,6 +38,11 @@ function maskIp(ip: string) {
   return ip.includes(":") ? ip.split(":").slice(0, 3).join(":") + "::" : "masked";
 }
 
+function countryName(code: string) {
+  if (!code) return "Unknown";
+  try { return new Intl.DisplayNames(["en"], { type: "region" }).of(code) || code; } catch { return code; }
+}
+
 function channelFor(input: { referrer: string; utmSource: string; utmMedium: string }) {
   const referrer = input.referrer.toLowerCase();
   const medium = input.utmMedium.toLowerCase();
@@ -87,7 +92,7 @@ export async function POST(request: Request) {
     createdAt: new Date().toISOString(),
     ...parsed.data,
     countryCode: request.headers.get("x-vercel-ip-country") || "",
-    country: request.headers.get("x-vercel-ip-country") || "Unknown",
+    country: countryName(request.headers.get("x-vercel-ip-country") || ""),
     region: request.headers.get("x-vercel-ip-country-region") || "",
     city: request.headers.get("x-vercel-ip-city") || "",
     userAgent: request.headers.get("user-agent") || "",
