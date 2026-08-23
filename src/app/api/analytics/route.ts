@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { isAdminAuthenticated } from "@/lib/admin-auth";
 import type { AnalyticsEventRecord } from "@/lib/admin-data";
+import { getSiteSettings } from "@/lib/admin-cms";
 import { appendStore, createId, readStore } from "@/lib/local-store";
 
 const eventSchema = z.object({
@@ -48,12 +49,13 @@ function channelFor(input: { referrer: string; utmSource: string; utmMedium: str
   return "Direct";
 }
 
-function classifyTraffic(request: Request, input: z.infer<typeof eventSchema>) {
+async function classifyTraffic(request: Request, input: z.infer<typeof eventSchema>) {
   const host = request.headers.get("host") || "";
   const ua = request.headers.get("user-agent") || "";
   const ip = clientIp(request);
-  const excludedIps = (process.env.ANALYTICS_EXCLUDED_IPS || "").split(",").map((item) => item.trim()).filter(Boolean);
-  const excludedAgents = (process.env.ANALYTICS_EXCLUDED_USER_AGENTS || "").split(",").map((item) => item.trim().toLowerCase()).filter(Boolean);
+  const settings = await getSiteSettings();
+  const excludedIps = [process.env.ANALYTICS_EXCLUDED_IPS || "", settings.analyticsExcludedIps].join(",").split(",").map((item) => item.trim()).filter(Boolean);
+  const excludedAgents = [process.env.ANALYTICS_EXCLUDED_USER_AGENTS || "", settings.analyticsExcludedUserAgents].join(",").split(",").map((item) => item.trim().toLowerCase()).filter(Boolean);
   const flaggedByClient = input.metadata.testTraffic === true || input.metadata.previewTraffic === true;
   if (host.endsWith(".vercel.app") || host.includes("localhost") || flaggedByClient) return { trafficType: "test" as const, trafficReason: "preview_or_test_environment" };
   if (excludedIps.includes(ip)) return { trafficType: "test" as const, trafficReason: "excluded_ip" };
@@ -79,7 +81,7 @@ export async function POST(request: Request) {
   const parsed = eventSchema.safeParse(body);
   if (!parsed.success) return NextResponse.json({ error: "Invalid analytics event" }, { status: 400 });
 
-  const traffic = classifyTraffic(request, parsed.data);
+  const traffic = await classifyTraffic(request, parsed.data);
   const event: AnalyticsEventRecord = {
     id: createId("evt"),
     createdAt: new Date().toISOString(),
