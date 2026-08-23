@@ -388,6 +388,9 @@ export async function saveSettings(formData: FormData) {
     googleVerification: text(formData, "googleVerification"),
     bingVerification: text(formData, "bingVerification"),
     robotsPolicy: text(formData, "robotsPolicy", "index,follow"),
+    analyticsExcludedIps: text(formData, "analyticsExcludedIps"),
+    analyticsExcludedUserAgents: text(formData, "analyticsExcludedUserAgents", "collects,playwright,puppeteer,selenium,lighthouse"),
+    analyticsIpRetentionDays: text(formData, "analyticsIpRetentionDays", "90"),
   };
   await cmsStore.upsertSettings(item);
   await audit("save_settings", "site_settings");
