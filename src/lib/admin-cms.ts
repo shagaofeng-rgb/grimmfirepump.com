@@ -457,7 +457,15 @@ export async function listManagedPages() {
 
 export async function getSiteSettings() {
   const items = await readStore<SiteSetting[]>("cms-settings.json", []);
-  if (items[0]) return { analyticsExcludedIps: "", analyticsExcludedUserAgents: "collects,playwright,puppeteer,selenium,lighthouse", analyticsIpRetentionDays: "90", ...items[0] };
+  if (items[0]) {
+    const existing = items[0] as Partial<SiteSetting>;
+    return {
+      ...existing,
+      analyticsExcludedIps: existing.analyticsExcludedIps || "",
+      analyticsExcludedUserAgents: existing.analyticsExcludedUserAgents || "collects,playwright,puppeteer,selenium,lighthouse",
+      analyticsIpRetentionDays: existing.analyticsIpRetentionDays || "90",
+    } as SiteSetting;
+  }
   const seed: SiteSetting = {
     id: "site_settings",
     createdAt: now(),
