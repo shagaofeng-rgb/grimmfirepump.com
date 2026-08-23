@@ -35,7 +35,7 @@ function MiniList({ items, empty }: { items: Array<[string, number]>; empty: str
       <div className="flex items-center justify-between gap-3 text-sm"><span className="truncate font-bold text-slate-700">{label}</span><strong className="text-slate-950">{count}</strong></div>
       <div className="h-1.5 overflow-hidden rounded-full bg-slate-100"><div className="h-full rounded-full bg-orange-500" style={{ width: `${Math.max(8, Math.round((count / max) * 100))}%` }} /></div>
     </div>
-  )}</div>;
+  ))}</div>;
 }
 
 export default async function AdminAnalyticsPage({ searchParams }: PageProps) {
