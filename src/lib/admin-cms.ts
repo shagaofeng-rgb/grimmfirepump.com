@@ -178,6 +178,9 @@ export type SiteSetting = {
   googleVerification: string;
   bingVerification: string;
   robotsPolicy: string;
+  analyticsExcludedIps: string;
+  analyticsExcludedUserAgents: string;
+  analyticsIpRetentionDays: string;
 };
 
 export type AdminUser = {
@@ -472,6 +475,9 @@ export async function getSiteSettings() {
     googleVerification: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || "",
     bingVerification: process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION || "",
     robotsPolicy: "index,follow",
+    analyticsExcludedIps: process.env.ANALYTICS_EXCLUDED_IPS || "",
+    analyticsExcludedUserAgents: process.env.ANALYTICS_EXCLUDED_USER_AGENTS || "collects,playwright,puppeteer,selenium,lighthouse",
+    analyticsIpRetentionDays: "90",
   };
   await writeStore("cms-settings.json", [seed]);
   return seed;
