@@ -32,10 +32,10 @@ function createId() {
 
 function getVisitorContext() {
   const visitorId = getStoredValue(visitorStorageKey, window.localStorage) || createId();
-  const sessionId = getStoredValue(sessionStorageKey, window.sessionStorage) || createId();
+  const existingSession = getStoredValue(sessionStorageKey, window.sessionStorage);
+  const sessionId = existingSession || createId();
   const currentVisit = Number(getStoredValue(visitStorageKey, window.localStorage) || "0");
-  const isNewVisitor = !getStoredValue(visitorStorageKey, window.localStorage);
-  const visitNumber = isNewVisitor ? currentVisit + 1 : Math.max(1, currentVisit);
+  const visitNumber = existingSession ? Math.max(1, currentVisit) : currentVisit + 1;
   setStoredValue(visitorStorageKey, visitorId, window.localStorage);
   setStoredValue(sessionStorageKey, sessionId, window.sessionStorage);
   setStoredValue(visitStorageKey, String(visitNumber), window.localStorage);
