@@ -4,6 +4,10 @@ import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 
 const gaMeasurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || process.env.NEXT_PUBLIC_GA_ID || "";
+const visitorStorageKey = "grimm_visitor_id";
+const visitStorageKey = "grimm_visit_number";
+const sessionStorageKey = "grimm_session_id";
+const sessionReferrerKey = "grimm_session_referrer";
 
 declare global {
   interface Window {
@@ -12,12 +16,58 @@ declare global {
   }
 }
 
+function getStoredValue(key: string, storage: Storage) {
+  try { return storage.getItem(key) || ""; } catch { return ""; }
+}
+
+function setStoredValue(key: string, value: string, storage: Storage) {
+  try { storage.setItem(key, value); } catch { /* tracking remains anonymous */ }
+}
+
+function createId() {
+  return typeof crypto !== "undefined" && "randomUUID" in crypto
+    ? crypto.randomUUID()
+    : `v_${Date.now()}_${Math.random().toString(16).slice(2)}`;
+}
+
+function getVisitorContext() {
+  const visitorId = getStoredValue(visitorStorageKey, window.localStorage) || createId();
+  const existingSession = getStoredValue(sessionStorageKey, window.sessionStorage);
+  const sessionId = existingSession || createId();
+  const currentVisit = Number(getStoredValue(visitStorageKey, window.localStorage) || "0");
+  const visitNumber = existingSession ? Math.max(1, currentVisit) : currentVisit + 1;
+  setStoredValue(visitorStorageKey, visitorId, window.localStorage);
+  setStoredValue(sessionStorageKey, sessionId, window.sessionStorage);
+  setStoredValue(visitStorageKey, String(visitNumber), window.localStorage);
+  const referrer = getStoredValue(sessionReferrerKey, window.sessionStorage) || document.referrer || "";
+  setStoredValue(sessionReferrerKey, referrer, window.sessionStorage);
+  const params = new URLSearchParams(window.location.search);
+  return {
+    visitorId,
+    sessionId,
+    visitNumber,
+    referrer,
+    utmSource: params.get("utm_source") || "",
+    utmMedium: params.get("utm_medium") || "",
+    utmCampaign: params.get("utm_campaign") || "",
+    testTraffic: params.get("grimm_traffic") === "test",
+  };
+}
+
 function track(event: string, label = "", metadata: Record<string, unknown> = {}) {
+  const context = getVisitorContext();
   window.gtag?.("event", event, { event_label: label, page_path: window.location.pathname, ...metadata });
   return fetch("/api/analytics", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ event, label, path: window.location.pathname, metadata }),
+    keepalive: true,
+    body: JSON.stringify({
+      event,
+      label,
+      path: window.location.pathname,
+      ...context,
+      metadata: { ...metadata, testTraffic: context.testTraffic },
+    }),
   }).catch(() => undefined);
 }
 
@@ -37,7 +87,7 @@ export function AnalyticsListener() {
   }, []);
 
   useEffect(() => {
-    track("page_view", document.title);
+    void track("page_view", document.title, { pageTitle: document.title });
   }, [pathname]);
 
   useEffect(() => {
@@ -46,9 +96,8 @@ export function AnalyticsListener() {
       if (!target) return;
       const eventName = target.dataset.event || "cta_click";
       const label = target.dataset.label || target.textContent?.trim() || target.getAttribute("href") || "";
-      void track(eventName, label.slice(0, 120), { href: target.getAttribute("href") });
+      void track(eventName, label.slice(0, 120), { href: target.getAttribute("href") || "" });
     }
-
     document.addEventListener("click", onClick);
     return () => document.removeEventListener("click", onClick);
   }, []);

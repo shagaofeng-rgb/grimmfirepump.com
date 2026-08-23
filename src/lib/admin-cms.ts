@@ -178,6 +178,9 @@ export type SiteSetting = {
   googleVerification: string;
   bingVerification: string;
   robotsPolicy: string;
+  analyticsExcludedIps: string;
+  analyticsExcludedUserAgents: string;
+  analyticsIpRetentionDays: string;
 };
 
 export type AdminUser = {
@@ -454,7 +457,15 @@ export async function listManagedPages() {
 
 export async function getSiteSettings() {
   const items = await readStore<SiteSetting[]>("cms-settings.json", []);
-  if (items[0]) return items[0];
+  if (items[0]) {
+    const existing = items[0] as Partial<SiteSetting>;
+    return {
+      ...existing,
+      analyticsExcludedIps: existing.analyticsExcludedIps || "",
+      analyticsExcludedUserAgents: existing.analyticsExcludedUserAgents || "collects,playwright,puppeteer,selenium,lighthouse",
+      analyticsIpRetentionDays: existing.analyticsIpRetentionDays || "90",
+    } as SiteSetting;
+  }
   const seed: SiteSetting = {
     id: "site_settings",
     createdAt: now(),
@@ -472,6 +483,9 @@ export async function getSiteSettings() {
     googleVerification: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || "",
     bingVerification: process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION || "",
     robotsPolicy: "index,follow",
+    analyticsExcludedIps: process.env.ANALYTICS_EXCLUDED_IPS || "",
+    analyticsExcludedUserAgents: process.env.ANALYTICS_EXCLUDED_USER_AGENTS || "collects,playwright,puppeteer,selenium,lighthouse",
+    analyticsIpRetentionDays: "90",
   };
   await writeStore("cms-settings.json", [seed]);
   return seed;
