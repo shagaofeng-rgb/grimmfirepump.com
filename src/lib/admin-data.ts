@@ -45,6 +45,10 @@ export type InquiryRecord = {
   utmCampaign?: string;
   ip?: string;
   userAgent?: string;
+  visitorId?: string;
+  sessionId?: string;
+  visitNumber?: number;
+  channel?: string;
   status?: string;
   intent?: "A" | "B" | "C" | "unrated";
   owner?: string;
@@ -67,6 +71,23 @@ export type AnalyticsEventRecord = {
   event: string;
   path?: string;
   label?: string;
+  metadata?: Record<string, unknown>;
+  visitorId?: string;
+  sessionId?: string;
+  visitNumber?: number;
+  country?: string;
+  countryCode?: string;
+  region?: string;
+  city?: string;
+  channel?: string;
+  referrer?: string;
+  utmSource?: string;
+  utmMedium?: string;
+  utmCampaign?: string;
+  ipMasked?: string;
+  userAgent?: string;
+  trafficType?: "real" | "test" | "bot";
+  trafficReason?: string;
 };
 
 export async function getAdminData() {
@@ -85,7 +106,8 @@ export async function getAdminData() {
   ]);
 
   const eventCounts = events.reduce<Record<string, number>>((acc, item) => {
-    acc[item.event] = (acc[item.event] || 0) + 1;
+    const key = item.event || "unknown";
+    acc[key] = (acc[key] || 0) + 1;
     return acc;
   }, {});
 
