@@ -53,7 +53,7 @@ export function filterAnalyticsEvents(events: AnalyticsEventRecord[], filters: A
   const query = filters.query?.trim().toLowerCase();
   return events.filter((item) => {
     if (!isWithinDateRange(item.createdAt, filters)) return false;
-    if (traffic !== "all" && (item.trafficType || "real") !== traffic) return false;
+    if (traffic !== "all" && item.trafficType !== traffic) return false;
     if (filters.country && filters.country !== "all" && item.countryCode !== filters.country) return false;
     if (filters.channel && filters.channel !== "all" && item.channel !== filters.channel) return false;
     if (!query) return true;
@@ -64,7 +64,7 @@ export function filterAnalyticsEvents(events: AnalyticsEventRecord[], filters: A
 
 export function getAnalyticsSummary(events: AnalyticsEventRecord[], filters: AnalyticsFilters = {}): AnalyticsSummary {
   const visibleEvents = filterAnalyticsEvents(events, filters);
-  const realEvents = events.filter((item) => (item.trafficType || "real") === "real");
+  const realEvents = events.filter((item) => item.trafficType === "real");
   const pageViews = visibleEvents.filter((item) => item.event === "page_view");
   const conversions = visibleEvents.filter((item) => conversionEvents.has(item.event));
   const visitorIds = new Set(pageViews.map((item) => item.visitorId).filter(Boolean));
