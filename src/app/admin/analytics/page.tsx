@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Activity, ArrowDownRight, Eye, Globe2, MousePointerClick, UsersRound } from "lucide-react";
+import { Activity, ArrowDownRight, MousePointerClick } from "lucide-react";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { AnalyticsRefresh } from "@/components/admin/analytics-refresh";
 import { AdminCard, AdminPageHeader, EmptyState, StatCard } from "@/components/admin/admin-widgets";
@@ -132,7 +132,7 @@ export default async function AdminAnalyticsPage({ searchParams }: PageProps) {
         <div className="flex flex-col gap-4 border-b border-slate-200 p-5 md:flex-row md:items-center md:justify-between">
           <div><p className="text-sm font-black text-orange-700">访客事件明细</p><h2 className="mt-1 text-xl font-black text-slate-950">可筛选、可分页的访问记录</h2></div>
           <div className="flex items-center gap-3">
-            <form method="get" className="flex items-center gap-2"><input type="hidden" name="from" value={filters.from} /><input type="hidden" name="to" value={filters.to} /><input type="hidden" name="country" value={filters.country} /><input type="hidden" name="channel" value={filters.channel} /><input type="hidden" name="traffic" value={filters.traffic} /><input type="hidden" name="query" value={filters.query} /><select name="pageSize" defaultValue={String(paged.pageSize)} className="min-h-10 rounded-md border border-slate-200 px-2 text-sm" onChange={(event) => event.currentTarget.form?.requestSubmit()}><option value="20">20 / 页</option><option value="25">25 / 页</option><option value="50">50 / 页</option><option value="100">100 / 页</option></select></form>
+            <form method="get" className="flex items-center gap-2"><input type="hidden" name="from" value={filters.from} /><input type="hidden" name="to" value={filters.to} /><input type="hidden" name="country" value={filters.country} /><input type="hidden" name="channel" value={filters.channel} /><input type="hidden" name="traffic" value={filters.traffic} /><input type="hidden" name="query" value={filters.query} /><select name="pageSize" defaultValue={String(paged.pageSize)} className="min-h-10 rounded-md border border-slate-200 px-2 text-sm"><option value="20">20 / 页</option><option value="25">25 / 页</option><option value="50">50 / 页</option><option value="100">100 / 页</option></select><button className="rounded-md border border-slate-200 px-3 py-2 text-sm font-bold" type="submit">更新</button></form>
             <a className="button button-secondary min-h-10 text-sm" href="/api/admin/export?type=events">导出 CSV</a>
           </div>
         </div>
