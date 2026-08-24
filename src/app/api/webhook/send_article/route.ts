@@ -74,11 +74,35 @@ function uniqueSlug(preferred: string, id: string, articles: CmsNews[]) {
   return !owner || owner.id === id ? preferred : `${preferred}-${id.slice(-6)}`;
 }
 
+function asRecord(value: unknown): Record<string, unknown> {
+  return value && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : {};
+}
+
+function firstText(...values: unknown[]) {
+  return values.find((value) => typeof value === "string" && value.trim().length > 0) || "";
+}
+
 async function parsePayload(request: Request) {
   const contentType = request.headers.get("content-type") || "";
-  if (contentType.includes("application/json")) return payloadSchema.safeParse(await request.json());
-  const form = await request.formData();
-  return payloadSchema.safeParse(Object.fromEntries(form.entries()));
+  let raw: Record<string, unknown>;
+  if (contentType.includes("application/json")) {
+    raw = asRecord(await request.json());
+  } else if (contentType.includes("multipart/form-data") || contentType.includes("application/x-www-form-urlencoded")) {
+    raw = Object.fromEntries((await request.formData()).entries());
+  } else {
+    raw = Object.fromEntries(new URLSearchParams(await request.text()).entries());
+  }
+
+  const authorization = request.headers.get("authorization") || "";
+  const bearerToken = authorization.match(/^Bearer\s+(.+)$/i)?.[1] || "";
+  return payloadSchema.safeParse({
+    sign: firstText(raw.sign, raw.api_key, raw.apiKey, raw.token, raw.key, request.headers.get("x-blog-sign"), request.headers.get("x-webhook-signature"), bearerToken),
+    class_id: firstText(raw.class_id, raw.classId, raw.category_id, raw.categoryId) || "blog",
+    title: firstText(raw.title, raw.article_title, raw.articleTitle),
+    content: firstText(raw.content, raw.article_content, raw.articleContent, raw.body),
+    author_id: firstText(raw.author_id, raw.authorId, raw.author),
+    image_url: firstText(raw.image_url, raw.imageUrl, raw.image),
+  });
 }
 
 function isPublishableArticle(title: string, content: string) {
@@ -164,6 +188,15 @@ export async function POST(request: Request) {
   }
 }
 
-export async function GET() {
+export async function GET(request: Request) {
+  // Some provider dashboards validate a webhook by GET before sending content.
+  // A signed GET confirms reachability but never creates or updates an article.
+  const secret = process.env.WEBHOOK_ARTICLE_SIGN || process.env.BLOG_WEBHOOK_API_KEY;
+  const sign = new URL(request.url).searchParams.get("sign") || "";
+  if (secret && sign && validSecret(sign, secret)) return response(1, "验证成功");
   return response(0, "仅支持POST请求。");
+}
+
+export async function OPTIONS() {
+  return new NextResponse(null, { status: 204, headers: { Allow: "GET, POST, OPTIONS" } });
 }
