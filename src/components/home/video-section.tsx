@@ -2,9 +2,9 @@ import { SectionHeading } from "@/components/section-heading";
 
 export function VideoSection() {
   const videos = [
-    { title: "Factory Tour", src: "/assets/videos/factory-tour.mp4" },
-    { title: "Dual Power Package", src: "/assets/videos/dual-power.mp4" },
-    { title: "Pump Truck Test", src: "/assets/videos/pump-truck-test.mp4" },
+    { title: "Factory Tour", src: "/assets/videos/factory-tour.mp4", poster: "/assets/factory/real/production-capacity.jpg" },
+    { title: "Dual Power Package", src: "/assets/videos/dual-power.mp4", poster: "/assets/factory/real/controller-assembly.jpg" },
+    { title: "Pump Truck Test", src: "/assets/videos/pump-truck-test.mp4", poster: "/assets/factory/real/cnc-machining.jpg" },
   ];
 
   return (
@@ -18,7 +18,7 @@ export function VideoSection() {
       <div className="container-shell grid gap-5 lg:grid-cols-3">
         {videos.map((video) => (
           <article key={video.title} className="overflow-hidden rounded-lg border border-white/10 bg-white/10">
-            <video src={video.src} controls preload="metadata" className="aspect-video w-full bg-black" />
+            <video src={video.src} poster={video.poster} controls preload="metadata" className="aspect-video w-full bg-black object-cover" />
             <h3 className="p-4 text-lg font-black text-white">{video.title}</h3>
           </article>
         ))}

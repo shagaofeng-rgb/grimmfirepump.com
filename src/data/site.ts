@@ -334,18 +334,86 @@ export const projects = [
 ];
 
 export const factoryImages = [
-  { src: "/assets/factory/factory-assembly.webp", title: "Fire pump package assembly", wide: true },
-  { src: "/assets/factory/factory-machining.webp", title: "Pump machining capability" },
-  { src: "/assets/factory/factory-testing.webp", title: "Performance testing area" },
-  { src: "/assets/factory/factory-warehouse.webp", title: "Parts and finished goods storage" },
-  { src: "/assets/factory/factory-products.webp", title: "Finished pump systems" },
+  {
+    src: "/assets/factory/real/production-capacity.jpg",
+    title: "Production capacity and component flow",
+    text: "Pump casings, vessels and production components organized for controlled manufacturing flow.",
+    wide: true,
+  },
+  {
+    src: "/assets/factory/real/cnc-machining.jpg",
+    title: "CNC pump component machining",
+    text: "Dedicated machining equipment for pump component processing.",
+  },
+  {
+    src: "/assets/factory/real/controller-assembly.jpg",
+    title: "Controller assembly area",
+    text: "Electrical control cabinets prepared alongside pump-system production.",
+  },
+  {
+    src: "/assets/factory/real/vertical-pump-assembly.jpg",
+    title: "Vertical pump assembly",
+    text: "Finished vertical pump units staged for quality review and delivery preparation.",
+  },
+  {
+    src: "/assets/factory/real/water-supply-vessels.jpg",
+    title: "Water supply equipment fabrication",
+    text: "Vessels and water-system equipment supporting broader project water requirements.",
+  },
+  {
+    src: "/assets/factory/real/frp-pump-station.jpg",
+    title: "Integrated pump station capability",
+    text: "FRP equipment capability for integrated water and pumping applications.",
+  },
+  {
+    src: "/assets/factory/real/motor-and-components.jpg",
+    title: "Motor and component staging",
+    text: "Organized motor and component preparation for assembly operations.",
+  },
 ];
 
 export const certificates = [
-  { src: "/assets/certificates/ce.png", title: "CE", note: "Machinery directive documentation" },
-  { src: "/assets/certificates/quality.webp", title: "Quality", note: "Management system certificate" },
-  { src: "/assets/certificates/test-report.png", title: "Test Reports", note: "Pump testing report sample" },
-  { src: "/assets/certificates/patent.png", title: "Patents", note: "Product innovation documents" },
+  {
+    src: "/assets/certificates/real/fire-pump-machinery-emc-attestation.jpg",
+    title: "Fire Pump Machinery & EMC Attestation",
+    note: "Attestation covering the Machinery Directive 2006/42/EC and EMC Directive 2014/30/EU for listed fire-pump models.",
+    issuer: "UDEM International Certification",
+    validity: "Valid through 08 Jan 2030",
+  },
+  {
+    src: "/assets/certificates/real/iso-9001.jpg",
+    title: "ISO 9001 Quality Management System",
+    note: "Quality management system certification covering pumps, motors, pump control cabinets and water supply and drainage equipment sales.",
+    issuer: "Huayi Certification Center",
+    validity: "Valid through 09 Nov 2026",
+  },
+  {
+    src: "/assets/certificates/real/iso-14001.jpg",
+    title: "ISO 14001 Environmental Management System",
+    note: "Environmental management system certification for the company scope stated on the certificate.",
+    issuer: "Huayi Certification Center",
+    validity: "Valid through 09 Nov 2026",
+  },
+  {
+    src: "/assets/certificates/real/iso-45001.jpg",
+    title: "ISO 45001 Occupational Health & Safety",
+    note: "Occupational health and safety management system certification for the company scope stated on the certificate.",
+    issuer: "Huayi Certification Center",
+    validity: "Valid through 09 Nov 2026",
+  },
+];
+
+export const waterSystemInnovationDocuments = [
+  {
+    src: "/assets/certificates/real/utility-patent-pressure-control.jpg",
+    title: "Adaptive pressure-control valve and sewage-treatment pump",
+    note: "Utility model document for water-treatment equipment innovation.",
+  },
+  {
+    src: "/assets/certificates/real/utility-patent-sewage.jpg",
+    title: "Sewage pretreatment device",
+    note: "Utility model document for water-treatment equipment innovation.",
+  },
 ];
 
 export const downloads = [

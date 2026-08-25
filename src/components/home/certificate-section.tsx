@@ -8,8 +8,9 @@ export function CertificateSection() {
     <section className="section bg-[var(--grey-50)]">
       <SectionHeading
         eyebrow="Certificates & Documents"
-        title="Trust material prepared for overseas procurement review."
-        action={<Link className="button button-secondary" href="/downloads">Request Certificates</Link>}
+        title="Documented evidence for technical and procurement review."
+        text="Public certificates are shown with their stated scope and validity. Project-specific documents are confirmed against the quoted configuration."
+        action={<Link className="button button-secondary" href="/certificates">View Certificates</Link>}
       />
       <div className="container-shell grid gap-5 md:grid-cols-2 xl:grid-cols-4">
         {certificates.map((item) => (
@@ -20,6 +21,7 @@ export function CertificateSection() {
             <div className="p-5">
               <h3 className="text-lg font-black text-[var(--navy-950)]">{item.title}</h3>
               <p className="mt-2 text-sm text-slate-600">{item.note}</p>
+              <p className="mt-4 text-xs font-bold uppercase tracking-[0.08em] text-[var(--navy-800)]">{item.validity}</p>
             </div>
           </article>
         ))}
