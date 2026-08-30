@@ -4,6 +4,7 @@ import { getPublicProducts, type PublicProduct } from "@/lib/public-cms";
 import { getProductKnowledge } from "@/lib/product-knowledge";
 import { getProductFamily } from "@/lib/product-taxonomy";
 import { acquireTaskLock, createId, readStore, upsertStore, writeStore } from "@/lib/local-store";
+import { getNewsPublishSchedule } from "@/lib/news-publish-schedule";
 import { markSitemapDirty } from "@/lib/sitemap-dirty";
 import { getSiteNewsConfig, validateSiteNewsConfig, type SiteNewsConfig } from "@/lib/site-news-config";
 
@@ -367,6 +368,41 @@ function cycleKey(hours: number, now = Date.now()) {
   return `${hours}h-${Math.floor(now / (hours * 60 * 60 * 1000))}`;
 }
 
+function newsPublishGraceMinutes() {
+  const configured = Number(process.env.NEWS_PUBLISH_GRACE_MINUTES || 5);
+  return Number.isFinite(configured) ? Math.min(Math.max(configured, 0), 60) : 5;
+}
+
+export async function getNewsAutomationHealth(siteId = SITE_ID, now = Date.now()) {
+  const config = validateSiteNewsConfig(siteId);
+  const [checks, candidates, jobs] = await Promise.all([
+    listNewsDeliveryChecks(siteId),
+    listNewsCandidates(siteId),
+    listNewsJobs(),
+  ]);
+  const lastSuccess = checks.find((check) => check.status === "passed");
+  const schedule = getNewsPublishSchedule(
+    lastSuccess?.createdAt,
+    now,
+    config.news.publishIntervalHours,
+    newsPublishGraceMinutes(),
+  );
+  const availableCandidates = candidates.filter(
+    (candidate) => candidate.state === "candidate"
+      && now - Date.parse(candidate.sourcePublishedAt) <= config.news.fallbackCandidateMaxAgeDays * 86_400_000,
+  ).length;
+  const latestJob = jobs.find((job) => !job.siteId || job.siteId === siteId);
+
+  return {
+    ...schedule,
+    availableCandidates,
+    latestJob: latestJob || null,
+    graceMinutes: newsPublishGraceMinutes(),
+    productionEnabled: config.publishing.productionEnabled,
+    autoPublishEnabled: process.env.NEWS_AUTO_PUBLISH !== "false",
+  };
+}
+
 function sourceDefinitionFor(config: SiteNewsConfig, url: string) {
   const host = new URL(url).hostname.replace(/^www\./, "").toLowerCase();
   return [...config.sources.primaryWhitelist, ...config.sources.fallbackWhitelist].find((source) => host === source.domain || host.endsWith(`.${source.domain}`));
@@ -494,10 +530,21 @@ export async function runNewsPublish(reason = "scheduled", options: { siteId?: s
   if (!release) return { ok: true, skipped: true, message: "This site's publish cycle is already running.", stats: { published: 0 } };
   const job = await startJob("compose-publish", `News publish started by ${reason}.`, siteId);
   try {
+    if (!options.dryRun && (!config.publishing.productionEnabled || process.env.NEWS_AUTO_PUBLISH === "false")) {
+      const message = "News automatic publishing is paused by the production configuration.";
+      await finishJob(job, "skipped", message, { published: 0 });
+      return { ok: true, skipped: true, message, stats: { published: 0 } };
+    }
     const checks = await listNewsDeliveryChecks(siteId);
     const lastSuccess = checks.find((check) => check.status === "passed");
-    if (!options.dryRun && lastSuccess && Date.now() - Date.parse(lastSuccess.createdAt) < config.news.publishIntervalHours * 3_600_000) {
-      const message = "48-hour publication interval has not elapsed since the last frontend-verified News article.";
+    const schedule = getNewsPublishSchedule(
+      lastSuccess?.createdAt,
+      Date.now(),
+      config.news.publishIntervalHours,
+      newsPublishGraceMinutes(),
+    );
+    if (!options.dryRun && !schedule.due) {
+      const message = `Next 48-hour News publication window opens at ${schedule.eligibleAt}.`;
       await finishJob(job, "skipped", message, { published: 0 });
       return { ok: true, skipped: true, message, stats: { published: 0 } };
     }

@@ -1,22 +1,19 @@
 import Link from "next/link";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { AdminCard, AdminPageHeader, EmptyState, StatCard, StatusPill } from "@/components/admin/admin-widgets";
-import { getNewsConfig, listNewsArticles, listNewsAudits, listNewsJobs, listNewsSources } from "@/lib/news-automation";
+import { getNewsAutomationHealth, getNewsConfig, listNewsArticles, listNewsAudits, listNewsJobs, listNewsSources } from "@/lib/news-automation";
 
 export const dynamic = "force-dynamic";
 
-function todayKey() {
-  return new Date().toISOString().slice(0, 10);
-}
-
 export default async function AdminNewsAutomationPage() {
-  const [articles, jobs, audits, sources] = await Promise.all([listNewsArticles(), listNewsJobs(), listNewsAudits(), listNewsSources()]);
+  const [articles, jobs, audits, sources, health] = await Promise.all([listNewsArticles(), listNewsJobs(), listNewsAudits(), listNewsSources(), getNewsAutomationHealth()]);
   const config = getNewsConfig();
-  const today = todayKey();
-  const published = articles.filter((item) => item.status === "published");
-  const publishedToday = published.filter((item) => (item.publishAt || item.createdAt).slice(0, 10) === today).length;
+  const published = articles.filter((item) => item.status === "published" || item.status === "published_success");
   const failed = articles.filter((item) => item.status === "failed").length;
   const latestAudit = audits[0];
+  const formatTime = (value: string | null) => value
+    ? new Intl.DateTimeFormat("zh-CN", { timeZone: config.timezone, dateStyle: "medium", timeStyle: "short" }).format(new Date(value))
+    : "等待首次发布";
 
   return (
     <AdminShell>
@@ -28,10 +25,10 @@ export default async function AdminNewsAutomationPage() {
       />
 
       <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <StatCard label="每日发布目标" value={config.dailyTarget} hint={`${config.timezone} · ${config.lookbackHours} 小时来源窗口`} />
-        <StatCard label="今日已发布" value={publishedToday} hint={publishedToday >= config.dailyTarget ? "今日目标已达成" : "自动任务会继续补发"} />
+        <StatCard label="48 小时发布状态" value={health.overdue ? "已超时" : health.due ? "待执行" : "正常"} hint={`最近成功：${formatTime(health.lastSuccessAt)}`} />
+        <StatCard label="下次发布窗口" value={health.due ? "已开启" : formatTime(health.eligibleAt)} hint={`调度容差 ${health.graceMinutes} 分钟`} />
         <StatCard label="自动 News 总数" value={articles.length} hint={`已发布 ${published.length} / 失败 ${failed}`} />
-        <StatCard label="新闻来源" value={sources.length} hint={`${sources.filter((item) => item.enabled).length} 个已启用`} />
+        <StatCard label="可发布候选" value={health.availableCandidates} hint={`${sources.filter((item) => item.enabled).length} 个新闻来源已启用`} />
       </div>
 
       <div className="mt-8 grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
@@ -39,6 +36,9 @@ export default async function AdminNewsAutomationPage() {
           <div className="grid gap-3 text-sm">
             {[
               ["自动发布", config.autoPublish ? "启用" : "关闭"],
+              ["生产发布开关", health.productionEnabled ? "启用" : "关闭"],
+              ["发布频率", "每 48 小时 1 篇"],
+              ["采集频率", "每 12 小时"],
               ["去重窗口", `${config.dedupDays} 天`],
               ["最大重试", `${config.maxRetries} 次`],
               ["产品相关性阈值", `${config.relevanceThreshold}`],

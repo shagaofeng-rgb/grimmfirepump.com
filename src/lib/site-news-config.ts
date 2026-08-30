@@ -85,7 +85,7 @@ const configuredSites = [
       primaryWhitelist: [{ domain: "datacenterdynamics.com", type: "trade-media", allowedTopics: ["data center", "critical infrastructure"], allowedLanguages: ["en"], rssOrApiUrl: "https://www.datacenterdynamics.com/en/rss/", sourceTrustScore: 85 }],
       fallbackWhitelist: [{ domain: "nfpa.org", type: "standards-body", allowedTopics: ["fire protection", "standards"], allowedLanguages: ["en"], rssOrApiUrl: "https://www.nfpa.org/news-blogs-and-articles", sourceTrustScore: 95 }],
     },
-    publishing: { cmsAdapter: "lead_store_news_articles", contentStatusAfterPublish: "published", requireFrontendVerification: true, alertChannel: "admin-news-automation", productionEnabled: false },
+    publishing: { cmsAdapter: "lead_store_news_articles", contentStatusAfterPublish: "published", requireFrontendVerification: true, alertChannel: "admin-news-automation", productionEnabled: true },
   },
 ] as const;
 
