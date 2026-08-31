@@ -158,4 +158,19 @@ Visual evidence:
 
 ## 7. Production Acceptance
 
-This section is completed against the production deployment after the audited commit is pushed. A deployment is not accepted until the custom domain, public routes, Blog webhook validation, latest News, Sitemaps, security headers and Vercel runtime error telemetry have been checked.
+Audited deployment: `dpl_98vrXPyHwf7T3G8Xawk8AcrHkbZq`
+
+Audited commit: `c48b238dd5d7d02264248552c5368c9b7d8eff54`
+
+- Vercel state: READY; aliases include the apex domain, `www` domain and project aliases.
+- Apex behavior: `https://grimmfirepump.com/` returns 301 to `https://www.grimmfirepump.com/`.
+- Production core audit: 23/23 routes passed.
+- Production deep audit: 109 public URLs across 6 Sitemap files; 0 failures.
+- Production latency: median 510 ms, p95 1,161 ms, max 1,991 ms. The pre-change baseline was median 477 ms, p95 1,167 ms and max 1,927 ms; no material tail-latency regression was measured.
+- Product Sitemap: 28 product URLs, including the two repaired Canonicals.
+- Latest News: HTTP 200 on list/detail; visible in News RSS and News Sitemap; source panel present; absent from Blog.
+- Production Blog webhook: signed validation passed; first and repeated publishes returned success; one database row was created; list/detail returned HTTP 200 and displayed the article; the marked record was then deleted.
+- Security headers: `X-Powered-By` absent; `X-Content-Type-Options: nosniff`, `X-Frame-Options: SAMEORIGIN` and strict referrer policy present.
+- Vercel telemetry after deployment: 223 HTTP 200 responses, expected 401/404/redirect checks, and no grouped runtime errors in the selected one-hour window.
+
+The marked production Blog test was removed from the database before the final report deployment. The final deployment clears the short public Blog cache; acceptance includes confirming that no `[AUDIT TEST]` title remains visible.
