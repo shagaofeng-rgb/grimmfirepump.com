@@ -30,8 +30,6 @@ export const localizedIndexablePaths = [
   "/about",
   "/factory",
   "/testing",
-  "/certificates",
-  "/downloads",
   "/contact",
 ] as const;
 

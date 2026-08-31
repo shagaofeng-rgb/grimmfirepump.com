@@ -51,6 +51,12 @@ async function actor() {
   return (await getCurrentAdmin())?.username || "system";
 }
 
+async function requireAdmin(allowedRoles: Array<"super_admin" | "content_manager" | "product_manager" | "sales" | "analyst">) {
+  const admin = await getCurrentAdmin();
+  if (!admin || !allowedRoles.includes(admin.role)) throw new Error("Unauthorized admin action.");
+  return admin;
+}
+
 async function audit(action: string, target: string, result: "success" | "failed" = "success") {
   await logAudit({ actor: await actor(), action, target, result });
 }
@@ -82,6 +88,7 @@ const categorySchema = z.object({
 });
 
 export async function saveCategory(formData: FormData) {
+  await requireAdmin(["super_admin", "product_manager"]);
   const now = new Date().toISOString();
   const parsed = categorySchema.parse({
     id: text(formData, "id"),
@@ -115,6 +122,7 @@ export async function saveCategory(formData: FormData) {
 }
 
 export async function deleteCategory(formData: FormData) {
+  await requireAdmin(["super_admin", "product_manager"]);
   const id = text(formData, "id");
   const products = await listCmsProducts();
   if (products.some((item) => item.categoryId === id)) {
@@ -129,6 +137,7 @@ export async function deleteCategory(formData: FormData) {
 }
 
 export async function saveProduct(formData: FormData) {
+  await requireAdmin(["super_admin", "product_manager"]);
   const now = new Date().toISOString();
   const id = text(formData, "id") || createId("prod");
   const existing = (await listCmsProducts()).find((item) => item.id === id);
@@ -193,6 +202,7 @@ export async function saveProduct(formData: FormData) {
 }
 
 export async function deleteProduct(formData: FormData) {
+  await requireAdmin(["super_admin", "product_manager"]);
   const id = text(formData, "id");
   const existing = (await listCmsProducts()).find((item) => item.id === id);
   if (existing) await cmsStore.upsertProduct({ ...existing, status: "archived", indexable: false, updatedAt: new Date().toISOString() });
@@ -206,6 +216,7 @@ export async function deleteProduct(formData: FormData) {
 }
 
 export async function saveProductKnowledge(formData: FormData) {
+  await requireAdmin(["super_admin", "product_manager"]);
   const existing = (await listCmsProductKnowledge()).find((item) => item.id === text(formData, "id"));
   if (!existing) redirect("/admin/product-knowledge?error=not-found");
   const now = new Date().toISOString();
@@ -235,6 +246,7 @@ export async function saveProductKnowledge(formData: FormData) {
 }
 
 export async function saveNews(formData: FormData) {
+  await requireAdmin(["super_admin", "content_manager"]);
   const now = new Date().toISOString();
   const id = text(formData, "id") || createId("news");
   const allNews = await listCmsNews();
@@ -277,6 +289,7 @@ export async function saveNews(formData: FormData) {
 }
 
 export async function deleteNews(formData: FormData) {
+  await requireAdmin(["super_admin", "content_manager"]);
   const id = text(formData, "id");
   const existing = (await listCmsNews()).find((item) => item.id === id);
   if (existing) await cmsStore.upsertNews({ ...existing, status: "archived", indexable: false, updatedAt: new Date().toISOString() });
@@ -289,6 +302,7 @@ export async function deleteNews(formData: FormData) {
 }
 
 export async function saveMedia(formData: FormData) {
+  await requireAdmin(["super_admin", "content_manager", "product_manager"]);
   const now = new Date().toISOString();
   const id = text(formData, "id") || createId("media");
   const existing = (await listMediaFiles()).find((item) => item.id === id);
@@ -314,6 +328,7 @@ export async function saveMedia(formData: FormData) {
 }
 
 export async function deleteMedia(formData: FormData) {
+  await requireAdmin(["super_admin", "content_manager", "product_manager"]);
   const id = text(formData, "id");
   await cmsStore.deleteMedia(id);
   await audit("delete_media", id);
@@ -321,6 +336,7 @@ export async function deleteMedia(formData: FormData) {
 }
 
 export async function saveDownloadAsset(formData: FormData) {
+  await requireAdmin(["super_admin", "content_manager", "product_manager"]);
   const now = new Date().toISOString();
   const id = text(formData, "id") || createId("download");
   const existing = (await listDownloadAssets()).find((item) => item.id === id);
@@ -345,6 +361,7 @@ export async function saveDownloadAsset(formData: FormData) {
 }
 
 export async function saveManagedPage(formData: FormData) {
+  await requireAdmin(["super_admin", "content_manager"]);
   const now = new Date().toISOString();
   const id = text(formData, "id") || createId("page");
   const existing = (await listManagedPages()).find((item) => item.id === id);
@@ -370,6 +387,7 @@ export async function saveManagedPage(formData: FormData) {
 }
 
 export async function saveSettings(formData: FormData) {
+  await requireAdmin(["super_admin"]);
   const now = new Date().toISOString();
   const item: SiteSetting = {
     id: "site_settings",
@@ -398,6 +416,7 @@ export async function saveSettings(formData: FormData) {
 }
 
 export async function updateLeadStatus(formData: FormData) {
+  await requireAdmin(["super_admin", "sales"]);
   const id = text(formData, "id");
   const inquiries = await readStore<InquiryRecord[]>("inquiries.json", []);
   const next = inquiries.map((item) =>
@@ -417,6 +436,7 @@ export async function updateLeadStatus(formData: FormData) {
 }
 
 export async function deleteLead(formData: FormData) {
+  await requireAdmin(["super_admin", "sales"]);
   const id = text(formData, "id");
   await deleteStoreItem<InquiryRecord>("inquiries.json", id);
   await audit("delete_lead", id);
@@ -424,6 +444,7 @@ export async function deleteLead(formData: FormData) {
 }
 
 export async function changeAdminPassword(_: { error?: string; success?: string } | undefined, formData: FormData) {
+  await requireAdmin(["super_admin"]);
   const admin = getConfiguredAdminUser();
   const oldPassword = formData.get("oldPassword");
   const newPassword = text(formData, "newPassword");

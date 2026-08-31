@@ -29,18 +29,39 @@ function decodeBase64Url(value: string) {
   return atob(padded);
 }
 
-async function verifySession(session: string | undefined, secret: string) {
-  if (!session) return false;
+type MiddlewareSession = { expiresAt?: number; role?: string };
+
+async function verifySession(session: string | undefined, secret: string): Promise<MiddlewareSession | null> {
+  if (!session) return null;
   const [payload, signature] = session.split(".");
-  if (!payload || !signature) return false;
+  if (!payload || !signature) return null;
   const expected = await sign(payload, secret);
-  if (signature !== expected) return false;
+  if (signature !== expected) return null;
   try {
-    const parsed = JSON.parse(decodeBase64Url(payload)) as { expiresAt?: number };
-    return Boolean(parsed.expiresAt && Date.now() <= parsed.expiresAt);
+    const parsed = JSON.parse(decodeBase64Url(payload)) as MiddlewareSession;
+    return parsed.expiresAt && Date.now() <= parsed.expiresAt ? parsed : null;
   } catch {
-    return false;
+    return null;
   }
+}
+
+function adminRouteAllowed(pathname: string, role = "") {
+  if (role === "super_admin") return true;
+  if (pathname.startsWith("/admin/products") || pathname.startsWith("/admin/product-categories") || pathname.startsWith("/admin/product-knowledge")) return role === "product_manager";
+  if (pathname.startsWith("/admin/news") || pathname.startsWith("/admin/pages")) return role === "content_manager";
+  if (pathname.startsWith("/admin/media") || pathname.startsWith("/admin/downloads")) return role === "content_manager" || role === "product_manager";
+  if (pathname.startsWith("/admin/leads") || pathname.startsWith("/admin/forms")) return role === "sales";
+  if (pathname.startsWith("/admin/analytics")) return role === "analyst";
+  return pathname === "/admin" || pathname.startsWith("/admin/dashboard");
+}
+
+function adminApiAllowed(pathname: string, role = "") {
+  if (role === "super_admin") return true;
+  if (pathname.startsWith("/api/admin/news")) return role === "content_manager";
+  if (pathname.startsWith("/api/admin/uploads")) return role === "content_manager" || role === "product_manager";
+  if (pathname === "/api/inquiries" || pathname === "/api/download-leads") return role === "sales";
+  if (pathname === "/api/analytics") return role === "analyst";
+  return false;
 }
 
 export async function middleware(request: NextRequest) {
@@ -84,14 +105,28 @@ export async function middleware(request: NextRequest) {
   requestHeaders.set("x-site-locale", pathname.match(localePattern)?.[1] || "en");
 
   const protectsAdminPage = pathname.startsWith("/admin") && pathname !== "/admin/login";
-  const protectsAdminReadApi = request.method === "GET" && ["/api/inquiries", "/api/download-leads", "/api/analytics"].includes(pathname);
-  if (!protectsAdminPage && !protectsAdminReadApi) {
+  const protectsAdminApi = pathname.startsWith("/api/admin/")
+    || (request.method === "GET" && ["/api/inquiries", "/api/download-leads", "/api/analytics"].includes(pathname));
+  if (!protectsAdminPage && !protectsAdminApi) {
     return NextResponse.next({ request: { headers: requestHeaders } });
   }
 
   const secret = process.env.ADMIN_SESSION_SECRET || process.env.ADMIN_PASSWORD_HASH || process.env.ADMIN_PASSWORD;
-  const isAuthed = secret ? await verifySession(request.cookies.get(ADMIN_COOKIE_NAME)?.value, secret) : false;
-  if (isAuthed) return NextResponse.next({ request: { headers: requestHeaders } });
+  const session = secret ? await verifySession(request.cookies.get(ADMIN_COOKIE_NAME)?.value, secret) : null;
+  const authorizedForRoute = protectsAdminPage
+    ? adminRouteAllowed(pathname, session?.role)
+    : adminApiAllowed(pathname, session?.role);
+  if (session && authorizedForRoute) {
+    return NextResponse.next({ request: { headers: requestHeaders } });
+  }
+  if (session && protectsAdminPage) {
+    const dashboardUrl = request.nextUrl.clone();
+    dashboardUrl.pathname = "/admin/dashboard";
+    dashboardUrl.searchParams.set("error", "forbidden");
+    return NextResponse.redirect(dashboardUrl);
+  }
+
+  if (session && protectsAdminApi) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   if (pathname.startsWith("/api/")) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const loginUrl = request.nextUrl.clone();

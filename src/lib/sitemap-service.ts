@@ -53,6 +53,7 @@ export type SitemapRun = {
   modified: string[];
   removed: string[];
   robotsDeclared: boolean;
+  googleSubmissionWindow?: boolean;
   searchConsole: SearchConsoleSubmission;
   message: string;
 };
@@ -250,6 +251,7 @@ export async function runSitemapMaintenance(options: {
       id: createId("sitemap_run"), createdAt: now, updatedAt: now, startedAt, finishedAt: now,
       durationMs: Date.now() - started, trigger: options.trigger, status: "locked", processed: 0, success: 0,
       skipped: 0, errors: [], files: [], split: false, added: [], modified: [], removed: [], robotsDeclared: true,
+      googleSubmissionWindow: false,
       searchConsole: { attempted: false, success: false, status: "disabled", message: "Skipped because another Sitemap task holds the lock." },
       message: "Another Sitemap task is already running.",
     };
@@ -286,9 +288,10 @@ export async function runSitemapMaintenance(options: {
       await writeStore(DIRTY_STORE, []);
     }
 
-    const searchConsole = options.submit && !options.dryRun && changed
+    const googleSubmissionWindow = Boolean(options.submit && !options.dryRun);
+    const searchConsole = googleSubmissionWindow
       ? await submitSitemapToSearchConsole()
-      : { attempted: false, success: false, status: "disabled" as const, message: "Submission not requested or Sitemap unchanged." };
+      : { attempted: false, success: false, status: "disabled" as const, message: "Google submission window is not due." };
     const finishedAt = new Date().toISOString();
     const run: SitemapRun = {
       id: createId("sitemap_run"),
@@ -309,6 +312,7 @@ export async function runSitemapMaintenance(options: {
       modified: diff.modified,
       removed: diff.removed,
       robotsDeclared: true,
+      googleSubmissionWindow,
       searchConsole,
       message: options.dryRun ? "Dry run completed; no files or manifest were changed." : changed ? "Sitemap generated and verified." : "Sitemap already matches public content.",
     };
@@ -321,6 +325,7 @@ export async function runSitemapMaintenance(options: {
       durationMs: Date.now() - started, trigger: options.trigger, status: "failed", processed: 0, success: 0, skipped: 0,
       errors: [error instanceof Error ? error.message : "Unknown Sitemap maintenance error"], files: [], split: false,
       added: [], modified: [], removed: [], robotsDeclared: true,
+      googleSubmissionWindow: false,
       searchConsole: { attempted: false, success: false, status: "failed", message: "Sitemap generation failed before Search Console submission." },
       message: "Sitemap generation failed; the last valid Sitemap snapshot was preserved.",
     };

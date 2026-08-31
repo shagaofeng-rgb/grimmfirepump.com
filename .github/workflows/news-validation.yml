@@ -2,7 +2,7 @@ name: News catalog and product validation
 
 on:
   push:
-    branches: [codex/grimm-news-automation]
+    branches: [main]
     paths:
       - "data/news/**"
       - "data/products/**"
@@ -14,7 +14,7 @@ on:
       - ".github/workflows/news-validation.yml"
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   validate:
@@ -23,8 +23,6 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: codex/grimm-news-automation
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -40,10 +38,3 @@ jobs:
       - run: npm run test:sitemap
       - run: npm run typecheck
       - run: npm run build
-      - name: Commit generated evidence
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/news/source-catalog.seed.* data/products/product-topic-profiles.json reports/
-          git diff --cached --quiet || git commit -m "Generate validation evidence [skip news validation]"
-          git push

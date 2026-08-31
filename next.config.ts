@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  poweredByHeader: false,
   images: {
     formats: ["image/avif", "image/webp"],
     remotePatterns: [
@@ -8,6 +9,11 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "*.public.blob.vercel-storage.com",
         pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "laikegeo.oss-cn-shanghai.aliyuncs.com",
+        pathname: "/uploads/**",
       },
     ],
   },

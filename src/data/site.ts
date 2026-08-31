@@ -335,38 +335,38 @@ export const projects = [
 
 export const factoryImages = [
   {
-    src: "/assets/factory/real/production-capacity.jpg",
+    src: "/assets/factory/real/production-capacity.webp",
     title: "Production capacity and component flow",
     text: "Pump casings, vessels and production components organized for controlled manufacturing flow.",
     wide: true,
   },
   {
-    src: "/assets/factory/real/cnc-machining.jpg",
+    src: "/assets/factory/real/cnc-machining.webp",
     title: "CNC pump component machining",
     text: "Dedicated machining equipment for pump component processing.",
   },
   {
-    src: "/assets/factory/real/controller-assembly.jpg",
+    src: "/assets/factory/real/controller-assembly.webp",
     title: "Controller assembly area",
     text: "Electrical control cabinets prepared alongside pump-system production.",
   },
   {
-    src: "/assets/factory/real/vertical-pump-assembly.jpg",
+    src: "/assets/factory/real/vertical-pump-assembly.webp",
     title: "Vertical pump assembly",
     text: "Finished vertical pump units staged for quality review and delivery preparation.",
   },
   {
-    src: "/assets/factory/real/water-supply-vessels.jpg",
+    src: "/assets/factory/real/water-supply-vessels.webp",
     title: "Water supply equipment fabrication",
     text: "Vessels and water-system equipment supporting broader project water requirements.",
   },
   {
-    src: "/assets/factory/real/frp-pump-station.jpg",
+    src: "/assets/factory/real/frp-pump-station.webp",
     title: "Integrated pump station capability",
     text: "FRP equipment capability for integrated water and pumping applications.",
   },
   {
-    src: "/assets/factory/real/motor-and-components.jpg",
+    src: "/assets/factory/real/motor-and-components.webp",
     title: "Motor and component staging",
     text: "Organized motor and component preparation for assembly operations.",
   },

@@ -1,4 +1,3 @@
-import { products as staticProducts } from "@/data/site";
 import { isLegacyImportedBlogSlug, listCmsNews, listCmsProducts, type CmsNews, type CmsProduct } from "@/lib/admin-cms";
 import { unstable_cache } from "next/cache";
 import { getProductDisplayName, getProductFamily } from "@/lib/product-taxonomy";
@@ -49,18 +48,20 @@ function publicArticleImage(value: string) {
   if (value.startsWith("/") && !value.startsWith("//")) return value;
   try {
     const url = new URL(value);
-    return url.protocol === "https:" && url.hostname.endsWith(".public.blob.vercel-storage.com") ? url.toString() : fallback;
+    const trustedHost = url.hostname.endsWith(".public.blob.vercel-storage.com")
+      || url.hostname === "laikegeo.oss-cn-shanghai.aliyuncs.com";
+    return url.protocol === "https:" && trustedHost ? url.toString() : fallback;
   } catch {
     return fallback;
   }
 }
 
-function productSpecs(item: CmsProduct, fallback?: PublicProduct) {
+function productSpecs(item: CmsProduct) {
   const params = item.parameters.map((param) => [param.name, param.value, param.unit].filter(Boolean).join(": "));
-  return (params.length ? params : [...lines(item.sellingPoints), ...(fallback?.specs || [])]).slice(0, 12);
+  return (params.length ? params : lines(item.sellingPoints)).slice(0, 12);
 }
 
-function productDetailLines(item: CmsProduct, fallback?: PublicProduct) {
+function productDetailLines(item: CmsProduct) {
   return [
     item.description,
     item.sellingPoints,
@@ -69,51 +70,29 @@ function productDetailLines(item: CmsProduct, fallback?: PublicProduct) {
     item.selectionGuide,
     item.installation,
     item.afterSales,
-    ...(fallback?.detailLines || []),
   ].flatMap(lines);
 }
 
 function mapProduct(item: CmsProduct): PublicProduct {
-  const fallback = staticProducts.find((product) => product.slug === item.slug) as PublicProduct | undefined;
   const family = getProductFamily(item.slug, item.title, item.categoryName);
-  const image = item.mainImage || fallback?.image || "/assets/products/edj-package.webp";
-  const gallery = item.gallery.length ? item.gallery : fallback?.detailImages?.map((detail) => detail.src) || [image];
+  const image = item.mainImage || "/assets/products/edj-package.webp";
+  const gallery = item.gallery.length ? item.gallery : [image];
   return {
     slug: item.slug,
     updatedAt: item.updatedAt || item.createdAt,
     canonicalUrl: `/products/${item.slug}`,
     indexable: item.indexable,
-    sourceUrl: fallback?.sourceUrl || "",
+    sourceUrl: "",
     title: getProductDisplayName(item.slug, item.title),
     category: family.name,
-    releaseTime: fallback?.releaseTime || item.createdAt.slice(0, 10),
+    releaseTime: item.createdAt.slice(0, 10),
     image,
-    summary: item.summary || fallback?.summary || item.description,
-    description: item.description || fallback?.description || item.summary,
-    specs: productSpecs(item, fallback),
-    keywords: item.seoKeywords || fallback?.keywords || item.title,
-    detailLines: productDetailLines(item, fallback),
+    summary: item.summary || item.description,
+    description: item.description || item.summary,
+    specs: productSpecs(item),
+    keywords: item.seoKeywords || item.title,
+    detailLines: productDetailLines(item),
     detailImages: gallery.map((src) => ({ src, alt: item.title })),
-  };
-}
-
-function mapStaticProduct(item: (typeof staticProducts)[number]): PublicProduct {
-  return {
-    slug: item.slug,
-    updatedAt: item.releaseTime,
-    canonicalUrl: `/products/${item.slug}`,
-    indexable: true,
-    sourceUrl: item.sourceUrl,
-    title: item.title,
-    category: item.category,
-    releaseTime: item.releaseTime,
-    image: item.image,
-    summary: item.summary,
-    description: item.description,
-    specs: item.specs,
-    keywords: item.keywords,
-    detailLines: item.detailLines,
-    detailImages: "detailImages" in item && Array.isArray(item.detailImages) ? item.detailImages : [{ src: item.image, alt: item.title }],
   };
 }
 
@@ -140,9 +119,7 @@ export async function getPublicProducts() {
     .filter((item) => item.status === "published")
     .sort((a, b) => a.sortOrder - b.sortOrder)
     .map(mapProduct);
-  const cmsSlugs = new Set(cmsProducts.map((item) => item.slug));
-  const fallbackProducts = staticProducts.filter((item) => !cmsSlugs.has(item.slug)).map(mapStaticProduct);
-  return [...cmsMapped, ...fallbackProducts];
+  return cmsMapped;
 }
 
 export async function getPublicProduct(slug: string) {

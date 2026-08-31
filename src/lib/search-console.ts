@@ -25,7 +25,7 @@ function base64Url(value: string | Buffer) {
 }
 
 async function loadCredentials(env: NodeJS.ProcessEnv) {
-  const inline = env.GOOGLE_SERVICE_ACCOUNT_CREDENTIALS_JSON;
+  const inline = env.GOOGLE_SERVICE_ACCOUNT_CREDENTIALS_JSON || env.GOOGLE_SEARCH_CONSOLE_SERVICE_ACCOUNT_JSON;
   const base64 = env.GOOGLE_SERVICE_ACCOUNT_CREDENTIALS_BASE64;
   const filePath = env.GOOGLE_SERVICE_ACCOUNT_CREDENTIALS_PATH;
   let raw = inline || "";

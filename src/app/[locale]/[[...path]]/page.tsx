@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { Footer } from "@/components/footer";
+import { Menu } from "lucide-react";
 import { StickyCta } from "@/components/sticky-cta";
 import { applications, certificates, company, downloads, knowledgePosts, products, projects } from "@/data/site";
 import { localizedSite } from "@/data/localized-site";
@@ -66,24 +66,39 @@ function LocalizedHeader({ locale }: { locale: LocalizedLocale }) {
 
   return (
     <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/92 backdrop-blur-xl" lang={content.htmlLang} dir={content.dir}>
-      <div className="mx-auto flex min-h-[76px] max-w-[1280px] flex-wrap items-center justify-between gap-4 px-6 py-3">
-        <Link href={localizedPath("/", locale)} className="flex min-w-[220px] items-center gap-3" aria-label={`${company.shortName} home`}>
+      <div className="mx-auto flex min-h-[76px] max-w-[1280px] items-center justify-between gap-3 px-4 py-3 md:px-6">
+        <Link href={localizedPath("/", locale)} className="flex min-w-0 items-center gap-3" aria-label={`${company.shortName} home`}>
           <Image src="/assets/images/logo.png" alt={`${company.shortName} logo`} width={42} height={42} className="object-contain" />
           <span className="flex flex-col leading-none">
             <strong className="text-base tracking-[0.04em] text-[var(--navy-900)]">{company.shortName}</strong>
             <small className="mt-1 text-xs text-slate-500">Fire Pump Systems</small>
           </span>
         </Link>
-        <nav className="flex max-w-full items-center gap-4 overflow-x-auto text-sm font-bold text-slate-700" aria-label={`${content.localeName} navigation`}>
+        <nav className="hidden items-center gap-4 text-sm font-bold text-slate-700 lg:flex" aria-label={`${content.localeName} navigation`}>
           {navPaths.map((navPath) => (
             <Link key={navPath} href={localizedPath(navPath, locale)} className="shrink-0 border-b-2 border-transparent py-2 hover:border-[var(--orange)]">
               {content.nav[navPath]}
             </Link>
           ))}
         </nav>
-        <a className="button button-primary min-h-[42px] px-4 text-sm" href={company.whatsappUrl} target="_blank" rel="noreferrer">
+        <a className="button button-primary hidden min-h-[42px] px-4 text-sm sm:inline-flex" href={company.whatsappUrl} target="_blank" rel="noreferrer">
           {content.labels.whatsapp}
         </a>
+        <details className="relative lg:hidden">
+          <summary className="grid h-11 w-11 cursor-pointer list-none place-items-center rounded-md border border-slate-200 text-[var(--navy-900)]" aria-label={`${content.localeName} navigation`}>
+            <Menu size={20} />
+          </summary>
+          <nav className="absolute end-0 top-14 z-50 grid w-[min(320px,calc(100vw-32px))] gap-1 rounded-lg border border-slate-200 bg-white p-3 text-sm font-bold text-slate-700 shadow-xl" aria-label={`${content.localeName} mobile navigation`}>
+            {navPaths.map((navPath) => (
+              <Link key={navPath} href={localizedPath(navPath, locale)} className="rounded-md px-3 py-3 hover:bg-slate-50">
+                {content.nav[navPath]}
+              </Link>
+            ))}
+            <a className="button button-primary mt-2 min-h-[42px] text-sm sm:hidden" href={company.whatsappUrl} target="_blank" rel="noreferrer">
+              {content.labels.whatsapp}
+            </a>
+          </nav>
+        </details>
       </div>
     </header>
   );
@@ -116,7 +131,7 @@ function LocalizedHero({ locale, path }: { locale: LocalizedLocale; path: Locali
         <div className="relative min-h-[310px] overflow-hidden rounded-lg bg-[var(--navy-900)] md:min-h-[430px]">
           <Image
             src="/assets/applications/hero-edj.webp"
-            alt="GRIMM PUMP fire pump package"
+            alt={page.title}
             fill
             priority={path === "/"}
             className="object-cover"
@@ -197,6 +212,55 @@ function ApplicationCards({ locale }: { locale: LocalizedLocale }) {
         ))}
       </div>
     </section>
+  );
+}
+
+function LocalizedHomeLinks({ locale }: { locale: LocalizedLocale }) {
+  const content = localizedSite[locale];
+  const items: Array<{ path: LocalizedPath; image: string }> = [
+    { path: "/products", image: "/assets/applications/hero-edj.webp" },
+    { path: "/applications", image: "/assets/applications/diesel-site.webp" },
+    { path: "/factory", image: "/assets/factory/real/production-capacity.webp" },
+  ];
+  return (
+    <section className="section bg-[var(--grey-50)]" lang={content.htmlLang} dir={content.dir}>
+      <div className="container-shell grid gap-5 md:grid-cols-3">
+        {items.map((item) => (
+          <Link key={item.path} href={localizedPath(item.path, locale)} className="card overflow-hidden">
+            <div className="relative h-44 bg-slate-100">
+              <Image src={item.image} alt={content.pages[item.path].title} fill className="object-cover" sizes="(min-width: 768px) 33vw, 100vw" />
+            </div>
+            <div className="p-5">
+              <h2 className="text-xl font-black text-[var(--navy-950)]">{content.pages[item.path].title}</h2>
+              <p className="mt-3 text-sm leading-6 text-slate-600">{content.pages[item.path].text}</p>
+            </div>
+          </Link>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function LocalizedFooter({ locale }: { locale: LocalizedLocale }) {
+  const content = localizedSite[locale];
+  const navPaths: LocalizedPath[] = ["/products", "/applications", "/projects", "/factory", "/downloads", "/contact"];
+  return (
+    <footer className="bg-[var(--navy-950)] px-6 pb-20 pt-14 text-slate-300" lang={content.htmlLang} dir={content.dir}>
+      <div className="mx-auto grid max-w-[1240px] gap-10 md:grid-cols-[1.2fr_0.8fr]">
+        <div>
+          <Link href={localizedPath("/", locale)} className="flex items-center gap-3">
+            <Image src="/assets/images/logo.png" alt={`${company.shortName} logo`} width={42} height={42} className="invert" />
+            <strong className="text-white">{company.shortName}</strong>
+          </Link>
+          <p className="mt-5 max-w-xl text-sm leading-7">{content.home.text}</p>
+          <p className="mt-4 text-sm leading-7">{company.legalName}</p>
+          <a className="mt-2 block text-sm hover:text-white" href={`mailto:${company.email}`}>{company.email}</a>
+        </div>
+        <nav className="grid grid-cols-2 gap-3 text-sm font-bold" aria-label={`${content.localeName} footer navigation`}>
+          {navPaths.map((path) => <Link key={path} href={localizedPath(path, locale)} className="hover:text-white">{content.nav[path]}</Link>)}
+        </nav>
+      </div>
+    </footer>
   );
 }
 
@@ -289,8 +353,7 @@ export default async function LocalizedPage({ params }: LocalizedPageProps) {
         {isHome ? (
           <>
             <ProofSection locale={locale} />
-            <ProductCards locale={locale} />
-            <ApplicationCards locale={locale} />
+            <LocalizedHomeLinks locale={locale} />
             <ContactPanel locale={locale} />
           </>
         ) : pagePath === "/products" ? (
@@ -308,7 +371,7 @@ export default async function LocalizedPage({ params }: LocalizedPageProps) {
           <ResourceCards locale={locale} path={pagePath} />
         )}
       </main>
-      <Footer />
+      <LocalizedFooter locale={locale} />
       <StickyCta />
     </>
   );

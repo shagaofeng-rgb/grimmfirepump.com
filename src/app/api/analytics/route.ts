@@ -4,6 +4,7 @@ import { isAdminAuthenticated } from "@/lib/admin-auth";
 import type { AnalyticsEventRecord } from "@/lib/admin-data";
 import { getSiteSettings } from "@/lib/admin-cms";
 import { appendStore, createId, readStore } from "@/lib/local-store";
+import { checkRequestRateLimit } from "@/lib/request-rate-limit";
 
 const eventSchema = z.object({
   event: z.string().min(2).max(80),
@@ -82,6 +83,8 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  const rate = await checkRequestRateLimit(request, "analytics", { limit: 180, windowMs: 10 * 60 * 1000 });
+  if (!rate.allowed) return NextResponse.json({ error: "Too many requests" }, { status: 429, headers: { "Retry-After": String(rate.retryAfterSeconds) } });
   const body = await request.json().catch(() => null);
   const parsed = eventSchema.safeParse(body);
   if (!parsed.success) return NextResponse.json({ error: "Invalid analytics event" }, { status: 400 });

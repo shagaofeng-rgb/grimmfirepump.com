@@ -11,10 +11,10 @@ export default async function NewsPage() {
   return (
     <AdminShell>
       <AdminPageHeader
-        eyebrow="新闻管理"
-        title="新闻、博客和行业知识内容"
-        description="管理新闻、博客、行业知识、SEO 信息、推荐和置顶状态。"
-        action={<Link className="button button-primary" href="/admin/news/new">新增文章</Link>}
+        eyebrow="Blog 管理"
+        title="原创技术文章与采购指南"
+        description="管理 Blog 草稿、人工发布、SEO 信息、推荐和置顶状态；News 自动化内容在独立模块中管理。"
+        action={<Link className="button button-primary" href="/admin/news/new">新增 Blog</Link>}
       />
       <div className="mt-8 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
         <table className="w-full min-w-[980px] text-left text-sm">

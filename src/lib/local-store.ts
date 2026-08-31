@@ -18,6 +18,18 @@ function getSql() {
   return databaseUrl ? neon(databaseUrl) : null;
 }
 
+function mustUseDatabase() {
+  return Boolean(getDatabaseUrl()) && (process.env.NODE_ENV === "production" || Boolean(process.env.VERCEL));
+}
+
+function handleDatabaseFailure(message: string, error: unknown): never | void {
+  if (mustUseDatabase()) {
+    console.error(message, error);
+    throw error;
+  }
+  console.warn(`${message} Falling back to the local development store.`, error);
+}
+
 async function ensureSchema() {
   const sql = getSql();
   if (!sql) return;
@@ -75,7 +87,7 @@ export async function readStore<T>(fileName: string, fallback: T): Promise<T> {
       `;
       return rows.map((row) => row.payload) as T;
     } catch (error) {
-      console.warn(`Database read failed for ${fileName}; using local runtime store.`, error);
+      handleDatabaseFailure(`Database read failed for ${fileName}.`, error);
     }
   }
 
@@ -95,7 +107,7 @@ export async function appendStore<T extends { id: string; createdAt: string }>(f
       `;
       return item;
     } catch (error) {
-      console.warn(`Database write failed for ${fileName}; using local runtime store.`, error);
+      handleDatabaseFailure(`Database write failed for ${fileName}.`, error);
     }
   }
 
@@ -118,7 +130,7 @@ export async function writeStore<T extends { id: string; createdAt: string; upda
       ]);
       return items;
     } catch (error) {
-      console.warn(`Database write failed for ${fileName}; using local runtime store.`, error);
+      handleDatabaseFailure(`Database write failed for ${fileName}.`, error);
     }
   }
 
@@ -140,7 +152,7 @@ export async function upsertStore<T extends { id: string; createdAt: string; upd
       `;
       return item;
     } catch (error) {
-      console.warn(`Database upsert failed for ${fileName}; using local runtime store.`, error);
+      handleDatabaseFailure(`Database upsert failed for ${fileName}.`, error);
     }
   }
 
@@ -192,7 +204,7 @@ export async function acquireTaskLock(name: string, ttlMs = 10 * 60 * 1000) {
         await sql`DELETE FROM task_locks WHERE name = ${name} AND token = ${token}`;
       };
     } catch (error) {
-      console.warn(`Database lock failed for ${name}; using local runtime lock.`, error);
+      handleDatabaseFailure(`Database lock failed for ${name}.`, error);
     }
   }
 

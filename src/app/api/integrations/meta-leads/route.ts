@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { appendStore, createId } from "@/lib/local-store";
+import { createHash, createHmac, timingSafeEqual } from "node:crypto";
+import { appendStore } from "@/lib/local-store";
 import { scoreLead } from "@/lib/lead-scoring";
 
 type MetaField = {
@@ -43,6 +44,13 @@ function extractLeadFields(fieldData: MetaField[] = []) {
   }, {});
 }
 
+function validMetaSignature(body: string, signature: string, secret: string) {
+  const expected = `sha256=${createHmac("sha256", secret).update(body).digest("hex")}`;
+  const actualBuffer = Buffer.from(signature);
+  const expectedBuffer = Buffer.from(expected);
+  return actualBuffer.length === expectedBuffer.length && timingSafeEqual(actualBuffer, expectedBuffer);
+}
+
 export async function GET(request: Request) {
   const url = new URL(request.url);
   const mode = url.searchParams.get("hub.mode");
@@ -60,14 +68,33 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  if (!process.env.META_LEADS_VERIFY_TOKEN) {
+  const appSecret = process.env.META_APP_SECRET;
+  if (!process.env.META_LEADS_VERIFY_TOKEN || !appSecret) {
     return NextResponse.json({ error: "Meta Lead Ads 未配置" }, { status: 501 });
   }
 
-  const payload = (await request.json()) as MetaLeadPayload;
+  const contentLength = Number(request.headers.get("content-length") || 0);
+  if (contentLength > 1_000_000) {
+    return NextResponse.json({ error: "Payload too large" }, { status: 413 });
+  }
+  const rawBody = await request.text();
+  if (rawBody.length > 1_000_000) {
+    return NextResponse.json({ error: "Payload too large" }, { status: 413 });
+  }
+  const signature = request.headers.get("x-hub-signature-256") || "";
+  if (!validMetaSignature(rawBody, signature, appSecret)) {
+    return NextResponse.json({ error: "Invalid Meta webhook signature" }, { status: 401 });
+  }
+  let payload: MetaLeadPayload;
+  try {
+    payload = JSON.parse(rawBody) as MetaLeadPayload;
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON payload" }, { status: 400 });
+  }
   const now = new Date().toISOString();
+  const deliveryFingerprint = createHash("sha256").update(rawBody).digest("hex").slice(0, 32);
   const rawRecord = {
-    id: createId("meta"),
+    id: `meta_${deliveryFingerprint}`,
     createdAt: now,
     payload,
   };
@@ -92,8 +119,11 @@ export async function POST(request: Request) {
 
     if (!leadInput.name || !leadInput.email) continue;
     const scoring = scoreLead(leadInput);
+    const leadId = change.value.leadgen_id
+      ? `fb_${change.value.leadgen_id.replace(/[^a-zA-Z0-9_-]/g, "").slice(0, 120)}`
+      : `fb_${createHash("sha256").update(JSON.stringify(change.value)).digest("hex").slice(0, 32)}`;
     const lead = {
-      id: createId("fb"),
+      id: leadId,
       createdAt: now,
       stage: scoring.status,
       status: "new",

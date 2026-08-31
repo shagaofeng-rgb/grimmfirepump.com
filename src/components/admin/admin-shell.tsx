@@ -20,26 +20,27 @@ import {
   Users,
 } from "lucide-react";
 import { company } from "@/data/site";
-import { getCurrentAdmin } from "@/lib/admin-auth";
+import { getCurrentAdmin, type AdminRole } from "@/lib/admin-auth";
 import { getAdminData } from "@/lib/admin-data";
 
-const adminNav = [
-  { label: "数据概览", href: "/admin/dashboard", icon: LayoutDashboard },
-  { label: "产品管理", href: "/admin/products", icon: Boxes },
-  { label: "产品分类", href: "/admin/product-categories", icon: FolderTree },
-  { label: "产品知识库", href: "/admin/product-knowledge", icon: ScrollText },
-  { label: "新闻管理", href: "/admin/news", icon: Newspaper },
-  { label: "新闻自动化", href: "/admin/news-automation", icon: ListChecks },
-  { label: "媒体资源", href: "/admin/media", icon: ImageIcon },
-  { label: "客户询盘", href: "/admin/leads", icon: Inbox },
-  { label: "表单管理", href: "/admin/forms", icon: FileText },
-  { label: "访问分析", href: "/admin/analytics", icon: BarChart3 },
-  { label: "SEO 管理", href: "/admin/seo", icon: Search },
-  { label: "页面管理", href: "/admin/pages", icon: Home },
-  { label: "下载资料", href: "/admin/downloads", icon: Download },
-  { label: "账号与权限", href: "/admin/users", icon: Users },
-  { label: "操作日志", href: "/admin/logs", icon: ScrollText },
-  { label: "系统设置", href: "/admin/settings", icon: Settings },
+const allRoles: AdminRole[] = ["super_admin", "content_manager", "product_manager", "sales", "analyst"];
+const adminNav: Array<{ label: string; href: string; icon: typeof LayoutDashboard; roles: AdminRole[] }> = [
+  { label: "数据概览", href: "/admin/dashboard", icon: LayoutDashboard, roles: allRoles },
+  { label: "产品管理", href: "/admin/products", icon: Boxes, roles: ["super_admin", "product_manager"] },
+  { label: "产品分类", href: "/admin/product-categories", icon: FolderTree, roles: ["super_admin", "product_manager"] },
+  { label: "产品知识库", href: "/admin/product-knowledge", icon: ScrollText, roles: ["super_admin", "product_manager"] },
+  { label: "Blog 管理", href: "/admin/news", icon: Newspaper, roles: ["super_admin", "content_manager"] },
+  { label: "News 自动化", href: "/admin/news-automation", icon: ListChecks, roles: ["super_admin", "content_manager"] },
+  { label: "媒体资源", href: "/admin/media", icon: ImageIcon, roles: ["super_admin", "content_manager", "product_manager"] },
+  { label: "客户询盘", href: "/admin/leads", icon: Inbox, roles: ["super_admin", "sales"] },
+  { label: "表单管理", href: "/admin/forms", icon: FileText, roles: ["super_admin", "sales"] },
+  { label: "访问分析", href: "/admin/analytics", icon: BarChart3, roles: ["super_admin", "analyst"] },
+  { label: "SEO 管理", href: "/admin/seo", icon: Search, roles: ["super_admin"] },
+  { label: "页面管理", href: "/admin/pages", icon: Home, roles: ["super_admin", "content_manager"] },
+  { label: "下载资料", href: "/admin/downloads", icon: Download, roles: ["super_admin", "content_manager", "product_manager"] },
+  { label: "账号与权限", href: "/admin/users", icon: Users, roles: ["super_admin"] },
+  { label: "操作日志", href: "/admin/logs", icon: ScrollText, roles: ["super_admin"] },
+  { label: "系统设置", href: "/admin/settings", icon: Settings, roles: ["super_admin"] },
 ];
 
 function roleName(role?: string) {
@@ -55,6 +56,7 @@ function roleName(role?: string) {
 
 export async function AdminShell({ children }: { children: ReactNode }) {
   const [admin, data] = await Promise.all([getCurrentAdmin(), getAdminData()]);
+  const visibleNav = adminNav.filter((item) => admin && item.roles.includes(admin.role));
   const pendingLeads = data.inquiries.filter((item) => item.stage === "new" || item.stage === "qualified").length;
 
   return (
@@ -70,7 +72,7 @@ export async function AdminShell({ children }: { children: ReactNode }) {
           </span>
         </Link>
         <nav className="mt-7 grid max-h-[calc(100vh-142px)] gap-1 overflow-y-auto pr-1">
-          {adminNav.map((item) => (
+          {visibleNav.map((item) => (
             <Link key={item.href} href={item.href} className="flex min-h-10 items-center gap-3 rounded-md px-3 py-2 text-sm font-bold text-slate-300 hover:bg-white/10 hover:text-white">
               <item.icon size={17} />
               {item.label}
@@ -109,7 +111,7 @@ export async function AdminShell({ children }: { children: ReactNode }) {
             </div>
           </div>
           <nav className="mx-auto mt-4 flex max-w-7xl gap-2 overflow-x-auto pb-1 lg:hidden">
-            {adminNav.map((item) => (
+            {visibleNav.map((item) => (
               <Link key={item.href} href={item.href} className="shrink-0 rounded-md bg-slate-100 px-3 py-2 text-sm font-bold text-slate-700">
                 {item.label}
               </Link>

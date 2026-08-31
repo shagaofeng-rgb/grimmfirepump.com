@@ -3,9 +3,9 @@ import Link from "next/link";
 import { SectionHeading } from "@/components/section-heading";
 
 const images = [
-  { src: "/assets/factory/real/production-capacity.jpg", title: "Production capacity" },
-  { src: "/assets/factory/real/cnc-machining.jpg", title: "CNC machining" },
-  { src: "/assets/factory/real/controller-assembly.jpg", title: "Controller assembly" },
+  { src: "/assets/factory/real/production-capacity.webp", title: "Production capacity" },
+  { src: "/assets/factory/real/cnc-machining.webp", title: "CNC machining" },
+  { src: "/assets/factory/real/controller-assembly.webp", title: "Controller assembly" },
 ];
 
 export function FactoryPreviewSection() {

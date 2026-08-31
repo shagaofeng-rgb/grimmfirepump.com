@@ -376,8 +376,7 @@ export async function listProductCategories() {
 export async function listCmsProducts() {
   const items = await readStore<CmsProduct[]>("cms-products.json", []);
   if (items.length) {
-    const existing = new Set(items.map((item) => item.slug));
-    return [...items, ...productSeeds.filter((item) => !existing.has(item.slug))].sort((a, b) => a.sortOrder - b.sortOrder);
+    return [...items].sort((a, b) => a.sortOrder - b.sortOrder);
   }
   await writeStore("cms-products.json", productSeeds);
   return productSeeds;

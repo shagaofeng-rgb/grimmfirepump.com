@@ -79,7 +79,7 @@ const configuredSites = [
       desiredWordCount: { min: 700, max: 1000 }, ingestIntervalHours: 12, publishIntervalHours: 48,
       candidateMaxAgeHours: 72, fallbackCandidateMaxAgeDays: 7, minScore: 70, maxInternalProductLinks: 1, defaultAuthorType: "Editorial Team",
     },
-    blog: { enabled: true, listRoute: "/blog", detailRoutePattern: "/blog/[slug]", sitemapRoute: "/blog-sitemap.xml", contentSource: "cms-news.json (legacy Blog collection)", allowNewsAutomation: false },
+    blog: { enabled: true, listRoute: "/blog", detailRoutePattern: "/blog/[slug]", sitemapRoute: "/blog-sitemap.xml", contentSource: "cms-news.json (isolated Blog collection)", allowNewsAutomation: false },
     productThemePlan: { sourceType: "cms_collection", sourceReference: "cms-products.json", requiredFields: ["theme_id", "product_url", "product_name", "start_at", "end_at", "status"] },
     sources: {
       primaryWhitelist: [{ domain: "datacenterdynamics.com", type: "trade-media", allowedTopics: ["data center", "critical infrastructure"], allowedLanguages: ["en"], rssOrApiUrl: "https://www.datacenterdynamics.com/en/rss/", sourceTrustScore: 85 }],

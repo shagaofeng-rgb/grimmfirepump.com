@@ -25,7 +25,10 @@ export type AdminCredential = {
 };
 
 function getSecret() {
-  return process.env.ADMIN_SESSION_SECRET || process.env.ADMIN_PASSWORD_HASH || process.env.ADMIN_PASSWORD || "local-admin-development-secret";
+  const secret = process.env.ADMIN_SESSION_SECRET || process.env.ADMIN_PASSWORD_HASH || process.env.ADMIN_PASSWORD;
+  if (secret) return secret;
+  if (process.env.NODE_ENV === "production") throw new Error("Admin session secret is not configured.");
+  return "local-admin-development-secret";
 }
 
 export function getConfiguredAdminUser() {
@@ -140,6 +143,7 @@ export async function setAdminSessionCookie(remember = false) {
     secure: process.env.NODE_ENV === "production",
     path: "/",
     maxAge,
+    priority: "high",
   });
 }
 

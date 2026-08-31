@@ -2,9 +2,9 @@ import { SectionHeading } from "@/components/section-heading";
 
 export function VideoSection() {
   const videos = [
-    { title: "Factory Tour", src: "/assets/videos/factory-tour.mp4", poster: "/assets/factory/real/production-capacity.jpg" },
-    { title: "Dual Power Package", src: "/assets/videos/dual-power.mp4", poster: "/assets/factory/real/controller-assembly.jpg" },
-    { title: "Pump Truck Test", src: "/assets/videos/pump-truck-test.mp4", poster: "/assets/factory/real/cnc-machining.jpg" },
+    { title: "Factory Tour", src: "/assets/videos/factory-tour.mp4", poster: "/assets/factory/real/production-capacity.webp" },
+    { title: "Dual Power Package", src: "/assets/videos/dual-power.mp4", poster: "/assets/factory/real/controller-assembly.webp" },
+    { title: "Pump Truck Test", src: "/assets/videos/pump-truck-test.mp4", poster: "/assets/factory/real/cnc-machining.webp" },
   ];
 
   return (
