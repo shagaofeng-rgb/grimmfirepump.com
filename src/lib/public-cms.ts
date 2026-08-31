@@ -2,8 +2,8 @@ import { isLegacyImportedBlogSlug, listCmsNews, listCmsProducts, type CmsNews, t
 import { unstable_cache } from "next/cache";
 import { getProductDisplayName, getProductFamily } from "@/lib/product-taxonomy";
 
-const cachedCmsProducts = unstable_cache(listCmsProducts, ["public-cms-products-v1"], { revalidate: 300, tags: ["cms-products"] });
-const cachedCmsNews = unstable_cache(listCmsNews, ["public-cms-blog-v1"], { revalidate: 300, tags: ["cms-blog"] });
+const cachedCmsProducts = unstable_cache(listCmsProducts, ["public-cms-products-v2"], { revalidate: 300, tags: ["cms-products"] });
+const cachedCmsNews = unstable_cache(listCmsNews, ["public-cms-blog-v2"], { revalidate: 300, tags: ["cms-blog"] });
 
 export type PublicProduct = {
   slug: string;

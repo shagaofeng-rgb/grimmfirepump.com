@@ -87,6 +87,8 @@ The product Sitemap subsequently increased from 26 to 28 valid URLs.
 16. Search Console submission was incorrectly conditional on Sitemap content changing. A due submission now runs even when the digest is unchanged.
 17. The production Blog Webhook key was absent. The already verified local plugin key was restored to Vercel as `WEBHOOK_ARTICLE_SIGN` without exposing it.
 18. Production now has a dedicated randomly generated `REQUEST_RATE_LIMIT_SECRET`; admin password-hash verification is also configured.
+19. Vercel's persistent Data Cache retained a deleted marked Blog test across deployments. Signed Blog verification now invalidates the Blog collection, list, detail pattern and Blog Sitemap without writing an article.
+20. A transient Neon HTTP connection timeout correctly failed closed but interrupted one local build. Database reads now retry three times with bounded exponential backoff and reset a rejected schema-initialization promise; the following clean build generated 172 pages with no marked test route.
 
 ### Confirmed normal
 

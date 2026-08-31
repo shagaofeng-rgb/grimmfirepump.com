@@ -109,6 +109,15 @@ function isPublishableArticle(title: string, content: string) {
   return title.trim().length >= 2 && plainText(content).length >= 20;
 }
 
+function revalidatePublicBlog(slug?: string) {
+  revalidateTag("cms-blog");
+  revalidateTag("sitemap-data");
+  revalidatePath("/blog");
+  revalidatePath("/blog/[slug]", "page");
+  revalidatePath("/blog-sitemap.xml");
+  if (slug) revalidatePath(`/blog/${slug}`);
+}
+
 async function recordFailure(action: string, target: string) {
   try {
     await logAudit({ actor: "blog_webhook", action, target: target.slice(0, 120), result: "failed" });
@@ -135,8 +144,12 @@ export async function POST(request: Request) {
     }
 
     // Custom framework verification sends only a signed class_id (or short placeholders).
-    // It is intentionally accepted without creating a database record.
-    if (!isPublishableArticle(parsed.data.title, parsed.data.content)) return response(1, "验证成功");
+    // It never creates a record, but it also serves as an authenticated cache sync
+    // point after an operator removes or withdraws a Blog entry in the database.
+    if (!isPublishableArticle(parsed.data.title, parsed.data.content)) {
+      revalidatePublicBlog();
+      return response(1, "验证成功");
+    }
 
     const now = new Date().toISOString();
     const content = plainText(parsed.data.content);
@@ -174,10 +187,7 @@ export async function POST(request: Request) {
     await cmsStore.upsertNews(item);
     await logAudit({ actor: "blog_webhook", action: existing ? "update_webhook_blog" : "publish_webhook_blog", target: item.id, result: "success" });
     await markSitemapDirty("external_blog_webhook");
-    revalidateTag("cms-blog");
-    revalidateTag("sitemap-data");
-    revalidatePath("/blog");
-    revalidatePath(`/blog/${item.slug}`);
+    revalidatePublicBlog(item.slug);
     revalidatePath("/sitemap.xml");
     revalidatePath("/sitemaps/[file]", "page");
     return response(1, "发布成功");

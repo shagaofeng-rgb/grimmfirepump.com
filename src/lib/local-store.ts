@@ -48,7 +48,30 @@ async function ensureSchema() {
       ON lead_store (store_name, created_at DESC)
     `,
   ]).then(() => undefined);
-  await schemaReady;
+  try {
+    await schemaReady;
+  } catch (error) {
+    // A transient Neon connection failure must not leave a rejected promise
+    // cached for the lifetime of the server or build worker.
+    schemaReady = null;
+    throw error;
+  }
+}
+
+async function withDatabaseReadRetry<T>(operation: () => Promise<T>, attempts = 3) {
+  let lastError: unknown;
+  for (let attempt = 0; attempt < attempts; attempt += 1) {
+    try {
+      return await operation();
+    } catch (error) {
+      lastError = error;
+      schemaReady = null;
+      if (attempt + 1 < attempts) {
+        await new Promise((resolve) => setTimeout(resolve, 300 * 2 ** attempt));
+      }
+    }
+  }
+  throw lastError;
 }
 
 async function ensureRuntimeDir() {
@@ -78,13 +101,15 @@ export async function readStore<T>(fileName: string, fallback: T): Promise<T> {
   const sql = getSql();
   if (sql) {
     try {
-      await ensureSchema();
-      const rows = await sql`
-        SELECT payload
-        FROM lead_store
-        WHERE store_name = ${fileName}
-        ORDER BY created_at DESC
-      `;
+      const rows = await withDatabaseReadRetry(async () => {
+        await ensureSchema();
+        return sql`
+          SELECT payload
+          FROM lead_store
+          WHERE store_name = ${fileName}
+          ORDER BY created_at DESC
+        `;
+      });
       return rows.map((row) => row.payload) as T;
     } catch (error) {
       handleDatabaseFailure(`Database read failed for ${fileName}.`, error);
