@@ -1,31 +1,37 @@
-import Image from "next/image";
-import Link from "next/link";
-import { SectionHeading } from "@/components/section-heading";
+import { Factory, FilePenLine, Folder } from "lucide-react";
 
-const images = [
-  { src: "/assets/factory/real/production-capacity.webp", title: "Production capacity" },
-  { src: "/assets/factory/real/cnc-machining.webp", title: "CNC machining" },
-  { src: "/assets/factory/real/controller-assembly.webp", title: "Controller assembly" },
+const items = [
+  {
+    title: "System configuration",
+    text: "Match the pump discussion to the duty point, source condition and installation inputs.",
+    Icon: FilePenLine,
+  },
+  {
+    title: "Project documents",
+    text: "Confirm the available information your team needs to review and coordinate.",
+    Icon: Folder,
+  },
+  {
+    title: "Factory & testing",
+    text: "Review published manufacturing, assembly and testing evidence for the package.",
+    Icon: Factory,
+  },
 ];
 
 export function FactoryPreviewSection() {
   return (
-    <section className="section">
-      <SectionHeading
-        eyebrow="Factory Strength"
-        title="Real manufacturing evidence behind every project package."
-        text="A focused look at production scale, pump-component machining and control-cabinet assembly."
-        action={<Link className="button button-secondary min-h-11" href="/factory">View Factory</Link>}
-      />
-      <div className="container-shell grid gap-4 md:grid-cols-3">
-        {images.map((image) => (
-          <figure key={image.src} className="relative m-0 h-[220px] overflow-hidden rounded-lg bg-slate-100 md:h-[260px]">
-            <Image src={image.src} alt={image.title} fill loading="lazy" className="object-cover" sizes="(min-width: 768px) 33vw, 100vw" />
-            <figcaption className="absolute bottom-4 left-4 bg-[rgba(7,20,38,0.84)] px-3 py-2 text-sm font-bold text-white">
-              {image.title}
-            </figcaption>
-          </figure>
-        ))}
+    <section className="home-practical">
+      <div className="home-section-inner">
+        <h2>Built for practical review.</h2>
+        <div className="home-practical-grid">
+          {items.map(({ title, text, Icon }) => (
+            <article key={title}>
+              <Icon size={47} strokeWidth={1.25} />
+              <h3>{title}</h3>
+              <p>{text}</p>
+            </article>
+          ))}
+        </div>
       </div>
     </section>
   );
