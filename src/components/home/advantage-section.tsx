@@ -1,27 +1,39 @@
-import { advantages } from "@/data/site";
-import { SectionHeading } from "@/components/section-heading";
+import Link from "next/link";
+import { ArrowRight, Droplets, Gauge, Waves, Zap } from "lucide-react";
+
+const inputs = [
+  { title: "Flow", text: "Required fire-water demand", Icon: Waves },
+  { title: "Head", text: "Required pressure or total head", Icon: Gauge },
+  { title: "Power", text: "Electric supply or diesel drive", Icon: Zap },
+  { title: "Water source", text: "Tank, reservoir or supply condition", Icon: Droplets },
+];
 
 export function AdvantageSection() {
   return (
-    <section className="section">
-      <SectionHeading
-        eyebrow="Why Choose GRIMM"
-        title="Built for project buyers who need certainty before shipment."
-        text="Overseas fire protection buyers do not only need a pump. They need a configured system, clear documents, reliable testing and a supplier who can reply with engineering details."
-      />
-      <div className="container-shell grid gap-px overflow-hidden rounded-lg border border-slate-200 bg-slate-200 md:grid-cols-2 xl:grid-cols-4">
-        {advantages.map((item) => {
-          const Icon = item.icon;
-          return (
-            <article key={item.title} className="min-h-[190px] bg-white p-5 md:min-h-[215px] md:p-6">
-              <div className="mb-5">
-                <Icon className="text-[var(--orange)]" size={24} />
-              </div>
-              <h3 className="text-base font-black leading-tight text-[var(--navy-950)] md:text-xl">{item.title}</h3>
-              <p className="mt-3 text-xs leading-5 text-slate-600 md:text-sm md:leading-6">{item.text}</p>
+    <section className="home-inputs-section">
+      <div className="container-shell py-16 md:py-20">
+        <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p className="home-kicker">Start with the project</p>
+            <h2 className="home-display mt-3 max-w-3xl text-3xl leading-tight text-white md:text-[44px]">
+              The inputs that shape the package.
+            </h2>
+          </div>
+          <Link href="/tools/fire-pump-selector" className="home-text-link">
+            Use fire pump selector
+            <ArrowRight size={18} />
+          </Link>
+        </div>
+
+        <div className="mt-10 grid gap-px overflow-hidden border border-white/10 bg-white/10 sm:grid-cols-2 lg:grid-cols-4">
+          {inputs.map(({ title, text, Icon }) => (
+            <article key={title} className="min-h-[190px] bg-[var(--navy-900)] p-6 md:p-7">
+              <Icon size={28} strokeWidth={1.6} className="text-[var(--orange)]" />
+              <h3 className="mt-8 text-xl font-black text-white">{title}</h3>
+              <p className="mt-2 text-sm leading-6 text-slate-400">{text}</p>
             </article>
-          );
-        })}
+          ))}
+        </div>
       </div>
     </section>
   );
