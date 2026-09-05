@@ -21,7 +21,7 @@ export function Hero() {
             Fire pump packages shaped around your duty, water source and project documentation needs.
           </p>
           <div className="mt-9 flex flex-col gap-4 sm:flex-row sm:items-center">
-            <Link className="button home-button-primary" href="/contact">
+            <Link className="button home-button-primary" href="#project-brief" data-event="project_brief_click">
               Request technical review
             </Link>
             <Link className="home-text-link" href="/products">

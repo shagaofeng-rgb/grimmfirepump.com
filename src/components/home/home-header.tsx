@@ -33,7 +33,7 @@ export function HomeHeader() {
         </nav>
 
         <div className="flex items-center gap-3">
-          <Link href="/contact" className="home-header-cta hidden sm:inline-flex">
+          <Link href="#project-brief" data-event="project_brief_click" className="home-header-cta hidden sm:inline-flex">
             Send project brief
             <ArrowRight size={16} />
           </Link>
@@ -62,7 +62,7 @@ export function HomeHeader() {
                 {item.label}
               </Link>
             ))}
-            <Link href="/contact" className="home-header-cta mt-4" onClick={() => setOpen(false)}>
+            <Link href="#project-brief" data-event="project_brief_click" className="home-header-cta mt-4" onClick={() => setOpen(false)}>
               Send project brief
               <ArrowRight size={16} />
             </Link>
