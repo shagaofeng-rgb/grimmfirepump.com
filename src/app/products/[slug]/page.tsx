@@ -348,16 +348,8 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
         value: spec.value,
       };
     }),
-    offers: {
-      "@type": "Offer",
-      url: productUrl,
-      priceCurrency: "USD",
-      availability: "https://schema.org/InStock",
-      seller: {
-        "@type": "Organization",
-        name: company.name,
-      },
-    },
+    // No Offer schema is emitted until price and availability are verified for
+    // this exact configuration. Product facts must not imply live stock.
   };
   const breadcrumbSchema = {
     "@context": "https://schema.org",

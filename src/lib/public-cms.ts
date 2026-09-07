@@ -74,13 +74,16 @@ function productDetailLines(item: CmsProduct) {
 }
 
 function mapProduct(item: CmsProduct): PublicProduct {
+  // The CMS historically contains mixed-case slugs. Public URLs are normalized
+  // to lowercase so links, canonical tags and Sitemaps describe one URL only.
+  const slug = item.slug.trim().toLowerCase();
   const family = getProductFamily(item.slug, item.title, item.categoryName);
   const image = item.mainImage || "/assets/products/edj-package.webp";
   const gallery = item.gallery.length ? item.gallery : [image];
   return {
-    slug: item.slug,
+    slug,
     updatedAt: item.updatedAt || item.createdAt,
-    canonicalUrl: `/products/${item.slug}`,
+    canonicalUrl: `/products/${slug}`,
     indexable: item.indexable,
     sourceUrl: "",
     title: getProductDisplayName(item.slug, item.title),
@@ -123,7 +126,7 @@ export async function getPublicProducts() {
 }
 
 export async function getPublicProduct(slug: string) {
-  return (await getPublicProducts()).find((item) => item.slug === slug);
+  return (await getPublicProducts()).find((item) => item.slug === slug.trim().toLowerCase());
 }
 
 export async function getPublicPosts() {

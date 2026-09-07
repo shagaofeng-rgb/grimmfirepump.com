@@ -2,9 +2,12 @@ import Link from "next/link";
 import { Activity, ArrowRight, BarChart3, Globe2, Inbox } from "lucide-react";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { AnalyticsRefresh } from "@/components/admin/analytics-refresh";
+import { SearchConsoleCheck } from "@/components/admin/search-console-check";
 import { AdminCard, AdminPageHeader, EmptyState, StatCard } from "@/components/admin/admin-widgets";
 import { getAdminData } from "@/lib/admin-data";
 import { getAnalyticsSummary } from "@/lib/visitor-analytics";
+import { getSearchConsoleConfiguration } from "@/lib/search-console";
+import { listSitemapRuns } from "@/lib/sitemap-service";
 
 export const dynamic = "force-dynamic";
 
@@ -15,8 +18,10 @@ function isToday(date: string) {
 }
 
 export default async function AdminDashboardPage() {
-  const data = await getAdminData();
+  const [data, sitemapRuns] = await Promise.all([getAdminData(), listSitemapRuns()]);
   const traffic = getAnalyticsSummary(data.events);
+  const searchConsole = getSearchConsoleConfiguration();
+  const latestSitemapRun = sitemapRuns[0] || null;
   const todayLeads = data.inquiries.filter((item) => isToday(item.createdAt)).length;
   const highIntent = data.inquiries.filter((item) => item.score >= 60 || item.intent === "A").length;
 
@@ -41,6 +46,23 @@ export default async function AdminDashboardPage() {
         <Link href="/admin/leads"><StatCard label="客户询盘" value={data.totals.inquiries} hint={"今日 " + todayLeads + " · 高意向 " + highIntent} /></Link>
         <Link href="/admin/analytics"><StatCard label="转化动作" value={traffic.conversions.length} hint="询盘、下载、WhatsApp、报价" /></Link>
       </div>
+      <section className="mt-8 grid gap-6 xl:grid-cols-2">
+        <AdminCard title="Google 收录连接状态">
+          <div className="grid gap-3 text-sm">
+            <div className="flex flex-wrap items-center justify-between gap-2 rounded-md bg-slate-50 p-3"><span className="font-bold text-slate-700">自动提交</span><strong className={searchConsole.status === "ready" ? "text-emerald-700" : "text-amber-700"}>{searchConsole.status === "ready" ? "已配置，待连接验证" : searchConsole.status === "disabled" ? "未启用" : "配置不完整"}</strong></div>
+            <p className="leading-6 text-slate-600">{searchConsole.message}</p>
+            <p className="leading-6 text-slate-500">属性：{searchConsole.siteUrl || "未配置"}<br />Sitemap：{searchConsole.sitemapUrl || "未配置"}</p>
+            <SearchConsoleCheck />
+          </div>
+        </AdminCard>
+        <AdminCard title="最近 Sitemap 维护">
+          {latestSitemapRun ? <div className="grid gap-3 text-sm">
+            <div className="flex flex-wrap items-center justify-between gap-2 rounded-md bg-slate-50 p-3"><span className="font-bold text-slate-700">运行结果</span><strong>{latestSitemapRun.status}</strong></div>
+            <p className="text-slate-600">完成时间：{new Date(latestSitemapRun.finishedAt).toLocaleString("zh-CN")}</p>
+            <p className="text-slate-600">Google：{latestSitemapRun.searchConsole.status} · {latestSitemapRun.searchConsole.message}</p>
+          </div> : <EmptyState text="尚无可读取的 Sitemap 运行记录。" />}
+        </AdminCard>
+      </section>
       <div className="mt-8 grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
         <AdminCard title="最近真实访客">
           <div className="mb-5 flex items-center justify-between gap-4 rounded-md bg-emerald-50 px-3 py-2 text-sm font-bold text-emerald-800"><span className="flex items-center gap-2"><Activity size={16} /> 自动同步中</span><span>{traffic.recentActivity.length} 条活动</span></div>
