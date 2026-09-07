@@ -28,7 +28,10 @@ export const metadata: Metadata = {
     description: "Factory-built fire pump systems for industrial, commercial and infrastructure projects worldwide.",
     images: ["/assets/applications/hero-edj.webp"],
   },
-  verification: {\n    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || undefined,\n  },\n  icons: {
+  verification: {
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || undefined,
+  },
+  icons: {
     icon: "/assets/images/logo.png",
     shortcut: "/assets/images/logo.png",
     apple: "/assets/images/logo.png",
