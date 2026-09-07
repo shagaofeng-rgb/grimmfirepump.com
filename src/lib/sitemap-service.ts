@@ -143,7 +143,8 @@ async function buildSitemapBundleUncached(): Promise<SitemapBundle> {
   }
 
   for (const product of products) {
-    const pathname = `/products/${product.slug}`;
+    const normalizedSlug = product.slug.trim().toLowerCase();
+    const pathname = `/products/${normalizedSlug}`;
     if (product.status !== "published" || !product.indexable) {
       skipped.push(`${pathname}: unpublished or noindex`);
       continue;
@@ -288,10 +289,12 @@ export async function runSitemapMaintenance(options: {
       await writeStore(DIRTY_STORE, []);
     }
 
-    const googleSubmissionWindow = Boolean(options.submit && !options.dryRun);
+    // A sitemap is a crawl hint, not a per-run push queue. Submit only when the
+    // 48-hour window is open and the canonical URL set actually changed.
+    const googleSubmissionWindow = Boolean(options.submit && !options.dryRun && changed);
     const searchConsole = googleSubmissionWindow
       ? await submitSitemapToSearchConsole()
-      : { attempted: false, success: false, status: "disabled" as const, message: "Google submission window is not due." };
+      : { attempted: false, success: false, status: "disabled" as const, message: changed ? "Google submission window is not due." : "Sitemap is unchanged; Google submission was not repeated." };
     const finishedAt = new Date().toISOString();
     const run: SitemapRun = {
       id: createId("sitemap_run"),
@@ -317,6 +320,14 @@ export async function runSitemapMaintenance(options: {
       message: options.dryRun ? "Dry run completed; no files or manifest were changed." : changed ? "Sitemap generated and verified." : "Sitemap already matches public content.",
     };
     await saveRun(run);
+    console.info("sitemap_maintenance", JSON.stringify({
+      trigger: run.trigger,
+      status: run.status,
+      changed,
+      googleSubmissionWindow: run.googleSubmissionWindow,
+      searchConsoleStatus: run.searchConsole.status,
+      searchConsoleSuccess: run.searchConsole.success,
+    }));
     return run;
   } catch (error) {
     const finishedAt = new Date().toISOString();
