@@ -80,7 +80,7 @@ function mapProduct(item: CmsProduct): PublicProduct {
   return {
     slug: item.slug,
     updatedAt: item.updatedAt || item.createdAt,
-    canonicalUrl: `/products/${item.slug}`,
+    canonicalUrl: `/products/${slug}`,
     indexable: item.indexable,
     sourceUrl: "",
     title: getProductDisplayName(item.slug, item.title),
