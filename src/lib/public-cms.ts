@@ -126,7 +126,7 @@ export async function getPublicProducts() {
 }
 
 export async function getPublicProduct(slug: string) {
-  return (await getPublicProducts()).find((item) => item.slug === slug);
+  return (await getPublicProducts()).find((item) => item.slug === slug.trim().toLowerCase());
 }
 
 export async function getPublicPosts() {
