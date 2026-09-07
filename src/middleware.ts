@@ -4,8 +4,8 @@ import { legacyUrlDecision } from "@/lib/legacy-url-governance";
 const ADMIN_COOKIE_NAME = "grimm_admin_session";
 const localePattern = /^\/(es|ru|ar|fr|pt)(?:\/|$)/;
 const productRedirects: Record<string, string> = {
-  "/products/GW-Sewage-Pump-Series-Set": "/products/GW-Sewage-Pump-Series-Pump",
-  "/products/LW-Sewage-Pump-Series-Set": "/products/LW-Sewage-Pump-Series-Pump",
+  "/products/GW-Sewage-Pump-Series-Set": "/products/gw-sewage-pump-series-pump",
+  "/products/LW-Sewage-Pump-Series-Set": "/products/lw-sewage-pump-series-pump",
 };
 
 function bytesToHex(bytes: ArrayBuffer) {
@@ -84,10 +84,19 @@ export async function middleware(request: NextRequest) {
     return NextResponse.rewrite(target);
   }
 
-  const productRedirect = productRedirects[pathname];
+  const productRedirect = Object.entries(productRedirects)
+    .find(([source]) => source.toLowerCase() === pathname.toLowerCase())?.[1];
   if (productRedirect) {
     const target = request.nextUrl.clone();
     target.pathname = productRedirect;
+    target.search = "";
+    return NextResponse.redirect(target, 301);
+  }
+  // Google crawls the URLs written in a Sitemap exactly. Keep historical mixed-case
+  // product links on a permanent redirect so only one canonical URL is indexable.
+  if (pathname.startsWith("/products/") && pathname !== pathname.toLowerCase()) {
+    const target = request.nextUrl.clone();
+    target.pathname = pathname.toLowerCase();
     target.search = "";
     return NextResponse.redirect(target, 301);
   }
