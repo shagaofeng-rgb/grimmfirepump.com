@@ -1,4 +1,5 @@
-// A changed canonical sitemap is re-submitted at most once every 48 hours.\nexport const GOOGLE_SITEMAP_SUBMIT_INTERVAL_MS = 48 * 60 * 60 * 1000;
+// A changed canonical sitemap is re-submitted at most once every 48 hours.
+export const GOOGLE_SITEMAP_SUBMIT_INTERVAL_MS = 48 * 60 * 60 * 1000;
 
 type SubmissionRun = {
   finishedAt?: string;
