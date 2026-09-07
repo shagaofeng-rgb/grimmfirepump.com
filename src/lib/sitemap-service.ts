@@ -22,7 +22,7 @@ import {
 const MANIFEST_STORE = "sitemap-manifest.json";
 const RUNS_STORE = "sitemap-runs.json";
 const DIRTY_STORE = "sitemap-dirty.json";
-const STATIC_CONTENT_UPDATED_AT = "2026-07-10T00:00:00.000Z";
+// Updated when shared editorial pages change. Product, Blog and News dates come from their records.\nconst STATIC_CONTENT_UPDATED_AT = "2026-09-05T06:19:20.000Z";
 const GROUPS: SitemapGroup[] = ["pages", "products", "knowledge", "categories"];
 
 export type SitemapManifest = {
@@ -90,7 +90,7 @@ function canonicalIsSelf(canonical: string, expectedPath: string) {
 }
 
 function safeSlug(slug: string) {
-  return /^[A-Za-z0-9]+(?:-[A-Za-z0-9]+)*$/.test(slug);
+  return /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug);
 }
 
 function latestDate(values: string[], fallback = STATIC_CONTENT_UPDATED_AT) {
@@ -148,7 +148,7 @@ async function buildSitemapBundleUncached(): Promise<SitemapBundle> {
       skipped.push(`${pathname}: unpublished or noindex`);
       continue;
     }
-    if (!safeSlug(product.slug) || !canonicalIsSelf(product.canonicalUrl, pathname)) {
+    if (!safeSlug(normalizedSlug) || !canonicalIsSelf(product.canonicalUrl?.toLowerCase(), pathname)) {
       skipped.push(`${pathname}: invalid slug or non-self canonical`);
       continue;
     }
