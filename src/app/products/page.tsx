@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { ProductSection } from "@/components/home/product-section";
 import { SimplePage } from "@/components/simple-page";
 import { localizedAlternates } from "@/lib/i18n";
+import { getPageNumber } from "@/components/content-pagination";
 
 export const metadata: Metadata = {
   title: "Fire Pump Products and Water System Catalog",
@@ -12,18 +13,18 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 type ProductsPageProps = {
-  searchParams: Promise<{ group?: string }>;
+  searchParams: Promise<{ group?: string; page?: string }>;
 };
 
 export default async function ProductsPage({ searchParams }: ProductsPageProps) {
-  const { group } = await searchParams;
+  const { group, page } = await searchParams;
   return (
     <SimplePage
       eyebrow="Product Center"
       title="Official GRIMM product catalog for fire pump and water system projects."
       text="Synchronized from the current GRIMM website, including fire pump packages, diesel and electric fire pumps, jockey pumps, booster systems, sewage pumps and water supply equipment."
     >
-      <ProductSection group={group} />
+      <ProductSection group={group} page={getPageNumber(page)} />
     </SimplePage>
   );
 }

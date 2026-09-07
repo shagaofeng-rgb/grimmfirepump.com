@@ -13,9 +13,24 @@ import { getRelatedNewsForProduct } from "@/lib/news-automation";
 import { getPublicProduct, getPublicProducts, type PublicProduct } from "@/lib/public-cms";
 import { getProductKnowledge } from "@/lib/product-knowledge";
 
-type ProductPageProps = { params: Promise<{ slug: string }> };
+type ProductPageProps = {
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<{ view?: string }>;
+};
+type ProductMetadataProps = { params: Promise<{ slug: string }> };
 type Product = PublicProduct;
 type DetailImage = { src: string; alt: string };
+
+const productViews = [
+  { id: "overview", label: "Overview" },
+  { id: "configuration", label: "Configuration" },
+  { id: "technical", label: "Technical Data" },
+  { id: "applications", label: "Applications" },
+  { id: "resources", label: "Resources" },
+  { id: "quote", label: "Get Quote" },
+] as const;
+
+type ProductView = (typeof productViews)[number]["id"];
 
 const ignoredTableLabels = new Set(["Pump", "Model", "Capacity(GPM)", "Head(BAR)", "Power(KW)", "Material", "FQA:"]);
 
@@ -26,7 +41,7 @@ export async function generateStaticParams() {
   return products.map((product) => ({ slug: product.slug }));
 }
 
-export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: ProductMetadataProps): Promise<Metadata> {
   const { slug } = await params;
   const product = await getPublicProduct(slug);
   if (!product) return {};
@@ -79,6 +94,20 @@ function splitSpec(line: string) {
   const [label, ...value] = line.split(":");
   if (!value.length) return { label: "Specification", value: line };
   return { label: label.trim(), value: value.join(":").trim() };
+}
+
+function getProductView(value: string | undefined): ProductView {
+  return productViews.some((view) => view.id === value) ? (value as ProductView) : "overview";
+}
+
+function groupTechnicalLines(lines: string[]) {
+  const groups = [
+    { title: "Key selection data", lines: lines.slice(0, 6) },
+    { title: "Configuration details", lines: lines.slice(6, 12) },
+    { title: "Additional project data", lines: lines.slice(12) },
+  ];
+
+  return groups.filter((group) => group.lines.length);
 }
 
 function getStructureItems(product: Product) {
@@ -203,7 +232,7 @@ function ProductImageGrid({ images, title }: { images: DetailImage[]; title: str
             />
           </div>
           <figcaption className="border-t border-slate-200 bg-white px-4 py-3 text-xs font-bold text-slate-500">
-            {index + 1 < 10 ? `0${index + 1}` : index + 1} · {title}
+            {title} image {index + 1}
           </figcaption>
         </figure>
       ))}
@@ -250,11 +279,15 @@ function ProductSidebar({ activeSlug }: { activeSlug: string }) {
           <h2 className="mt-2 text-xl font-black">Browse by category</h2>
         </div>
         <div className="max-h-[calc(100vh-220px)] overflow-y-auto p-4">
-          {productMegaMenuGroups.map((group) => (
-            <section key={group.title} className="border-b border-slate-100 py-4 first:pt-0 last:border-b-0">
-              <Link href={group.href} className="text-sm font-black text-[var(--navy-950)]">
-                {group.title}
-              </Link>
+          {productMegaMenuGroups.map((group) => {
+            const groupHasActiveProduct = group.items.some((item) => item.href.endsWith(`/${activeSlug}`));
+
+            return (
+            <details key={group.title} className="border-b border-slate-100 py-3 first:pt-0 last:border-b-0" open={groupHasActiveProduct}>
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-black text-[var(--navy-950)] marker:content-none">
+                <span>{group.title}</span>
+                <span aria-hidden="true" className="text-xs text-[var(--orange)]">+</span>
+              </summary>
               <div className="mt-3 grid gap-1">
                 {group.items.map((item) => {
                   const slug = item.href.split("/").pop();
@@ -272,8 +305,9 @@ function ProductSidebar({ activeSlug }: { activeSlug: string }) {
                   );
                 })}
               </div>
-            </section>
-          ))}
+            </details>
+            );
+          })}
         </div>
       </div>
     </aside>
@@ -300,8 +334,30 @@ function ContentCard({
   );
 }
 
-export default async function ProductDetailPage({ params }: ProductPageProps) {
+function ProductViewNavigation({ slug, activeView }: { slug: string; activeView: ProductView }) {
+  return (
+    <nav aria-label="Product information sections" className="flex min-w-0 gap-2 overflow-x-auto border-b border-slate-200 pb-3">
+      {productViews.map((view) => (
+        <Link
+          key={view.id}
+          href={view.id === "overview" ? `/products/${slug}` : `/products/${slug}?view=${view.id}`}
+          aria-current={activeView === view.id ? "page" : undefined}
+          className={`shrink-0 rounded-md px-4 py-2.5 text-sm font-black transition ${
+            activeView === view.id
+              ? "bg-[var(--navy-950)] text-white"
+              : "bg-white text-[var(--navy-900)] hover:bg-orange-50 hover:text-[var(--orange-dark)]"
+          }`}
+        >
+          {view.label}
+        </Link>
+      ))}
+    </nav>
+  );
+}
+
+export default async function ProductDetailPage({ params, searchParams }: ProductPageProps) {
   const { slug } = await params;
+  const { view: viewParam } = await searchParams;
   const [products, relatedNews] = await Promise.all([getPublicProducts(), getRelatedNewsForProduct(slug, 3)]);
   const product = products.find((item) => item.slug === slug);
   if (!product) notFound();
@@ -321,6 +377,8 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
   const productUrl = `${company.website}/products/${product.slug}`;
   const metaDescription = productMetaDescription(product);
   const knowledge = getProductKnowledge(product.slug, product.title, product.category);
+  const activeView = getProductView(viewParam);
+  const technicalGroups = groupTechnicalLines(technicalLines);
   const productSchema = {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -400,8 +458,8 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
                 ))}
               </ul>
               <div className="mt-8 flex flex-wrap gap-4">
-                <Link className="button button-primary" href="#product-quote">Get Quote</Link>
-                <Link className="button button-secondary" href="#technical-data">Technical Data</Link>
+                <Link className="button button-primary" href={`/products/${product.slug}?view=quote`}>Get Quote</Link>
+                <Link className="button button-secondary" href={`/products/${product.slug}?view=technical`}>Technical Data</Link>
               </div>
             </div>
           </div>
@@ -410,42 +468,31 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
         <section className="container-shell grid gap-8 py-12 lg:grid-cols-[290px_1fr]">
           <ProductSidebar activeSlug={product.slug} />
 
-          <div className="grid min-w-0 gap-8">
-            <nav aria-label="Product section navigation" className="sticky top-20 z-20 flex min-w-0 gap-1 overflow-x-auto rounded-lg border border-slate-200 bg-white p-2 shadow-[0_12px_30px_rgba(7,20,38,0.08)]">
-              {[
-                ["overview", "Product Overview"],
-                ["structure", "Product Structure"],
-                ["applications", "Applications"],
-                ["technical-data", "Technical Data"],
-              ].map(([id, label]) => (
-                <a key={id} className="shrink-0 rounded-md px-4 py-2.5 text-sm font-black text-[var(--navy-900)] transition hover:bg-orange-50 hover:text-[var(--orange-dark)]" href={`#${id}`}>
-                  {label}
-                </a>
-              ))}
-            </nav>
+          <div className="grid min-w-0 content-start gap-7">
+            <ProductViewNavigation slug={product.slug} activeView={activeView} />
 
-            <ContentCard id="overview" eyebrow="Product Overview" title="Product overview">
+            {activeView === "overview" ? <ContentCard id="overview" eyebrow="Product overview" title="Product overview">
               <div className="grid gap-4 text-base leading-8 text-slate-600">
                 {overviewLines.map((line) => (
                   <p key={line}>{line}</p>
                 ))}
               </div>
               <ProductImageGrid images={overviewImages} title={`${product.title} overview image`} />
-            </ContentCard>
+            </ContentCard> : null}
 
-            <ContentCard id="structure" eyebrow="Product Structure" title="Main structure and package scope">
+            {activeView === "configuration" ? <ContentCard id="configuration" eyebrow="Configuration" title="Main structure and package scope">
               <div className="grid gap-4 md:grid-cols-2">
                 {structureItems.map((item, index) => (
                   <div key={item} className="rounded-md bg-slate-50 p-5">
-                    <span className="text-sm font-black text-[var(--orange)]">0{index + 1}</span>
+                    <span className="text-sm font-black text-[var(--orange)]">Component {index + 1}</span>
                     <p className="mt-2 text-sm font-bold leading-6 text-slate-700">{item}</p>
                   </div>
                 ))}
               </div>
               <ProductImageGrid images={structureImages.length ? structureImages : overviewImages} title={`${product.title} structure image`} />
-            </ContentCard>
+            </ContentCard> : null}
 
-            <ContentCard id="applications" eyebrow="Applications" title="Recommended project applications">
+            {activeView === "applications" ? <ContentCard id="applications" eyebrow="Applications" title="Recommended project applications">
               <div className="grid gap-4 md:grid-cols-2">
                 {applicationItems.map((item) => (
                   <div key={item} className="flex items-center gap-3 rounded-md border border-slate-200 p-4">
@@ -459,25 +506,41 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
               <div className="mt-6 rounded-md bg-slate-50 p-5 text-sm leading-7 text-slate-700">
                 <strong className="text-[var(--navy-950)]">Selection information to provide:</strong> {knowledge.specificationKeywords.join(", ")}. Confirm actual approval, drawings and documentation requirements with the project team before final selection.
               </div>
-            </ContentCard>
+            </ContentCard> : null}
 
-            <ContentCard id="technical-data" eyebrow="Technical Data" title="Specifications and selection data">
-              <dl className="grid overflow-hidden rounded-lg border border-slate-200">
-                {technicalLines.map((line) => {
-                  const spec = splitSpec(line);
-                  return (
-                    <div key={line} className="grid gap-2 border-b border-slate-200 p-4 last:border-b-0 md:grid-cols-[180px_1fr]">
-                      <dt className="text-sm font-black text-[var(--navy-950)]">{spec.label}</dt>
-                      <dd className="text-sm leading-6 text-slate-600">{spec.value}</dd>
-                    </div>
-                  );
-                })}
-              </dl>
+            {activeView === "technical" ? <ContentCard id="technical" eyebrow="Technical data" title="Specifications and selection data">
+              <div className="grid gap-5 xl:grid-cols-3">
+                {technicalGroups.map((group) => (
+                  <section key={group.title} className="rounded-md border border-slate-200 bg-slate-50 p-5">
+                    <h3 className="text-base font-black text-[var(--navy-950)]">{group.title}</h3>
+                    <dl className="mt-4 grid gap-4">
+                      {group.lines.map((line) => {
+                        const spec = splitSpec(line);
+                        return (
+                          <div key={line}>
+                            <dt className="text-xs font-black text-slate-500">{spec.label}</dt>
+                            <dd className="mt-1 text-sm font-bold leading-6 text-[var(--navy-900)]">{spec.value}</dd>
+                          </div>
+                        );
+                      })}
+                    </dl>
+                  </section>
+                ))}
+              </div>
+              <p className="mt-6 text-sm leading-7 text-slate-600">Final performance curves, approval documents and configuration details are confirmed against the quoted duty point and project specification.</p>
+            </ContentCard> : null}
+
+            {activeView === "resources" ? <ContentCard id="resources" eyebrow="Resources" title="Related products, project guidance and news">
               <RelatedProductCarousel title="Related products" items={related} />
-            </ContentCard>
-
-            {relatedNews.length ? (
-              <ContentCard id="related-news" eyebrow="Industry News" title="Related fire pump news and engineering context">
+              <section className="mt-9 rounded-md bg-slate-50 p-5">
+                <h3 className="text-lg font-black text-[var(--navy-950)]">Selection checklist</h3>
+                <ul className="mt-4 grid gap-3 text-sm leading-6 text-slate-700 md:grid-cols-2">
+                  {knowledge.buyerPainPoints.map((item) => <li key={item} className="flex gap-2"><CheckCircle2 className="mt-0.5 shrink-0 text-[var(--orange)]" size={16} />{item}</li>)}
+                </ul>
+              </section>
+              {relatedNews.length ? (
+                <section className="mt-9">
+                  <h3 className="text-lg font-black text-[var(--navy-950)]">Related industry news</h3>
                 <div className="grid gap-4 md:grid-cols-3">
                   {relatedNews.map((item) => (
                     <Link key={item.id} href={`/news/${item.slug}`} className="rounded-md border border-slate-200 bg-slate-50 p-4 hover:bg-orange-50">
@@ -487,10 +550,11 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
                     </Link>
                   ))}
                 </div>
-              </ContentCard>
-            ) : null}
+                </section>
+              ) : null}
+            </ContentCard> : null}
 
-            <section id="product-quote" className="scroll-mt-28 rounded-lg bg-[var(--navy-950)] p-6 md:p-8">
+            {activeView === "quote" ? <section className="rounded-lg bg-[var(--navy-950)] p-6 md:p-8">
               <div className="grid gap-8 lg:grid-cols-[0.78fr_1.22fr]">
                 <div>
                   <p className="eyebrow mb-3">Get Quote</p>
@@ -505,7 +569,7 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
                 </div>
                 <ProductInquiryForm productTitle={product.title} />
               </div>
-            </section>
+            </section> : null}
           </div>
         </section>
       </main>

@@ -3,6 +3,7 @@ import { BlogSection } from "@/components/home/blog-section";
 import { SimplePage } from "@/components/simple-page";
 import { knowledgePosts } from "@/data/site";
 import { localizedAlternates } from "@/lib/i18n";
+import { getPageNumber } from "@/components/content-pagination";
 
 export const metadata: Metadata = {
   title: "Fire Pump Knowledge Center",
@@ -10,7 +11,10 @@ export const metadata: Metadata = {
   alternates: localizedAlternates("/knowledge"),
 };
 
-export default function KnowledgePage() {
+type KnowledgePageProps = { searchParams: Promise<{ page?: string }> };
+
+export default async function KnowledgePage({ searchParams }: KnowledgePageProps) {
+  const { page } = await searchParams;
   return (
     <SimplePage
       eyebrow="Knowledge Center"
@@ -22,6 +26,8 @@ export default function KnowledgePage() {
         basePath="/knowledge"
         eyebrow="Knowledge Center"
         title="Complete fire pump guides with relevant project images."
+        page={getPageNumber(page)}
+        paginationPath="/knowledge"
       />
     </SimplePage>
   );

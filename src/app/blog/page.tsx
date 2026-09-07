@@ -3,6 +3,7 @@ import { BlogSection } from "@/components/home/blog-section";
 import { SimplePage } from "@/components/simple-page";
 import { localizedAlternates } from "@/lib/i18n";
 import { getPublicPosts } from "@/lib/public-cms";
+import { getPageNumber } from "@/components/content-pagination";
 
 export const metadata: Metadata = {
   title: "Fire Pump Technical Blog and Selection Guides",
@@ -12,15 +13,18 @@ export const metadata: Metadata = {
 
 export const dynamic = "force-dynamic";
 
-export default async function BlogPage() {
+type BlogPageProps = { searchParams: Promise<{ page?: string }> };
+
+export default async function BlogPage({ searchParams }: BlogPageProps) {
   const posts = await getPublicPosts();
+  const { page } = await searchParams;
   return (
     <SimplePage
       eyebrow="Technical Blog"
       title="Original fire pump engineering and procurement guidance."
       text="Practical articles for EPC contractors, fire protection engineers and project buyers covering selection, installation, maintenance and documentation."
     >
-      <BlogSection items={posts} basePath="/blog" eyebrow="Technical Blog" title="Fire pump selection, engineering and maintenance guidance." />
+      <BlogSection items={posts} basePath="/blog" eyebrow="Technical Blog" title="Fire pump selection, engineering and maintenance guidance." page={getPageNumber(page)} paginationPath="/blog" />
     </SimplePage>
   );
 }

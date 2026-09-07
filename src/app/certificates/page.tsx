@@ -4,6 +4,7 @@ import Link from "next/link";
 import { SimplePage } from "@/components/simple-page";
 import { certificates } from "@/data/site";
 import { localizedAlternates } from "@/lib/i18n";
+import { ContentPagination, getPageNumber, getPageSlice } from "@/components/content-pagination";
 
 export const metadata: Metadata = {
   title: "Fire Pump Certificates and Documents",
@@ -11,7 +12,12 @@ export const metadata: Metadata = {
   alternates: localizedAlternates("/certificates"),
 };
 
-export default function CertificatesPage() {
+type CertificatesPageProps = { searchParams: Promise<{ page?: string }> };
+
+export default async function CertificatesPage({ searchParams }: CertificatesPageProps) {
+  const { page } = await searchParams;
+  const pagedCertificates = getPageSlice(certificates, getPageNumber(page), 6);
+
   return (
     <SimplePage
       eyebrow="Certificates & Documents"
@@ -20,7 +26,7 @@ export default function CertificatesPage() {
     >
       <section className="section">
         <div className="container-shell grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-          {certificates.map((item) => (
+          {pagedCertificates.items.map((item) => (
             <article key={item.title} className="card overflow-hidden">
               <a href={item.src} target="_blank" rel="noreferrer" className="relative block h-60 bg-slate-50 p-4" aria-label={`Open ${item.title} certificate preview`}>
                 <Image src={item.src} alt={`${item.title} certificate preview`} fill className="object-contain p-4 transition duration-300 hover:scale-[1.02]" sizes="(min-width: 1280px) 25vw, (min-width: 768px) 50vw, 100vw" />
@@ -33,6 +39,9 @@ export default function CertificatesPage() {
               </div>
             </article>
           ))}
+        </div>
+        <div className="container-shell">
+          <ContentPagination currentPage={pagedCertificates.currentPage} totalItems={certificates.length} pageSize={6} pathname="/certificates" />
         </div>
         <div className="container-shell mt-10 grid gap-8 border-y border-slate-200 py-9 lg:grid-cols-[0.7fr_1.3fr]">
           <div>

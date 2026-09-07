@@ -5,6 +5,7 @@ import { Footer } from "@/components/footer";
 import { company } from "@/data/site";
 import { localizedAlternates } from "@/lib/i18n";
 import { listPublishedNews } from "@/lib/news-automation";
+import { ContentPagination, getPageNumber, getPageSlice } from "@/components/content-pagination";
 
 export const dynamic = "force-dynamic";
 
@@ -19,8 +20,12 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function NewsPage() {
+type NewsPageProps = { searchParams: Promise<{ page?: string }> };
+
+export default async function NewsPage({ searchParams }: NewsPageProps) {
   const news = await listPublishedNews();
+  const { page } = await searchParams;
+  const pagedNews = getPageSlice(news, getPageNumber(page), 6);
 
   return (
     <>
@@ -39,7 +44,7 @@ export default async function NewsPage() {
         <section className="container-shell py-12">
           {news.length ? (
             <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-              {news.map((item) => (
+              {pagedNews.items.map((item) => (
                 <article key={item.id} className="card overflow-hidden">
                   <Link href={`/news/${item.slug}`} className="block">
                     <span className="relative block aspect-[16/10] overflow-hidden bg-slate-100">
@@ -64,6 +69,7 @@ export default async function NewsPage() {
               <p className="mt-3 max-w-3xl leading-7 text-slate-600">The next verified industry update will appear here after source and editorial checks are complete.</p>
             </div>
           )}
+          {news.length ? <ContentPagination currentPage={pagedNews.currentPage} totalItems={news.length} pageSize={6} pathname="/news" /> : null}
         </section>
       </main>
       <Footer />

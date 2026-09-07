@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { SectionHeading } from "@/components/section-heading";
+import { ContentPagination, getPageSlice } from "@/components/content-pagination";
 import { productMegaMenuGroups } from "@/data/site";
 import { getPublicProducts } from "@/lib/public-cms";
 import { getProductFamily } from "@/lib/product-taxonomy";
@@ -9,6 +10,7 @@ import { getProductFamily } from "@/lib/product-taxonomy";
 type ProductSectionProps = {
   featuredOnly?: boolean;
   group?: string;
+  page?: number;
 };
 
 const homepageSystems = [
@@ -29,7 +31,7 @@ const homepageSystems = [
   },
 ];
 
-export async function ProductSection({ featuredOnly = false, group }: ProductSectionProps) {
+export async function ProductSection({ featuredOnly = false, group, page = 1 }: ProductSectionProps) {
   if (featuredOnly) {
     return (
       <section className="home-systems">
@@ -58,6 +60,7 @@ export async function ProductSection({ featuredOnly = false, group }: ProductSec
   const groupedProducts = activeGroup
     ? products.filter((product) => getProductFamily(product.slug, product.title, product.category).id === activeGroup.slug)
     : products;
+  const pagedProducts = getPageSlice(groupedProducts, page, 6);
 
   return (
     <section className="section bg-[var(--grey-50)]">
@@ -71,8 +74,8 @@ export async function ProductSection({ featuredOnly = false, group }: ProductSec
         }
       />
       <div className="container-shell grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-        {groupedProducts.map((product) => (
-          <article key={product.slug} className="product-card card card-interactive group relative flex min-h-[405px] flex-col overflow-hidden">
+        {pagedProducts.items.map((product) => (
+          <article key={product.slug} className="product-card card card-interactive group relative flex min-h-[385px] flex-col overflow-hidden">
             <Link href={"/products/" + product.slug} className="absolute inset-0 z-10" aria-label={"View details for " + product.title} />
             <figure className="product-card-media relative grid h-[200px] place-items-center bg-[#f4f7f9] p-5">
               <Image src={product.image} alt={product.title} fill className="object-contain p-5 transition duration-300 group-hover:scale-[1.03]" sizes="(min-width: 1280px) 30vw, 50vw" />
@@ -80,9 +83,9 @@ export async function ProductSection({ featuredOnly = false, group }: ProductSec
             <div className="product-card-body flex flex-1 flex-col p-5">
               <p className="mb-2 text-xs font-black text-[var(--orange-dark)]">{product.category}</p>
               <h3 className="text-xl font-black text-[var(--navy-950)]">{product.title}</h3>
-              <p className="mt-3 text-sm leading-6 text-slate-600">{product.summary}</p>
+              <p className="mt-3 max-h-[4.5rem] overflow-hidden text-sm leading-6 text-slate-600">{product.summary}</p>
               <ul className="product-card-specs mt-auto flex flex-wrap gap-2 pt-5">
-                {product.specs.map((spec) => (
+                {product.specs.slice(0, 3).map((spec) => (
                   <li key={spec} className="rounded-full bg-blue-50 px-3 py-1.5 text-xs font-bold text-[var(--navy-800)]">{spec}</li>
                 ))}
               </ul>
@@ -90,6 +93,15 @@ export async function ProductSection({ featuredOnly = false, group }: ProductSec
             </div>
           </article>
         ))}
+      </div>
+      <div className="container-shell">
+        <ContentPagination
+          currentPage={pagedProducts.currentPage}
+          totalItems={groupedProducts.length}
+          pageSize={6}
+          pathname="/products"
+          searchParams={group ? { group } : {}}
+        />
       </div>
     </section>
   );

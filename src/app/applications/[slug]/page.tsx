@@ -47,13 +47,25 @@ const applicationGuidance: Record<string, { background: string; challenges: stri
   },
 };
 
-type ApplicationPageProps = { params: Promise<{ slug: string }> };
+const applicationViews = [
+  { id: "overview", label: "Project Context" },
+  { id: "selection", label: "Selection" },
+  { id: "enquiry", label: "Enquiry" },
+] as const;
+
+type ApplicationView = (typeof applicationViews)[number]["id"];
+type ApplicationPageProps = { params: Promise<{ slug: string }>; searchParams: Promise<{ view?: string }> };
+type ApplicationMetadataProps = { params: Promise<{ slug: string }> };
+
+function getApplicationView(value: string | undefined): ApplicationView {
+  return applicationViews.some((item) => item.id === value) ? (value as ApplicationView) : "overview";
+}
 
 export async function generateStaticParams() {
   return applications.map((item) => ({ slug: item.slug }));
 }
 
-export async function generateMetadata({ params }: ApplicationPageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: ApplicationMetadataProps): Promise<Metadata> {
   const { slug } = await params;
   const application = applications.find((item) => item.slug === slug);
   if (!application) return {};
@@ -69,11 +81,13 @@ export async function generateMetadata({ params }: ApplicationPageProps): Promis
   };
 }
 
-export default async function ApplicationDetailPage({ params }: ApplicationPageProps) {
+export default async function ApplicationDetailPage({ params, searchParams }: ApplicationPageProps) {
   const { slug } = await params;
+  const { view } = await searchParams;
   const application = applications.find((item) => item.slug === slug);
   if (!application) notFound();
   const guidance = applicationGuidance[application.slug] || applicationGuidance["industrial-plant-fire-protection"];
+  const activeView = getApplicationView(view);
 
   return (
     <>
@@ -85,25 +99,38 @@ export default async function ApplicationDetailPage({ params }: ApplicationPageP
             <h1 className="text-5xl font-black leading-tight text-[var(--navy-950)]">{application.title} Fire Protection</h1>
             <p className="mt-6 text-lg leading-8 text-slate-600">{application.text}</p>
             <p className="mt-6 rounded-lg bg-blue-50 p-5 font-bold text-[var(--navy-800)]">Recommended: {application.recommended}</p>
-            <Link className="button button-primary mt-8" href="/contact">Get Engineering Advice</Link>
+            <Link className="button button-primary mt-8" href={`/applications/${application.slug}?view=enquiry`}>Get Engineering Advice</Link>
           </div>
           <div className="relative min-h-[420px] overflow-hidden rounded-lg">
             <Image src={application.image} alt={`${application.title} fire protection`} fill priority className="object-cover" />
           </div>
         </section>
-        <section className="bg-[var(--grey-50)] py-14">
+        <section className="bg-[var(--grey-50)] py-10">
+          <div className="container-shell">
+            <nav className="flex gap-2 overflow-x-auto border-b border-slate-200 pb-3" aria-label="Application information sections">
+              {applicationViews.map((item) => (
+                <Link key={item.id} href={item.id === "overview" ? `/applications/${application.slug}` : `/applications/${application.slug}?view=${item.id}`} aria-current={activeView === item.id ? "page" : undefined} className={`shrink-0 rounded-md px-4 py-2.5 text-sm font-black ${activeView === item.id ? "bg-[var(--navy-950)] text-white" : "bg-white text-[var(--navy-900)] hover:bg-orange-50"}`}>
+                  {item.label}
+                </Link>
+              ))}
+            </nav>
+          </div>
+        </section>
+        {activeView === "overview" ? <section className="bg-[var(--grey-50)] pb-14">
           <div className="container-shell grid gap-6 lg:grid-cols-2">
             <article className="rounded-lg border border-slate-200 bg-white p-7"><h2 className="text-2xl font-black text-[var(--navy-950)]">Industry context</h2><p className="mt-4 leading-8 text-slate-600">{guidance.background}</p></article>
             <article className="rounded-lg border border-slate-200 bg-white p-7"><h2 className="text-2xl font-black text-[var(--navy-950)]">Project issues to review</h2><ul className="mt-4 grid gap-3 text-slate-700">{guidance.challenges.map((item) => <li key={item}>• {item}</li>)}</ul></article>
-            <article className="rounded-lg border border-slate-200 bg-white p-7"><h2 className="text-2xl font-black text-[var(--navy-950)]">Selection logic</h2><ol className="mt-4 grid gap-3 text-slate-700">{guidance.selection.map((item, index) => <li key={item}>{index + 1}. {item}</li>)}</ol></article>
-            <article className="rounded-lg border border-slate-200 bg-white p-7"><h2 className="text-2xl font-black text-[var(--navy-950)]">Typical product paths</h2><ul className="mt-4 grid gap-3 text-slate-700">{guidance.products.map((item) => <li key={item}>• {item}</li>)}</ul></article>
-            <article className="rounded-lg border border-slate-200 bg-white p-7 lg:col-span-2"><h2 className="text-2xl font-black text-[var(--navy-950)]">Installation and project files</h2><p className="mt-4 leading-8 text-slate-600">{guidance.installation}</p></article>
           </div>
-        </section>
-        <section className="container-shell grid gap-8 py-14 lg:grid-cols-[0.8fr_1.2fr]">
+        </section> : null}
+        {activeView === "selection" ? <section className="container-shell grid gap-6 py-14 lg:grid-cols-2">
+          <article className="rounded-lg border border-slate-200 bg-white p-7"><h2 className="text-2xl font-black text-[var(--navy-950)]">Selection logic</h2><ol className="mt-4 grid gap-3 text-slate-700">{guidance.selection.map((item, index) => <li key={item}>{index + 1}. {item}</li>)}</ol></article>
+          <article className="rounded-lg border border-slate-200 bg-white p-7"><h2 className="text-2xl font-black text-[var(--navy-950)]">Typical product paths</h2><ul className="mt-4 grid gap-3 text-slate-700">{guidance.products.map((item) => <li key={item}>• {item}</li>)}</ul></article>
+          <article className="rounded-lg border border-slate-200 bg-white p-7 lg:col-span-2"><h2 className="text-2xl font-black text-[var(--navy-950)]">Installation and project files</h2><p className="mt-4 leading-8 text-slate-600">{guidance.installation}</p></article>
+        </section> : null}
+        {activeView === "enquiry" ? <section className="container-shell grid gap-8 py-14 lg:grid-cols-[0.8fr_1.2fr]">
           <div><p className="eyebrow">Project enquiry</p><h2 className="mt-3 text-3xl font-black text-[var(--navy-950)]">Information to prepare</h2><ul className="mt-6 grid gap-3 leading-7 text-slate-700">{guidance.enquiry.map((item) => <li key={item}>• {item}</li>)}</ul><h2 className="mt-10 text-2xl font-black text-[var(--navy-950)]">FAQ</h2>{guidance.faq.map(([question, answer]) => <div key={question} className="mt-5"><h3 className="font-black text-[var(--navy-950)]">{question}</h3><p className="mt-2 leading-7 text-slate-600">{answer}</p></div>)}</div>
           <div className="rounded-lg bg-[var(--navy-950)] p-6 md:p-8"><ProductInquiryForm productTitle={`${application.title} project fire protection`} /></div>
-        </section>
+        </section> : null}
       </main>
       <Footer />
       <StickyCta />
