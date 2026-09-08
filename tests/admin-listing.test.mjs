@@ -18,7 +18,7 @@ test("date presets respect the configured reporting timezone", () => {
 
 test("custom and all ranges stay explicit", () => {
   const custom = resolveDateRange("custom", { from: "2026-08-03", to: "2026-08-05", timeZone: "Asia/Shanghai" });
-  assert.deepEqual(custom, { preset: "custom", from: "2026-08-03", to: "2026-08-05", label: "自定义日期" });
+  assert.deepEqual(custom, { preset: "custom", from: "2026-08-03", to: "2026-08-05", label: "自定义范围" });
 
   const all = resolveDateRange("all", { timeZone: "Asia/Shanghai" });
   assert.equal(all.from, "");
