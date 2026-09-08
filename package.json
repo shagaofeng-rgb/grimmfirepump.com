@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev -p 4174",
     "build": "next build",
+    "build:vercel": "npm run news:sources:import && npm run news:sources:validate && npm run news:sources:probe && npm run audit:products && npm run test:news-sources && npm run test:news-quality && npm run test:news-schedule && npm run test:sitemap && npm run test:admin-listing && npm run build",
     "start": "next start -p 4174",
     "typecheck": "tsc --noEmit",
     "lint": "tsc --noEmit",
