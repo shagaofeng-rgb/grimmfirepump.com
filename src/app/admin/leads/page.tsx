@@ -1,8 +1,11 @@
 import Link from "next/link";
 import { deleteLead, updateLeadStatus } from "@/app/admin/actions";
 import { AdminShell } from "@/components/admin/admin-shell";
+import { DateRangeFilter } from "@/components/admin/date-range-filter";
 import { AdminPageHeader, EmptyState, Field, inputClass, textareaClass } from "@/components/admin/admin-widgets";
 import { getAdminData, type InquiryRecord } from "@/lib/admin-data";
+import { getSiteSettings } from "@/lib/admin-cms";
+import { paginationPageSize, parsePositiveInt, resolveDateRange } from "@/lib/admin-listing";
 import { paginate } from "@/lib/visitor-analytics";
 
 export const dynamic = "force-dynamic";
@@ -28,16 +31,19 @@ function urlFor(values: Record<string, string | number | undefined>) {
 
 export default async function LeadsPage({ searchParams }: PageProps) {
   const params = await searchParams;
+  const settings = await getSiteSettings();
+  const range = resolveDateRange(param(params, "range"), { from: param(params, "from"), to: param(params, "to"), timeZone: settings.timezone || "Asia/Shanghai" });
   const filters = {
+    range: range.preset,
     query: param(params, "query"),
     source: param(params, "source") || "all",
     status: param(params, "status") || "all",
     intent: param(params, "intent") || "all",
-    from: param(params, "from"),
-    to: param(params, "to"),
+    from: range.from,
+    to: range.to,
   };
-  const page = Math.max(1, Number(param(params, "page") || "1"));
-  const pageSize = Number(param(params, "pageSize") || "25");
+  const page = parsePositiveInt(param(params, "page"));
+  const pageSize = paginationPageSize(param(params, "pageSize"));
   const { inquiries, downloadLeads } = await getAdminData();
   const filtered = inquiries.filter((lead) => {
     if (!matches(lead, filters.query)) return false;
@@ -50,18 +56,23 @@ export default async function LeadsPage({ searchParams }: PageProps) {
     return true;
   }).sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt));
   const paged = paginate(filtered, page, pageSize);
+  const downloadFiltered = downloadLeads.filter((lead) => {
+    const created = new Date(lead.createdAt).getTime();
+    return (!range.from || created >= new Date(range.from + "T00:00:00").getTime()) && (!range.to || created <= new Date(range.to + "T23:59:59.999").getTime());
+  }).sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt));
+  const downloadPage = parsePositiveInt(param(params, "downloadPage"));
+  const pagedDownloads = paginate(downloadFiltered, downloadPage, pageSize);
 
   return (
     <AdminShell>
       <AdminPageHeader eyebrow="客户询盘 CRM" title="客户线索、来源路径和销售跟进" description="从网站访问、产品咨询、资料下载与广告表单获得的线索统一管理。筛选条件可叠加并支持分页导出。" action={<a className="button button-secondary" href="/api/admin/export?type=leads">导出线索 CSV</a>} />
       <section className="mt-8 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
         <form className="grid gap-3 border-b border-slate-200 bg-slate-50 p-4 md:grid-cols-2 xl:grid-cols-4" method="get">
+          <div className="xl:col-span-4"><DateRangeFilter pathname="/admin/leads" query={filters} preset={range.preset} from={range.from} to={range.to} /></div>
           <input name="query" defaultValue={filters.query} className={inputClass} placeholder="姓名、邮箱、国家、产品、公司..." />
           <select name="source" defaultValue={filters.source} className={inputClass}><option value="all">全部来源</option><option value="website_form">网站表单</option><option value="product_inquiry">产品询价</option><option value="download">资料下载</option><option value="advertising">广告线索</option></select>
           <select name="status" defaultValue={filters.status} className={inputClass}><option value="all">全部状态</option>{["new","pending","contacted","quoted","following","sample","negotiating","won","lost","spam","invalid"].map((status) => <option key={status} value={status}>{status}</option>)}</select>
           <select name="intent" defaultValue={filters.intent} className={inputClass}><option value="all">全部意向</option><option value="A">A 高意向</option><option value="B">B 中意向</option><option value="C">C 低意向</option><option value="unrated">未判断</option></select>
-          <input type="date" name="from" defaultValue={filters.from} className={inputClass} aria-label="开始日期" />
-          <input type="date" name="to" defaultValue={filters.to} className={inputClass} aria-label="结束日期" />
           <select name="pageSize" defaultValue={String(paged.pageSize)} className={inputClass}><option value="20">20 条 / 页</option><option value="25">25 条 / 页</option><option value="50">50 条 / 页</option><option value="100">100 条 / 页</option></select>
           <button className="button button-primary min-h-11" type="submit">筛选线索</button>
         </form>
@@ -75,7 +86,7 @@ export default async function LeadsPage({ searchParams }: PageProps) {
                   <p className="mt-2 text-sm text-slate-500">{lead.email} · {lead.phone || "未填写电话"} · {lead.country || "未填写国家"} · {lead.company || "未填写公司"}</p>
                   <p className="mt-3 text-sm leading-6 text-slate-700">{lead.product || "未填写产品"} / Flow: {lead.flow || "-"} / Head: {lead.head || "-"} / Cert: {lead.certification || "-"}</p>
                   <p className="mt-3 rounded-md bg-slate-50 p-3 text-sm leading-6 text-slate-600">{lead.message || "未填写需求内容"}</p>
-                  <p className="mt-2 text-xs font-bold text-slate-400">{lead.sourcePage || "website"} · {lead.sourceType || "website_form"} · {new Date(lead.createdAt).toLocaleString()} · {lead.channel || "Direct"}</p>
+                  <p className="mt-2 text-xs font-bold text-slate-400">{lead.sourcePage || "website"} · {lead.sourceType || "website_form"} · {new Date(lead.createdAt).toLocaleString()} · {lead.channel || "Direct"}</p>{lead.visitorId ? <Link href={`/admin/analytics/visitors/${encodeURIComponent(lead.visitorId)}?range=${range.preset}&from=${range.from}&to=${range.to}`} className="mt-2 inline-flex text-xs font-black text-orange-700 hover:underline">查看该客户完整访问路径</Link> : null}
                 </div>
                 <div className="grid gap-3 rounded-md bg-slate-50 p-4">
                   <form action={updateLeadStatus} className="grid gap-3"><input type="hidden" name="id" value={lead.id} /><Field label="跟进状态"><select name="status" defaultValue={lead.status || "new"} className={inputClass}>{["new","pending","contacted","quoted","following","sample","negotiating","won","lost","spam","invalid"].map((status) => <option key={status} value={status}>{status}</option>)}</select></Field><Field label="意向等级"><select name="intent" defaultValue={lead.intent || "unrated"} className={inputClass}><option value="A">A 高意向</option><option value="B">B 中意向</option><option value="C">C 低意向</option><option value="unrated">未判断</option></select></Field><Field label="销售负责人"><input name="owner" defaultValue={lead.owner} className={inputClass} /></Field><Field label="内部备注"><textarea name="notes" rows={3} defaultValue={lead.notes} className={textareaClass} /></Field><button className="button button-primary min-h-10 text-sm" type="submit">保存跟进</button></form>
@@ -88,7 +99,7 @@ export default async function LeadsPage({ searchParams }: PageProps) {
         </div>
         <div className="flex items-center justify-between border-t border-slate-200 px-5 py-4 text-sm"><span className="text-slate-500">第 {paged.page} / {paged.totalPages} 页</span><div className="flex gap-2"><Link aria-disabled={paged.page <= 1} className="rounded-md border border-slate-200 px-3 py-2 font-bold aria-disabled:pointer-events-none aria-disabled:opacity-40" href={urlFor({ ...filters, page: paged.page - 1, pageSize: paged.pageSize })}>上一页</Link><Link aria-disabled={paged.page >= paged.totalPages} className="rounded-md border border-slate-200 px-3 py-2 font-bold aria-disabled:pointer-events-none aria-disabled:opacity-40" href={urlFor({ ...filters, page: paged.page + 1, pageSize: paged.pageSize })}>下一页</Link></div></div>
       </section>
-      <section className="mt-8 rounded-xl border border-slate-200 bg-white p-6 shadow-sm"><h2 className="text-xl font-black text-slate-950">下载资料线索</h2><div className="mt-4 grid gap-3 md:grid-cols-2">{downloadLeads.slice(0, 20).map((lead) => <div key={lead.id} className="rounded-md bg-slate-50 p-4 text-sm"><strong>{lead.name}</strong><p className="mt-1 text-slate-500">{lead.assetTitle} · {lead.email} · {lead.country || "未填写国家"}</p></div>)}{!downloadLeads.length ? <EmptyState text="暂无下载资料线索。" /> : null}</div></section>
+      <section className="mt-8 rounded-xl border border-slate-200 bg-white p-6 shadow-sm"><div className="flex items-center justify-between gap-3"><div><h2 className="text-xl font-black text-slate-950">下载资料线索</h2><p className="mt-1 text-sm text-slate-500">与上方时间范围同步，共 {pagedDownloads.total} 条。</p></div></div><div className="mt-4 grid gap-3 md:grid-cols-2">{pagedDownloads.items.map((lead) => <div key={lead.id} className="rounded-md bg-slate-50 p-4 text-sm"><strong>{lead.name}</strong><p className="mt-1 text-slate-500">{lead.assetTitle} · {lead.email} · {lead.country || "未填写国家"}</p></div>)}{!pagedDownloads.items.length ? <EmptyState text="当前时间范围内暂无下载资料线索。" /> : null}</div><div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-4 text-sm text-slate-500"><span>第 {pagedDownloads.page} / {pagedDownloads.totalPages} 页</span><div className="flex gap-2"><Link aria-disabled={pagedDownloads.page <= 1} className="rounded-md border border-slate-200 px-3 py-2 font-bold aria-disabled:pointer-events-none aria-disabled:opacity-40" href={urlFor({ ...filters, downloadPage: pagedDownloads.page - 1, pageSize: pagedDownloads.pageSize })}>上一页</Link><Link aria-disabled={pagedDownloads.page >= pagedDownloads.totalPages} className="rounded-md border border-slate-200 px-3 py-2 font-bold aria-disabled:pointer-events-none aria-disabled:opacity-40" href={urlFor({ ...filters, downloadPage: pagedDownloads.page + 1, pageSize: pagedDownloads.pageSize })}>下一页</Link></div></div></section>
     </AdminShell>
   );
 }

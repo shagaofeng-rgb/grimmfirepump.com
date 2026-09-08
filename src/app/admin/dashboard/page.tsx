@@ -2,28 +2,38 @@ import Link from "next/link";
 import { Activity, ArrowRight, BarChart3, Globe2, Inbox } from "lucide-react";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { AnalyticsRefresh } from "@/components/admin/analytics-refresh";
+import { DateRangeFilter } from "@/components/admin/date-range-filter";
 import { SearchConsoleCheck } from "@/components/admin/search-console-check";
 import { AdminCard, AdminPageHeader, EmptyState, StatCard } from "@/components/admin/admin-widgets";
 import { getAdminData } from "@/lib/admin-data";
+import { getSiteSettings } from "@/lib/admin-cms";
+import { resolveDateRange } from "@/lib/admin-listing";
 import { getAnalyticsSummary } from "@/lib/visitor-analytics";
 import { getSearchConsoleConfiguration } from "@/lib/search-console";
 import { listSitemapRuns } from "@/lib/sitemap-service";
 
 export const dynamic = "force-dynamic";
 
-function isToday(date: string) {
-  const value = new Date(date);
-  const today = new Date();
-  return value.getFullYear() === today.getFullYear() && value.getMonth() === today.getMonth() && value.getDate() === today.getDate();
+type Props = { searchParams: Promise<Record<string, string | string[] | undefined>> };
+
+function value(params: Record<string, string | string[] | undefined>, key: string) {
+  const item = params[key];
+  return Array.isArray(item) ? item[0] || "" : item || "";
 }
 
-export default async function AdminDashboardPage() {
-  const [data, sitemapRuns] = await Promise.all([getAdminData(), listSitemapRuns()]);
-  const traffic = getAnalyticsSummary(data.events);
+export default async function AdminDashboardPage({ searchParams }: Props) {
+  const params = await searchParams;
+  const [data, sitemapRuns, settings] = await Promise.all([getAdminData(), listSitemapRuns(), getSiteSettings()]);
+  const range = resolveDateRange(value(params, "range") || "today", { from: value(params, "from"), to: value(params, "to"), timeZone: settings.timezone || "Asia/Shanghai" });
+  const traffic = getAnalyticsSummary(data.events, { from: range.from, to: range.to, traffic: "real" });
   const searchConsole = getSearchConsoleConfiguration();
   const latestSitemapRun = sitemapRuns[0] || null;
-  const todayLeads = data.inquiries.filter((item) => isToday(item.createdAt)).length;
-  const highIntent = data.inquiries.filter((item) => item.score >= 60 || item.intent === "A").length;
+  const periodLeads = data.inquiries.filter((item) => {
+    const time = Date.parse(item.createdAt);
+    return (!range.from || time >= Date.parse(range.from + "T00:00:00")) && (!range.to || time <= Date.parse(range.to + "T23:59:59.999"));
+  });
+  const highIntent = periodLeads.filter((item) => item.score >= 60 || item.intent === "A").length;
+  const sharedQuery = { range: range.preset, from: range.from, to: range.to };
 
   return (
     <AdminShell>
@@ -34,16 +44,17 @@ export default async function AdminDashboardPage() {
         action={<AnalyticsRefresh />}
       />
       <section className="mt-8 rounded-xl bg-gradient-to-br from-[#071426] via-[#0d2a48] to-[#164e63] p-6 text-white shadow-[0_20px_60px_rgba(15,23,42,0.18)]">
+        <div className="mb-6 rounded-lg border border-white/10 bg-white/5 p-4"><DateRangeFilter pathname="/admin/dashboard" query={sharedQuery} preset={range.preset} from={range.from} to={range.to} compact /><form method="get" className="mt-2 flex justify-end"><input type="hidden" name="range" value="custom" /><input type="hidden" name="from" value={range.from} /><input type="hidden" name="to" value={range.to} /><button className="rounded-md bg-white px-3 py-2 text-xs font-black text-slate-900" type="submit">应用时间范围</button></form></div>
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div><p className="text-xs font-black uppercase tracking-[0.2em] text-cyan-200">Live operations</p><h2 className="mt-2 text-3xl font-black">真实访客正在转化为可跟进的客户</h2><p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300">访客分析按首方会话、来源渠道和国家归因。点击任意模块可继续下钻。</p></div>
           <div className="grid grid-cols-3 gap-4 rounded-lg border border-white/10 bg-white/5 p-4 text-center"><div><strong className="block text-2xl text-orange-300">{traffic.uniqueVisitors}</strong><span className="text-xs text-slate-300">真实访客</span></div><div><strong className="block text-2xl text-orange-300">{traffic.conversions.length}</strong><span className="text-xs text-slate-300">转化动作</span></div><div><strong className="block text-2xl text-orange-300">{highIntent}</strong><span className="text-xs text-slate-300">高意向</span></div></div>
         </div>
-        <div className="mt-6 flex flex-wrap gap-3"><Link href="/admin/analytics" className="inline-flex items-center gap-2 rounded-md bg-white px-4 py-2.5 text-sm font-black text-slate-900">查看真实流量 <ArrowRight size={16} /></Link><Link href="/admin/leads" className="inline-flex items-center gap-2 rounded-md border border-white/20 px-4 py-2.5 text-sm font-black text-white">处理新询盘 <Inbox size={16} /></Link></div>
+        <div className="mt-6 flex flex-wrap gap-3"><Link href={"/admin/analytics?range=" + range.preset + "&from=" + range.from + "&to=" + range.to} className="inline-flex items-center gap-2 rounded-md bg-white px-4 py-2.5 text-sm font-black text-slate-900">查看真实流量 <ArrowRight size={16} /></Link><Link href={"/admin/leads?range=" + range.preset + "&from=" + range.from + "&to=" + range.to} className="inline-flex items-center gap-2 rounded-md border border-white/20 px-4 py-2.5 text-sm font-black text-white">处理新询盘 <Inbox size={16} /></Link></div>
       </section>
       <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <Link href="/admin/analytics"><StatCard label="真实独立访客" value={traffic.uniqueVisitors} hint={"会话 " + traffic.uniqueSessions + " · 回访 " + traffic.returningVisitors} /></Link>
         <Link href="/admin/analytics"><StatCard label="真实页面浏览" value={traffic.pageViews.length} hint={"已过滤非真实事件 " + traffic.filteredEvents} /></Link>
-        <Link href="/admin/leads"><StatCard label="客户询盘" value={data.totals.inquiries} hint={"今日 " + todayLeads + " · 高意向 " + highIntent} /></Link>
+        <Link href="/admin/leads"><StatCard label="客户询盘" value={periodLeads.length} hint={range.label + " · 高意向 " + highIntent} /></Link>
         <Link href="/admin/analytics"><StatCard label="转化动作" value={traffic.conversions.length} hint="询盘、下载、WhatsApp、报价" /></Link>
       </div>
       <section className="mt-8 grid gap-6 xl:grid-cols-2">
