@@ -20,7 +20,7 @@ function value(params: Record<string, string | string[] | undefined>, key: strin
 function queryFor(values: Record<string, string | number | undefined>) {
   const query = new URLSearchParams();
   for (const [key, value] of Object.entries(values)) if (value) query.set(key, String(value));
-  return \`/admin/downloads?\${query.toString()}\`;
+  return `/admin/downloads?${query.toString()}`;
 }
 
 function inRange(createdAt: string | undefined, from: string, to: string) {
