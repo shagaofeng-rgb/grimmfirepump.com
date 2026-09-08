@@ -54,12 +54,19 @@ export function DateRangeFilter({
           </Link>
         ))}
       </div>
-      <div className={compact ? "grid grid-cols-2 gap-2" : "grid gap-2 sm:grid-cols-2"}>
-        <input type="hidden" name="range" value={preset === "custom" ? "custom" : preset} />
+      <div className={compact ? "grid gap-2" : "grid gap-2 sm:grid-cols-3"}>
+        <select
+          name="range"
+          defaultValue={preset}
+          className="min-h-10 rounded-md border border-slate-300 bg-white px-3 text-sm font-bold text-slate-900"
+          aria-label="日期范围模式"
+        >
+          {options.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}
+        </select>
         <input type="date" name="from" defaultValue={from} className="min-h-10 rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-900" aria-label="开始日期" />
         <input type="date" name="to" defaultValue={to} className="min-h-10 rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-900" aria-label="结束日期" />
       </div>
-      <p className="text-xs font-bold text-slate-500">选择日期后点击页面的“应用筛选”；自定义日期会按后台时区计算。</p>
+      <p className="text-xs font-bold text-slate-500">可快捷切换预设范围，或选择“自定义”并填写日期后应用筛选。日期按后台时区计算。</p>
     </div>
   );
 }
