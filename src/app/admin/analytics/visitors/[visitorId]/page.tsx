@@ -49,10 +49,10 @@ export default async function VisitorDetailPage({ params, searchParams }: Props)
   return (
     <AdminShell>
       <Link href="/admin/analytics" className="inline-flex items-center gap-2 text-sm font-black text-orange-700"><ArrowLeft size={16} /> 返回访问分析</Link>
-      <AdminPageHeader eyebrow="访客访问档案" title={\`匿名访客 \${profile.visitorId.slice(0, 12)}\`} description="同一浏览器第一方访客 ID 下的访问、会话、行为与已关联线索。跨设备或未验证的身份不会被强行合并。" />
+      <AdminPageHeader eyebrow="访客访问档案" title={`匿名访客 ${profile.visitorId.slice(0, 12)}`} description="同一浏览器第一方访客 ID 下的访问、会话、行为与已关联线索。跨设备或未验证的身份不会被强行合并。" />
 
       <section className="mt-7 rounded-xl bg-[#091b32] p-5 text-white shadow-[0_20px_60px_rgba(15,23,42,0.18)]">
-        <DateRangeFilter pathname={\`/admin/analytics/visitors/\${encodeURIComponent(visitorId)}\`} query={query} preset={range.preset} from={range.from} to={range.to} />
+        <DateRangeFilter pathname={`/admin/analytics/visitors/${encodeURIComponent(visitorId)}`} query={query} preset={range.preset} from={range.from} to={range.to} />
         <form method="get" className="mt-3 flex justify-end gap-2">
           <input type="hidden" name="range" value="custom" />
           <input type="hidden" name="from" value={range.from} />
@@ -64,9 +64,9 @@ export default async function VisitorDetailPage({ params, searchParams }: Props)
       <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-5">
         <StatCard label="首次访问" value={stamp(profile.firstSeenAt)} />
         <StatCard label="最近访问" value={stamp(profile.lastSeenAt)} />
-        <StatCard label="访问次数" value={profile.visits} hint={\`\${profile.sessions} 个会话\`} />
-        <StatCard label="页面浏览" value={profile.pageViews} hint={\`\${profile.conversions} 个转化动作\`} />
-        <StatCard label="最新来源" value={profile.channel} hint={\`\${profile.country} · \${profile.ipMasked || "IP 已隐藏"}\`} />
+        <StatCard label="访问次数" value={profile.visits} hint={`${profile.sessions} 个会话`} />
+        <StatCard label="页面浏览" value={profile.pageViews} hint={`${profile.conversions} 个转化动作`} />
+        <StatCard label="最新来源" value={profile.channel} hint={`${profile.country} · ${profile.ipMasked || "IP 已隐藏"}`} />
       </div>
 
       <div className="mt-8 grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
@@ -74,7 +74,7 @@ export default async function VisitorDetailPage({ params, searchParams }: Props)
           <div className="grid gap-4 text-sm leading-6 text-slate-600">
             <div className="flex items-start gap-3 rounded-md bg-slate-50 p-4"><UserRound className="mt-0.5 text-orange-700" size={18} /><div><strong className="block text-slate-900">匿名访客档案</strong>由本站第一方 visitor ID 归并同一浏览器访问。</div></div>
             <div className="flex items-start gap-3 rounded-md bg-slate-50 p-4"><Globe2 className="mt-0.5 text-orange-700" size={18} /><div><strong className="block text-slate-900">最近地理与来源</strong>{profile.country} · {profile.channel} · 脱敏 IP {profile.ipMasked || "不可用"}。</div></div>
-            <div className="flex items-start gap-3 rounded-md bg-slate-50 p-4"><Mail className="mt-0.5 text-orange-700" size={18} /><div><strong className="block text-slate-900">已关联客户记录</strong>{relatedInquiries.length ? \`\${relatedInquiries.length} 条询盘已关联，可在客户询盘中继续跟进。\` : "尚未关联询盘。提交表单并携带 visitor ID 后会自动关联。"}</div></div>
+            <div className="flex items-start gap-3 rounded-md bg-slate-50 p-4"><Mail className="mt-0.5 text-orange-700" size={18} /><div><strong className="block text-slate-900">已关联客户记录</strong>{relatedInquiries.length ? `${relatedInquiries.length} 条询盘已关联，可在客户询盘中继续跟进。` : "尚未关联询盘。提交表单并携带 visitor ID 后会自动关联。"}</div></div>
           </div>
         </AdminCard>
         <AdminCard title="关键页面与行为">
@@ -110,8 +110,8 @@ export default async function VisitorDetailPage({ params, searchParams }: Props)
         <div className="flex flex-col gap-3 border-t border-slate-200 px-5 py-4 text-sm text-slate-600 sm:flex-row sm:items-center sm:justify-between">
           <span>第 {pagedSessions.page} / {pagedSessions.totalPages} 页，共 {pagedSessions.total} 个会话</span>
           <div className="flex gap-2">
-            <Link aria-disabled={pagedSessions.page <= 1} className="rounded-md border border-slate-200 px-3 py-2 font-bold aria-disabled:pointer-events-none aria-disabled:opacity-40" href={\`?range=\${range.preset}&from=\${range.from}&to=\${range.to}&page=\${pagedSessions.page - 1}&pageSize=\${pagedSessions.pageSize}\`}>上一页</Link>
-            <Link aria-disabled={pagedSessions.page >= pagedSessions.totalPages} className="rounded-md border border-slate-200 px-3 py-2 font-bold aria-disabled:pointer-events-none aria-disabled:opacity-40" href={\`?range=\${range.preset}&from=\${range.from}&to=\${range.to}&page=\${pagedSessions.page + 1}&pageSize=\${pagedSessions.pageSize}\`}>下一页</Link>
+            <Link aria-disabled={pagedSessions.page <= 1} className="rounded-md border border-slate-200 px-3 py-2 font-bold aria-disabled:pointer-events-none aria-disabled:opacity-40" href={`?range=${range.preset}&from=${range.from}&to=${range.to}&page=${pagedSessions.page - 1}&pageSize=${pagedSessions.pageSize}`}>上一页</Link>
+            <Link aria-disabled={pagedSessions.page >= pagedSessions.totalPages} className="rounded-md border border-slate-200 px-3 py-2 font-bold aria-disabled:pointer-events-none aria-disabled:opacity-40" href={`?range=${range.preset}&from=${range.from}&to=${range.to}&page=${pagedSessions.page + 1}&pageSize=${pagedSessions.pageSize}`}>下一页</Link>
           </div>
         </div>
       </section>
