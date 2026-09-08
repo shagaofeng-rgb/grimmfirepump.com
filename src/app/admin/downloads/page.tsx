@@ -39,7 +39,7 @@ export default async function AdminDownloadsPage({ searchParams }: Props) {
   const pageSize = paginationPageSize(value(params, "pageSize"));
   const { cmsDownloads, downloadLeads } = await getAdminData();
   const assets = cmsDownloads.filter((item) => inRange(item.createdAt, range.from, range.to) && (status === "all" || item.status === status) && (!query || [item.title, item.category, item.relatedProduct, item.language].join(" ").toLowerCase().includes(query))).sort((a, b) => Date.parse(b.createdAt || "") - Date.parse(a.createdAt || ""));
-  const leads = downloadLeads.filter((item) => inRange(item.createdAt, range.from, range.to) && (!query || [item.name, item.email, item.country, item.assetTitle, item.company].join(" ").toLowerCase().includes(query))).sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt));
+  const leads = downloadLeads.filter((item) => inRange(item.createdAt, range.from, range.to) && (!query || [item.name, item.email, item.country, item.assetTitle].join(" ").toLowerCase().includes(query))).sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt));
   const pagedAssets = paginate(assets, page, pageSize);
   const pagedLeads = paginate(leads, page, pageSize);
   const base = { range: range.preset, from: range.from, to: range.to, query, status, pageSize: String(pageSize) };
