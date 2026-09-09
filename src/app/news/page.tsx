@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
@@ -48,7 +49,11 @@ export default async function NewsPage({ searchParams }: NewsPageProps) {
                 <article key={item.id} className="card overflow-hidden">
                   <Link href={`/news/${item.slug}`} className="block">
                     <span className="relative block aspect-[16/10] overflow-hidden bg-slate-100">
-                      <img src={item.coverImageUrl} alt={item.coverImageAlt} className="h-full w-full object-cover" loading="lazy" />
+                      {item.coverImageUrl.startsWith("/") ? (
+                        <Image src={item.coverImageUrl} alt={item.coverImageAlt} fill sizes="(min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw" className="object-cover" />
+                      ) : (
+                        <img src={item.coverImageUrl} alt={item.coverImageAlt} className="h-full w-full object-cover" loading="lazy" />
+                      )}
                     </span>
                     <span className="block p-6">
                   <span className="text-xs font-black text-[var(--orange-dark)]">{item.category}</span>
