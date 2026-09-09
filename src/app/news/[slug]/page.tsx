@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
@@ -91,7 +92,11 @@ export default async function NewsDetailPage({ params }: NewsDetailProps) {
           <div className="mt-5 flex flex-wrap gap-x-4 gap-y-2 text-sm font-bold text-slate-500"><span>Editorial publication: {(article.publishAt || article.createdAt).slice(0, 10)}</span><span>Original publication: {article.sourcePublishedAt.slice(0, 10)}</span></div>
           <p className="article-content-copy mt-6 text-xl leading-9 text-slate-600">{article.summary}</p>
           <figure className="mt-10 overflow-hidden rounded-lg border border-slate-200 bg-slate-50">
-            <img src={safeArticleImageUrl(article.coverImageUrl)} alt={article.coverImageAlt} className="aspect-[16/9] h-auto w-full object-cover" loading="eager" decoding="async" />
+            {safeArticleImageUrl(article.coverImageUrl).startsWith("/") ? (
+              <Image src={safeArticleImageUrl(article.coverImageUrl)} alt={article.coverImageAlt} width={article.coverImageWidth || 1200} height={article.coverImageHeight || 630} sizes="(min-width: 1024px) 896px, 100vw" className="aspect-[16/9] h-auto w-full object-cover" priority />
+            ) : (
+              <img src={safeArticleImageUrl(article.coverImageUrl)} alt={article.coverImageAlt} className="aspect-[16/9] h-auto w-full object-cover" loading="eager" decoding="async" />
+            )}
             <figcaption className="article-content-copy border-t border-slate-200 bg-white px-4 py-3 text-xs font-bold text-slate-500">
               Image source: <a href={article.coverImagePageUrl} target="_blank" rel="noreferrer" className="underline">{sourcePageHost}</a>
             </figcaption>
