@@ -1,22 +1,21 @@
-import { Droplets, Gauge, Waves, Zap } from "lucide-react";
+import { BadgeCheck, Factory, Globe2, Headset } from "lucide-react";
 
 const inputs = [
-  { title: "Flow", Icon: Waves },
-  { title: "Head", Icon: Gauge },
-  { title: "Power", Icon: Zap },
-  { title: "Water source", Icon: Droplets },
+  { value: "10+", title: "Years of Experience", Icon: BadgeCheck },
+  { value: "50+", title: "Countries Served", Icon: Globe2 },
+  { value: "1,000+", title: "Projects Delivered", Icon: Factory },
+  { value: "24/7", title: "Technical Support", Icon: Headset },
 ];
 
 export function AdvantageSection() {
   return (
     <section className="home-inputs">
       <div className="home-section-inner">
-        <h2>Start with the inputs that shape the package.</h2>
         <div className="home-input-grid">
-          {inputs.map(({ title, Icon }) => (
+          {inputs.map(({ value, title, Icon }) => (
             <article key={title}>
-              <Icon size={43} strokeWidth={1.35} />
-              <h3>{title}</h3>
+              <Icon size={30} strokeWidth={1.55} />
+              <div><strong>{value}</strong><h3>{title}</h3></div>
             </article>
           ))}
         </div>

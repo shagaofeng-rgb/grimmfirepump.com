@@ -2,13 +2,16 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, Search, X } from "lucide-react";
 
 const nav = [
+  { label: "Home", href: "/" },
   { label: "Products", href: "/products" },
-  { label: "Applications", href: "/applications" },
-  { label: "Project support", href: "/testing" },
-  { label: "Resources", href: "/downloads" },
+  { label: "Solutions", href: "/applications" },
+  { label: "Quality", href: "#certifications" },
+  { label: "Projects", href: "/projects" },
+  { label: "About", href: "/about" },
+  { label: "Contact", href: "/contact" },
 ];
 
 export function HomeHeader() {
@@ -17,13 +20,19 @@ export function HomeHeader() {
   return (
     <header className="home-header">
       <div className="home-header-inner">
-        <Link href="/" className="home-wordmark" aria-label="GRIMM PUMP home">GRIMM PUMP</Link>
+        <Link href="/" className="home-wordmark" aria-label="GRIMM PUMP home">
+          <span>GRIMM<span>PUMP</span></span>
+          <small>PUMPING A SAFER TOMORROW</small>
+        </Link>
 
         <nav className="home-desktop-nav" aria-label="Primary navigation">
           {nav.map((item) => <Link key={item.href} href={item.href}>{item.label}</Link>)}
         </nav>
 
-        <Link href="/contact" className="home-header-cta">Send project brief</Link>
+        <div className="home-header-actions">
+          <Link href="/contact" className="home-header-cta">Get a Quote <span aria-hidden="true">→</span></Link>
+          <Link href="/search" className="home-search-link" aria-label="Search"><Search size={18} /></Link>
+        </div>
 
         <button
           type="button"

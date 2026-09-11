@@ -15,19 +15,29 @@ type ProductSectionProps = {
 
 const homepageSystems = [
   {
-    title: "EDJ fire pump systems",
-    image: "/assets/applications/hero-edj.webp",
+    title: "End Suction Fire Pumps",
+    text: "Reliable, efficient and widely used for building and industrial applications.",
+    image: "/assets/products/electric-fire-pump-clean.webp",
+    href: "/products/electric-horizontal-split-end-suction-pump",
+  },
+  {
+    title: "Vertical Turbine Fire Pumps",
+    text: "Designed for deep well and large flow applications.",
+    image: "/assets/products/vertical-turbine-fire-pump.webp",
+    href: "/products/vertical-stainless-steel-multistage-pump-jockey-pump",
+  },
+  {
+    title: "Fire Pump Packages",
+    text: "Complete electric, diesel and jockey-pump configurations for reliable operation.",
+    image: "/assets/products/edj-package.webp",
     href: "/products/edj-fire-pump-set",
   },
   {
-    title: "Diesel fire pump sets",
-    image: "/assets/applications/diesel-site.webp",
-    href: "/products/diesel-engine-fire-pump",
-  },
-  {
-    title: "Jockey pump configurations",
-    image: "/assets/applications/jockey-room.webp",
-    href: "/products/vertical-stainless-steel-multistage-pump-jockey-pump",
+    title: "Fire Pump Control Panels",
+    text: "Diesel, electric and jockey pump controllers for reliable operation.",
+    image: "/assets/factory/real/controller-assembly.webp",
+    imageClassName: "object-cover",
+    href: "/products",
   },
 ];
 
@@ -36,16 +46,21 @@ export async function ProductSection({ featuredOnly = false, group, page = 1 }: 
     return (
       <section className="home-systems">
         <div className="home-section-inner">
-          <h2>Explore systems by project condition</h2>
+          <div className="home-section-heading">
+            <div><p>OUR PRODUCT SYSTEMS</p><h2>Our Product Systems</h2></div>
+            <p>Complete fire pump solutions engineered for reliable performance in the most demanding applications.</p>
+            <Link href="/products">View All Products <ArrowRight size={17} /></Link>
+          </div>
           <div className="home-system-grid">
             {homepageSystems.map((item) => (
               <Link href={item.href} key={item.title} className="home-system-card">
                 <figure>
-                  <Image src={item.image} alt={item.title} fill className="object-cover" sizes="(min-width: 768px) 33vw, 38vw" />
+                  <Image src={item.image} alt={item.title} fill className={item.imageClassName || "object-cover"} sizes="(min-width: 768px) 33vw, 38vw" />
                 </figure>
                 <div>
                   <h3>{item.title}</h3>
-                  <ArrowRight size={21} />
+                  <p>{item.text}</p>
+                  <span>Learn More <ArrowRight size={15} /></span>
                 </div>
               </Link>
             ))}
