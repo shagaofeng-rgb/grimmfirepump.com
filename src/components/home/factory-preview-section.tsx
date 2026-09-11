@@ -20,6 +20,7 @@ const items = [
 export function FactoryPreviewSection() {
   return (
     <section className="home-practical">
+      <Image src="/assets/factory/factory-assembly.webp" alt="GRIMM PUMP factory floor" fill className="home-factory-background" sizes="100vw" />
       <div className="home-section-inner home-factory-layout">
         <div className="home-factory-copy">
           <p>REAL PROJECTS. REAL IMPACT.</p>

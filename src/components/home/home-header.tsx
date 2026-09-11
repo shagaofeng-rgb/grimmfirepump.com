@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Menu, Search, X } from "lucide-react";
+import { ChevronDown, Menu, Search, X } from "lucide-react";
 
 const nav = [
   { label: "Home", href: "/" },
@@ -32,6 +32,7 @@ export function HomeHeader() {
         <div className="home-header-actions">
           <Link href="/contact" className="home-header-cta">Get a Quote <span aria-hidden="true">→</span></Link>
           <Link href="/search" className="home-search-link" aria-label="Search"><Search size={18} /></Link>
+          <Link href="/" className="home-language-link" aria-label="English language site">EN <ChevronDown size={13} /></Link>
         </div>
 
         <button
