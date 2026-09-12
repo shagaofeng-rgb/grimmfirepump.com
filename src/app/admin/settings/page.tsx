@@ -32,7 +32,7 @@ export default async function SettingsPage() {
           <Field label="Robots Policy"><input name="robotsPolicy" defaultValue={settings.robotsPolicy} className={inputClass} /></Field>
         </section>
         <section className="grid gap-4 rounded-lg border border-slate-200 bg-white p-6 shadow-sm md:grid-cols-2">
-          <div className="md:col-span-2"><h2 className="text-xl font-black text-slate-950">真实流量与隐私规则</h2><p className="mt-2 text-sm leading-6 text-slate-600">预览环境、自动化 UA 与此处配置的规则会被标记为测试/机器人流量，默认不会进入经营报表。分析页只显示脱敏 IP。</p></div>
+          <div className="md:col-span-2"><h2 className="text-xl font-black text-slate-950">访问统计与隐私设置</h2><p className="mt-2 text-sm leading-6 text-slate-600">可设置不纳入经营报表的内部访问规则；访客分析页仅展示经过脱敏处理的网络信息。</p></div>
           <Field label="排除 IP（逗号分隔）"><textarea name="analyticsExcludedIps" rows={3} defaultValue={settings.analyticsExcludedIps} className={textareaClass} placeholder="例如：203.0.113.10, 198.51.100.0/24" /></Field>
           <Field label="排除 User-Agent 关键词（逗号分隔）"><textarea name="analyticsExcludedUserAgents" rows={3} defaultValue={settings.analyticsExcludedUserAgents} className={textareaClass} placeholder="例如：collects, playwright, selenium" /></Field>
           <Field label="脱敏 IP 数据保留天数"><input name="analyticsIpRetentionDays" inputMode="numeric" defaultValue={settings.analyticsIpRetentionDays} className={inputClass} /></Field>

@@ -2,24 +2,23 @@ import { AdminShell } from "@/components/admin/admin-shell";
 import { AdminPageHeader, AdminCard, StatusPill } from "@/components/admin/admin-widgets";
 
 const forms = [
-  ["Contact Us", "contact", "联系页面询盘", "active"],
-  ["Product Inquiry", "product-inquiry", "产品详情询价", "active"],
-  ["Download Gate", "download-gate", "资料下载线索", "active"],
-  ["OEM / ODM Application", "oem-odm", "OEM/ODM 合作申请", "active"],
-  ["广告线索", "ad-leads", "广告表单线索接入", "not_configured"],
+  ["联系咨询", "网站联系页和首页项目咨询", "客户询盘"],
+  ["产品询价", "产品详情页的技术参数与报价咨询", "客户询盘"],
+  ["资料下载", "目录和技术文件下载后留下的客户信息", "下载线索"],
+  ["OEM / ODM 合作", "合作需求与项目采购信息", "客户询盘"],
 ];
 
 export default function FormsPage() {
   return (
     <AdminShell>
-      <AdminPageHeader eyebrow="表单管理" title="网站表单和线索入口" description="管理网站询盘、资料下载、OEM/ODM 合作和广告线索来源。" />
+      <AdminPageHeader eyebrow="客户管理" title="客户入口" description="查看网站已启用的客户咨询、产品询价、资料下载和合作需求入口。提交记录统一进入客户询盘或下载线索。" />
       <div className="mt-8 grid gap-4 md:grid-cols-2">
-        {forms.map(([name, key, desc, status]) => (
-          <AdminCard key={key} title={name}>
+        {forms.map(([name, desc, destination]) => (
+          <AdminCard key={name} title={name}>
             <p className="text-sm leading-6 text-slate-600">{desc}</p>
             <div className="mt-4 flex items-center justify-between">
-              <code className="rounded bg-slate-100 px-2 py-1 text-xs">{key}</code>
-              <StatusPill value={status} />
+              <span className="text-sm font-bold text-slate-500">提交后进入：{destination}</span>
+              <StatusPill value="active" />
             </div>
           </AdminCard>
         ))}

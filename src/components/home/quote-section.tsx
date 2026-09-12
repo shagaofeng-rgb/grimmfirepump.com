@@ -4,6 +4,7 @@ import { FormEvent, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { company } from "@/data/site";
+import { getVisitorContext } from "@/components/analytics-listener";
 
 export function QuoteSection() {
   const [message, setMessage] = useState("Tell us your project requirement and our team will reply by email or WhatsApp.");
@@ -16,18 +17,19 @@ export function QuoteSection() {
     setSubmitted(false);
     const form = event.currentTarget;
     const data = Object.fromEntries(new FormData(form).entries());
+    const visitor = getVisitorContext();
 
     try {
       const response = await fetch("/api/inquiries", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...data, sourcePage: window.location.pathname }),
+        body: JSON.stringify({ ...data, ...visitor, sourcePage: window.location.pathname }),
       });
       if (!response.ok) throw new Error("Submission failed");
       await fetch("/api/analytics", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ event: "inquiry_submit", path: window.location.pathname, label: String(data.product || "project brief") }),
+        body: JSON.stringify({ event: "inquiry_submit", path: window.location.pathname, label: String(data.product || "project brief"), ...visitor }),
       });
       setSubmitted(true);
       setMessage("Project brief received. Our team will reply using the contact details you provided.");

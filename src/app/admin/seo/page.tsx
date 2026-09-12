@@ -1,17 +1,30 @@
 import { AdminShell } from "@/components/admin/admin-shell";
+import { AdminPagination } from "@/components/admin/admin-pagination";
 import { AdminPageHeader, AdminCard, StatusPill } from "@/components/admin/admin-widgets";
 import { getSiteSettings, listCmsProducts, listCmsNews } from "@/lib/admin-cms";
+import { paginationPageSize, parsePositiveInt } from "@/lib/admin-listing";
 import { listSitemapRuns } from "@/lib/sitemap-service";
+import { paginate } from "@/lib/visitor-analytics";
 
 export const dynamic = "force-dynamic";
 
-export default async function SeoPage() {
+type PageProps = { searchParams: Promise<Record<string, string | string[] | undefined>> };
+
+function param(params: Record<string, string | string[] | undefined>, name: string) {
+  const value = params[name];
+  return Array.isArray(value) ? value[0] || "" : value || "";
+}
+
+export default async function SeoPage({ searchParams }: PageProps) {
+  const params = await searchParams;
   const [settings, products, news, sitemapRuns] = await Promise.all([getSiteSettings(), listCmsProducts(), listCmsNews(), listSitemapRuns()]);
   const sitemap = sitemapRuns[0];
   const seoIssues = [
     ...products.filter((item) => !item.seoTitle || item.seoDescription.length < 70).map((item) => ({ type: "Product", title: item.title, issue: "SEO 标题或描述不足" })),
     ...news.filter((item) => !item.seoTitle || item.seoDescription.length < 70).map((item) => ({ type: "News", title: item.title, issue: "SEO 标题或描述不足" })),
   ];
+  const pageSize = paginationPageSize(param(params, "pageSize"));
+  const pagedIssues = paginate(seoIssues, parsePositiveInt(param(params, "page")), pageSize);
   return (
     <AdminShell>
       <AdminPageHeader eyebrow="SEO 管理" title="SEO、GEO 和搜索数据配置" description="管理页面 SEO、搜索验证、统计代码和基础页面审计。" />
@@ -28,9 +41,10 @@ export default async function SeoPage() {
         </AdminCard>
         <AdminCard title="SEO 异常提醒">
           <div className="grid gap-3">
-            {seoIssues.slice(0, 12).map((item) => <div key={`${item.type}-${item.title}`} className="flex justify-between gap-4 rounded-md bg-slate-50 p-3 text-sm"><span>{item.type}: {item.title}</span><StatusPill value={item.issue} /></div>)}
+            {pagedIssues.items.map((item) => <div key={`${item.type}-${item.title}`} className="flex justify-between gap-4 rounded-md bg-slate-50 p-3 text-sm"><span>{item.type}: {item.title}</span><StatusPill value={item.issue} /></div>)}
             {!seoIssues.length ? <StatusPill value="success" /> : null}
           </div>
+          {seoIssues.length ? <div className="mt-5 -mx-5 border-t border-slate-200 md:-mx-6"><AdminPagination pathname="/admin/seo" query={{ pageSize: String(pageSize) }} page={pagedIssues.page} totalPages={pagedIssues.totalPages} total={pagedIssues.total} pageSize={pagedIssues.pageSize} label="待完善项目" /></div> : null}
         </AdminCard>
       </div>
       <div className="mt-6 grid gap-6 xl:grid-cols-2">
@@ -46,7 +60,7 @@ export default async function SeoPage() {
         <AdminCard title="Google Search Console 提交">
           <div className="grid gap-3 text-sm text-slate-600">
             <p className="flex items-center justify-between gap-4"><strong>最近提交</strong><StatusPill value={sitemap?.searchConsole.status || "not_configured"} /></p>
-            <p>{sitemap?.searchConsole.message || "配置 Service Account 并授权 Search Console Property 后才会启用。"}</p>
+            <p>{sitemap?.searchConsole.message || "管理员完成搜索服务授权后即可启用。"}</p>
             <p className="text-xs leading-6 text-slate-500">提交成功只表示 Google 已接收 Sitemap，不代表页面已经抓取或收录。最终状态以 Search Console 为准。</p>
           </div>
         </AdminCard>

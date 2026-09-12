@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { deleteLead, updateLeadStatus } from "@/app/admin/actions";
 import { AdminShell } from "@/components/admin/admin-shell";
+import { AdminPagination, adminQuery } from "@/components/admin/admin-pagination";
 import { DateRangeFilter } from "@/components/admin/date-range-filter";
-import { AdminPageHeader, EmptyState, Field, inputClass, textareaClass } from "@/components/admin/admin-widgets";
+import { AdminPageHeader, EmptyState, StatusPill, inputClass } from "@/components/admin/admin-widgets";
 import { getAdminData, type InquiryRecord } from "@/lib/admin-data";
 import { getSiteSettings } from "@/lib/admin-cms";
 import { paginationPageSize, parsePositiveInt, resolveDateRange } from "@/lib/admin-listing";
@@ -20,86 +20,49 @@ function param(params: Record<string, string | string[] | undefined>, name: stri
 function matches(lead: InquiryRecord, query: string) {
   if (!query) return true;
   const value = query.toLowerCase();
-  return [lead.name, lead.email, lead.company, lead.country, lead.product, lead.phone, lead.sourcePage].join(" ").toLowerCase().includes(value);
+  return [lead.name, lead.email, lead.company, lead.country, lead.product, lead.phone, lead.sourcePage, lead.owner].join(" ").toLowerCase().includes(value);
 }
 
-function urlFor(values: Record<string, string | number | undefined>) {
-  const params = new URLSearchParams();
-  for (const [key, value] of Object.entries(values)) if (value) params.set(key, String(value));
-  return "/admin/leads?" + params.toString();
+function stamp(value: string) {
+  return new Intl.DateTimeFormat("zh-CN", { dateStyle: "medium", timeStyle: "short" }).format(new Date(value));
 }
 
 export default async function LeadsPage({ searchParams }: PageProps) {
   const params = await searchParams;
   const settings = await getSiteSettings();
   const range = resolveDateRange(param(params, "range"), { from: param(params, "from"), to: param(params, "to"), timeZone: settings.timezone || "Asia/Shanghai" });
-  const filters = {
-    range: range.preset,
-    query: param(params, "query"),
-    source: param(params, "source") || "all",
-    status: param(params, "status") || "all",
-    intent: param(params, "intent") || "all",
-    from: range.from,
-    to: range.to,
-  };
+  const filters = { range: range.preset, query: param(params, "query"), source: param(params, "source") || "all", status: param(params, "status") || "all", intent: param(params, "intent") || "all", from: range.from, to: range.to };
   const page = parsePositiveInt(param(params, "page"));
   const pageSize = paginationPageSize(param(params, "pageSize"));
-  const { inquiries, downloadLeads } = await getAdminData();
+  const { inquiries } = await getAdminData();
   const filtered = inquiries.filter((lead) => {
     if (!matches(lead, filters.query)) return false;
     if (filters.source !== "all" && lead.sourceType !== filters.source) return false;
     if (filters.status !== "all" && (lead.status || lead.stage || "new") !== filters.status) return false;
     if (filters.intent !== "all" && lead.intent !== filters.intent) return false;
-    const created = new Date(lead.createdAt).getTime();
-    if (filters.from && created < new Date(filters.from + "T00:00:00").getTime()) return false;
-    if (filters.to && created > new Date(filters.to + "T23:59:59").getTime()) return false;
-    return true;
+    const created = Date.parse(lead.createdAt);
+    return (!filters.from || created >= Date.parse(`${filters.from}T00:00:00`)) && (!filters.to || created <= Date.parse(`${filters.to}T23:59:59.999`));
   }).sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt));
   const paged = paginate(filtered, page, pageSize);
-  const downloadFiltered = downloadLeads.filter((lead) => {
-    const created = new Date(lead.createdAt).getTime();
-    return (!range.from || created >= new Date(range.from + "T00:00:00").getTime()) && (!range.to || created <= new Date(range.to + "T23:59:59.999").getTime());
-  }).sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt));
-  const downloadPage = parsePositiveInt(param(params, "downloadPage"));
-  const pagedDownloads = paginate(downloadFiltered, downloadPage, pageSize);
+  const sourceOptions = [...new Set(inquiries.map((lead) => lead.sourceType).filter(Boolean))];
 
-  return (
-    <AdminShell>
-      <AdminPageHeader eyebrow="客户询盘 CRM" title="客户线索、来源路径和销售跟进" description="从网站访问、产品咨询、资料下载与广告表单获得的线索统一管理。筛选条件可叠加并支持分页导出。" action={<a className="button button-secondary" href="/api/admin/export?type=leads">导出线索 CSV</a>} />
-      <section className="mt-8 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-        <form className="grid gap-3 border-b border-slate-200 bg-slate-50 p-4 md:grid-cols-2 xl:grid-cols-4" method="get">
-          <div className="xl:col-span-4"><DateRangeFilter pathname="/admin/leads" query={filters} preset={range.preset} from={range.from} to={range.to} /></div>
-          <input name="query" defaultValue={filters.query} className={inputClass} placeholder="姓名、邮箱、国家、产品、公司..." />
-          <select name="source" defaultValue={filters.source} className={inputClass}><option value="all">全部来源</option><option value="website_form">网站表单</option><option value="product_inquiry">产品询价</option><option value="download">资料下载</option><option value="advertising">广告线索</option></select>
-          <select name="status" defaultValue={filters.status} className={inputClass}><option value="all">全部状态</option>{["new","pending","contacted","quoted","following","sample","negotiating","won","lost","spam","invalid"].map((status) => <option key={status} value={status}>{status}</option>)}</select>
-          <select name="intent" defaultValue={filters.intent} className={inputClass}><option value="all">全部意向</option><option value="A">A 高意向</option><option value="B">B 中意向</option><option value="C">C 低意向</option><option value="unrated">未判断</option></select>
-          <select name="pageSize" defaultValue={String(paged.pageSize)} className={inputClass}><option value="20">20 条 / 页</option><option value="25">25 条 / 页</option><option value="50">50 条 / 页</option><option value="100">100 条 / 页</option></select>
-          <button className="button button-primary min-h-11" type="submit">筛选线索</button>
-        </form>
-        <div className="flex items-center justify-between border-b border-slate-100 px-5 py-3 text-sm text-slate-500"><span>显示 {paged.items.length} / {paged.total} 条线索</span><span>按最新提交时间排序</span></div>
-        <div className="grid gap-4 p-4">
-          {paged.items.map((lead) => (
-            <article key={lead.id} className="rounded-lg border border-slate-200 p-4 transition hover:border-orange-200">
-              <div className="grid gap-4 lg:grid-cols-[1fr_360px]">
-                <div>
-                  <div className="flex flex-wrap items-center gap-3"><h2 className="text-xl font-black text-slate-950">{lead.name}</h2><span className="rounded-full bg-orange-50 px-2 py-1 text-xs font-black text-orange-700">评分 {lead.score}</span><span className="rounded-full bg-slate-100 px-2 py-1 text-xs font-black text-slate-600">{lead.status || lead.stage || "new"}</span>{lead.intent ? <span className="rounded-full bg-emerald-50 px-2 py-1 text-xs font-black text-emerald-700">{lead.intent} 类意向</span> : null}</div>
-                  <p className="mt-2 text-sm text-slate-500">{lead.email} · {lead.phone || "未填写电话"} · {lead.country || "未填写国家"} · {lead.company || "未填写公司"}</p>
-                  <p className="mt-3 text-sm leading-6 text-slate-700">{lead.product || "未填写产品"} / Flow: {lead.flow || "-"} / Head: {lead.head || "-"} / Cert: {lead.certification || "-"}</p>
-                  <p className="mt-3 rounded-md bg-slate-50 p-3 text-sm leading-6 text-slate-600">{lead.message || "未填写需求内容"}</p>
-                  <p className="mt-2 text-xs font-bold text-slate-400">{lead.sourcePage || "website"} · {lead.sourceType || "website_form"} · {new Date(lead.createdAt).toLocaleString()} · {lead.channel || "Direct"}</p>{lead.visitorId ? <Link href={`/admin/analytics/visitors/${encodeURIComponent(lead.visitorId)}?range=${range.preset}&from=${range.from}&to=${range.to}`} className="mt-2 inline-flex text-xs font-black text-orange-700 hover:underline">查看该客户完整访问路径</Link> : null}
-                </div>
-                <div className="grid gap-3 rounded-md bg-slate-50 p-4">
-                  <form action={updateLeadStatus} className="grid gap-3"><input type="hidden" name="id" value={lead.id} /><Field label="跟进状态"><select name="status" defaultValue={lead.status || "new"} className={inputClass}>{["new","pending","contacted","quoted","following","sample","negotiating","won","lost","spam","invalid"].map((status) => <option key={status} value={status}>{status}</option>)}</select></Field><Field label="意向等级"><select name="intent" defaultValue={lead.intent || "unrated"} className={inputClass}><option value="A">A 高意向</option><option value="B">B 中意向</option><option value="C">C 低意向</option><option value="unrated">未判断</option></select></Field><Field label="销售负责人"><input name="owner" defaultValue={lead.owner} className={inputClass} /></Field><Field label="内部备注"><textarea name="notes" rows={3} defaultValue={lead.notes} className={textareaClass} /></Field><button className="button button-primary min-h-10 text-sm" type="submit">保存跟进</button></form>
-                  <form action={deleteLead}><input type="hidden" name="id" value={lead.id} /><button className="button button-secondary min-h-10 w-full text-sm" type="submit">删除线索</button></form>
-                </div>
-              </div>
-            </article>
-          ))}
-          {!paged.items.length ? <EmptyState text="当前筛选条件下暂无线索。" /> : null}
-        </div>
-        <div className="flex items-center justify-between border-t border-slate-200 px-5 py-4 text-sm"><span className="text-slate-500">第 {paged.page} / {paged.totalPages} 页</span><div className="flex gap-2"><Link aria-disabled={paged.page <= 1} className="rounded-md border border-slate-200 px-3 py-2 font-bold aria-disabled:pointer-events-none aria-disabled:opacity-40" href={urlFor({ ...filters, page: paged.page - 1, pageSize: paged.pageSize })}>上一页</Link><Link aria-disabled={paged.page >= paged.totalPages} className="rounded-md border border-slate-200 px-3 py-2 font-bold aria-disabled:pointer-events-none aria-disabled:opacity-40" href={urlFor({ ...filters, page: paged.page + 1, pageSize: paged.pageSize })}>下一页</Link></div></div>
-      </section>
-      <section className="mt-8 rounded-xl border border-slate-200 bg-white p-6 shadow-sm"><div className="flex items-center justify-between gap-3"><div><h2 className="text-xl font-black text-slate-950">下载资料线索</h2><p className="mt-1 text-sm text-slate-500">与上方时间范围同步，共 {pagedDownloads.total} 条。</p></div></div><div className="mt-4 grid gap-3 md:grid-cols-2">{pagedDownloads.items.map((lead) => <div key={lead.id} className="rounded-md bg-slate-50 p-4 text-sm"><strong>{lead.name}</strong><p className="mt-1 text-slate-500">{lead.assetTitle} · {lead.email} · {lead.country || "未填写国家"}</p></div>)}{!pagedDownloads.items.length ? <EmptyState text="当前时间范围内暂无下载资料线索。" /> : null}</div><div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-4 text-sm text-slate-500"><span>第 {pagedDownloads.page} / {pagedDownloads.totalPages} 页</span><div className="flex gap-2"><Link aria-disabled={pagedDownloads.page <= 1} className="rounded-md border border-slate-200 px-3 py-2 font-bold aria-disabled:pointer-events-none aria-disabled:opacity-40" href={urlFor({ ...filters, downloadPage: pagedDownloads.page - 1, pageSize: pagedDownloads.pageSize })}>上一页</Link><Link aria-disabled={pagedDownloads.page >= pagedDownloads.totalPages} className="rounded-md border border-slate-200 px-3 py-2 font-bold aria-disabled:pointer-events-none aria-disabled:opacity-40" href={urlFor({ ...filters, downloadPage: pagedDownloads.page + 1, pageSize: pagedDownloads.pageSize })}>下一页</Link></div></div></section>
-    </AdminShell>
-  );
+  return <AdminShell>
+    <AdminPageHeader eyebrow="客户管理" title="客户询盘" description="查看真实网站询盘及其来源、项目需求、销售跟进和已关联访问记录。" action={<a className="button button-secondary" href="/api/admin/export?type=leads">导出当前线索</a>} />
+    <section className="mt-8 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+      <form className="grid gap-3 border-b border-slate-200 bg-slate-50 p-4 md:grid-cols-2 xl:grid-cols-4" method="get">
+        <div className="xl:col-span-4"><DateRangeFilter pathname="/admin/leads" query={filters} preset={range.preset} from={range.from} to={range.to} /></div>
+        <input name="query" defaultValue={filters.query} className={inputClass} placeholder="姓名、公司、邮箱、产品或负责人" />
+        <select name="source" defaultValue={filters.source} className={inputClass}><option value="all">全部来源</option>{sourceOptions.map((source) => <option key={source} value={source}>{source}</option>)}</select>
+        <select name="status" defaultValue={filters.status} className={inputClass}><option value="all">全部跟进状态</option>{["new", "pending", "contacted", "quoted", "following", "sample", "negotiating", "won", "lost", "spam", "invalid"].map((status) => <option key={status} value={status}>{status}</option>)}</select>
+        <select name="intent" defaultValue={filters.intent} className={inputClass}><option value="all">全部意向等级</option><option value="A">A 高意向</option><option value="B">B 中意向</option><option value="C">C 低意向</option><option value="unrated">未判断</option></select>
+        <select name="pageSize" defaultValue={String(paged.pageSize)} className={inputClass}><option value="20">20 条 / 页</option><option value="25">25 条 / 页</option><option value="50">50 条 / 页</option><option value="100">100 条 / 页</option></select>
+        <button className="button button-primary min-h-11" type="submit">应用筛选</button>
+      </form>
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 px-5 py-3 text-sm text-slate-500"><span>显示 {paged.items.length} / {paged.total} 条线索</span><span>按提交时间从新到旧排列</span></div>
+      <div className="overflow-x-auto"><table className="min-w-[1040px] w-full text-left text-sm"><thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500"><tr><th className="px-5 py-3">客户</th><th className="px-5 py-3">需求</th><th className="px-5 py-3">来源</th><th className="px-5 py-3">意向 / 状态</th><th className="px-5 py-3">负责人</th><th className="px-5 py-3">提交时间</th><th className="px-5 py-3"></th></tr></thead><tbody className="divide-y divide-slate-100">
+        {paged.items.map((lead) => <tr key={lead.id} className="hover:bg-slate-50/70"><td className="px-5 py-4"><strong className="block text-slate-950">{lead.name}</strong><span className="block max-w-[220px] truncate text-xs text-slate-500">{lead.company || "未填写公司"} · {lead.country || "未填写国家"}</span><span className="block max-w-[220px] truncate text-xs text-slate-500">{lead.email}</span></td><td className="px-5 py-4"><strong className="block max-w-[200px] truncate text-slate-800">{lead.product || "一般咨询"}</strong><span className="block text-xs text-slate-500">{lead.flow || "-"} / {lead.head || "-"}</span></td><td className="px-5 py-4"><span className="block font-bold text-slate-700">{lead.sourceType || "网站表单"}</span><span className="block max-w-[180px] truncate text-xs text-slate-500">{lead.sourcePage || "/"}</span></td><td className="px-5 py-4"><div className="flex flex-wrap gap-1.5"><StatusPill value={lead.status || lead.stage || "new"} />{lead.intent ? <span className="rounded-full bg-orange-50 px-2.5 py-1 text-xs font-black text-orange-700">{lead.intent} 类</span> : null}</div><span className="mt-1 block text-xs text-slate-500">评分 {lead.score}</span></td><td className="px-5 py-4 text-slate-600">{lead.owner || "未分配"}</td><td className="px-5 py-4 text-slate-600">{stamp(lead.createdAt)}</td><td className="px-5 py-4"><Link href={adminQuery(`/admin/leads/${lead.id}`, { range: range.preset, from: range.from, to: range.to })} className="inline-flex rounded-md bg-slate-900 px-3 py-2 text-xs font-black text-white hover:bg-slate-700">查看详情</Link></td></tr>)}
+      </tbody></table>{!paged.items.length ? <div className="p-5"><EmptyState text="当前筛选条件下没有客户询盘。" /></div> : null}</div>
+      <AdminPagination pathname="/admin/leads" query={{ ...filters, pageSize: paged.pageSize }} page={paged.page} totalPages={paged.totalPages} total={paged.total} pageSize={paged.pageSize} label="线索" />
+    </section>
+  </AdminShell>;
 }

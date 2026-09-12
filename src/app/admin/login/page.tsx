@@ -22,8 +22,8 @@ export default async function AdminLoginPage() {
           </span>
           <p className="text-sm font-black text-orange-200">GRIMM 管理后台</p>
         </div>
-        <h1 className="mt-5 text-4xl font-black leading-tight text-white">登录网站运营后台</h1>
-        <p className="mt-4 leading-7 text-slate-400">管理产品、新闻、询盘、下载资料和网站运营数据。</p>
+        <h1 className="mt-5 text-4xl font-black leading-tight text-white">登录网站管理中心</h1>
+        <p className="mt-4 leading-7 text-slate-400">管理产品、内容、客户询盘、下载资料和网站运营数据。</p>
         {!isAdminConfigured() ? (
           <div className="mt-8 rounded-lg border border-orange-300/30 bg-orange-300/10 p-4 text-sm leading-6 text-orange-100">
             管理员登录尚未启用，请联系网站管理员完成账号配置。

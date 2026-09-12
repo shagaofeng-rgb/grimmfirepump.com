@@ -64,7 +64,8 @@ export function filterAnalyticsEvents(events: AnalyticsEventRecord[], filters: A
 
 export function getAnalyticsSummary(events: AnalyticsEventRecord[], filters: AnalyticsFilters = {}): AnalyticsSummary {
   const visibleEvents = filterAnalyticsEvents(events, filters);
-  const realEvents = events.filter((item) => item.trafficType === "real");
+  const comparableEvents = filterAnalyticsEvents(events, { ...filters, traffic: "all" });
+  const realEvents = comparableEvents.filter((item) => item.trafficType === "real");
   const pageViews = visibleEvents.filter((item) => item.event === "page_view");
   const conversions = visibleEvents.filter((item) => conversionEvents.has(item.event));
   const visitorIds = new Set(pageViews.map((item) => item.visitorId).filter(Boolean));
@@ -78,7 +79,7 @@ export function getAnalyticsSummary(events: AnalyticsEventRecord[], filters: Ana
     uniqueVisitors: visitorIds.size,
     uniqueSessions: sessionIds.size,
     returningVisitors: returningVisitors.size,
-    filteredEvents: events.length - realEvents.length,
+    filteredEvents: comparableEvents.filter((item) => item.trafficType !== "real").length,
     topPages: countBy(pageViews, (item) => item.path || "/").slice(0, 8),
     countries: countBy(pageViews, (item) => item.country || "Unknown").slice(0, 8),
     channels: countBy(pageViews, (item) => item.channel || "Direct").slice(0, 8),

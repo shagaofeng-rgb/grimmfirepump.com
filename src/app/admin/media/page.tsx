@@ -1,40 +1,28 @@
+import Image from "next/image";
 import { deleteMedia, saveMedia } from "@/app/admin/actions";
 import { AdminShell } from "@/components/admin/admin-shell";
-import { AdminPageHeader, Field, EmptyState, inputClass, textareaClass } from "@/components/admin/admin-widgets";
+import { AdminPagination } from "@/components/admin/admin-pagination";
+import { AdminPageHeader, EmptyState, inputClass } from "@/components/admin/admin-widgets";
+import { MediaUploadForm } from "@/components/admin/media-upload-form";
 import { listMediaFiles } from "@/lib/admin-cms";
+import { paginationPageSize, parsePositiveInt } from "@/lib/admin-listing";
+import { paginate } from "@/lib/visitor-analytics";
 
 export const dynamic = "force-dynamic";
+type Props = { searchParams: Promise<Record<string, string | string[] | undefined>> };
+function value(params: Record<string, string | string[] | undefined>, name: string) { const item = params[name]; return Array.isArray(item) ? item[0] || "" : item || ""; }
 
-export default async function MediaPage() {
+export default async function MediaPage({ searchParams }: Props) {
+  const params = await searchParams;
   const media = await listMediaFiles();
-  return (
-    <AdminShell>
-      <AdminPageHeader eyebrow="媒体资源" title="图片、PDF、视频和技术文件资源库" description="管理网站图片、资料文件、视频链接和技术文件路径。" />
-      <div className="mt-8 grid gap-6 xl:grid-cols-[420px_1fr]">
-        <form action={saveMedia} className="grid gap-4 rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="text-xl font-black text-slate-950">登记媒体文件</h2>
-          <Field label="文件名称"><input name="name" required className={inputClass} /></Field>
-          <Field label="文件类型"><select name="type" className={inputClass}><option value="image">图片</option><option value="pdf">PDF</option><option value="video">视频</option><option value="document">Word/Excel</option><option value="cad">CAD</option><option value="archive">ZIP</option><option value="other">其他</option></select></Field>
-          <Field label="文件 URL / 路径"><input name="url" required className={inputClass} placeholder="/assets/..." /></Field>
-          <Field label="文件夹"><input name="folder" defaultValue="General" className={inputClass} /></Field>
-          <Field label="Alt 文本"><input name="alt" className={inputClass} /></Field>
-          <Field label="大小"><input name="sizeLabel" className={inputClass} placeholder="320KB" /></Field>
-          <Field label="引用位置"><input name="usedBy" className={inputClass} /></Field>
-          <Field label="描述"><textarea name="description" rows={3} className={textareaClass} /></Field>
-          <button className="button button-primary" type="submit">保存媒体</button>
-        </form>
-        <section className="grid gap-4">
-          {media.map((item) => (
-            <article key={item.id} className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-              <div className="flex flex-wrap justify-between gap-4">
-                <div><strong>{item.name}</strong><p className="mt-1 text-sm text-slate-500">{item.type} · {item.folder} · {item.sizeLabel || "未填写大小"}</p><p className="mt-2 break-all text-sm text-slate-600">{item.url}</p></div>
-                <form action={deleteMedia}><input type="hidden" name="id" value={item.id} /><button className="rounded-md bg-red-50 px-3 py-2 text-sm font-bold text-red-700">删除</button></form>
-              </div>
-            </article>
-          ))}
-          {!media.length ? <EmptyState text="暂无媒体资源。" /> : null}
-        </section>
-      </div>
-    </AdminShell>
-  );
+  const filters = { query: value(params, "query"), type: value(params, "type") || "all", folder: value(params, "folder") || "all" };
+  const page = parsePositiveInt(value(params, "page"));
+  const pageSize = paginationPageSize(value(params, "pageSize"));
+  const folders = [...new Set(media.map((item) => item.folder).filter(Boolean))];
+  const filtered = media.filter((item) => { const search = filters.query.toLowerCase(); return (!search || [item.name, item.url, item.folder, item.alt, item.usedBy].join(" ").toLowerCase().includes(search)) && (filters.type === "all" || item.type === filters.type) && (filters.folder === "all" || item.folder === filters.folder); }).sort((a, b) => Date.parse(b.updatedAt) - Date.parse(a.updatedAt));
+  const paged = paginate(filtered, page, pageSize);
+  return <AdminShell>
+    <AdminPageHeader eyebrow="内容管理" title="媒体资源" description="集中维护网站图片、PDF、视频和技术资料；资源列表与上传操作分离，避免长页面堆叠。" />
+    <div className="mt-8 grid gap-6 xl:grid-cols-[360px_minmax(0,1fr)]"><MediaUploadForm action={saveMedia} /><section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm"><form className="grid gap-3 border-b border-slate-200 bg-slate-50 p-4 md:grid-cols-4" method="get"><input name="query" defaultValue={filters.query} className={inputClass} placeholder="搜索名称、地址、分类或使用位置" /><select name="type" defaultValue={filters.type} className={inputClass}><option value="all">全部类型</option>{["image", "pdf", "video", "document", "cad", "archive", "other"].map((type) => <option key={type} value={type}>{type}</option>)}</select><select name="folder" defaultValue={filters.folder} className={inputClass}><option value="all">全部分类</option>{folders.map((folder) => <option key={folder} value={folder}>{folder}</option>)}</select><select name="pageSize" defaultValue={String(paged.pageSize)} className={inputClass}><option value="20">20 条 / 页</option><option value="25">25 条 / 页</option><option value="50">50 条 / 页</option><option value="100">100 条 / 页</option></select><button className="button button-primary min-h-11" type="submit">应用筛选</button></form><div className="grid gap-4 p-5 sm:grid-cols-2 2xl:grid-cols-3">{paged.items.map((item) => <article key={item.id} className="overflow-hidden rounded-lg border border-slate-200 bg-white"><div className="grid aspect-[16/10] place-items-center bg-slate-50">{item.type === "image" ? <Image src={item.url} alt={item.alt || item.name} width={640} height={400} className="h-full w-full object-contain" unoptimized /> : <span className="text-sm font-black text-slate-500">{item.type.toUpperCase()}</span>}</div><div className="p-4"><div className="flex items-start justify-between gap-3"><div className="min-w-0"><strong className="block truncate text-slate-900">{item.name}</strong><p className="mt-1 text-xs text-slate-500">{item.type} · {item.folder || "未分类"}</p></div><form action={deleteMedia}><input type="hidden" name="id" value={item.id} /><button className="rounded-md border border-slate-200 px-2 py-1 text-xs font-bold text-slate-600">移除</button></form></div><p className="mt-3 line-clamp-2 text-xs leading-5 text-slate-500">{item.usedBy || item.description || "尚未添加使用说明"}</p></div></article>)}{!paged.items.length ? <div className="sm:col-span-2 2xl:col-span-3"><EmptyState text="没有符合条件的媒体资源。" /></div> : null}</div><AdminPagination pathname="/admin/media" query={{ ...filters, pageSize: paged.pageSize }} page={paged.page} totalPages={paged.totalPages} total={paged.total} pageSize={paged.pageSize} label="资源" /></section></div>
+  </AdminShell>;
 }

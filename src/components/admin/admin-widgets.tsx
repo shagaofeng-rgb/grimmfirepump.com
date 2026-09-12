@@ -49,8 +49,15 @@ export function EmptyState({ text }: { text: string }) {
 export function StatusPill({ value }: { value: string }) {
   const labels: Record<string, string> = {
     published: "已发布",
+    published_success: "已发布",
     success: "成功",
     active: "启用",
+    disabled: "停用",
+    running: "执行中",
+    skipped: "已跳过",
+    partial: "部分完成",
+    ready: "可用",
+    not_run: "未执行",
     draft: "草稿",
     review: "审核中",
     offline: "下架",
@@ -71,7 +78,7 @@ export function StatusPill({ value }: { value: string }) {
     connected: "已接入",
   };
   const color =
-    value === "published" || value === "success" || value === "active" || value === "configured" || value === "connected"
+    value === "published" || value === "published_success" || value === "success" || value === "active" || value === "configured" || value === "connected" || value === "ready"
       ? "bg-emerald-50 text-emerald-700"
       : value === "draft" || value === "not_configured" || value === "offline"
         ? "bg-slate-100 text-slate-600"

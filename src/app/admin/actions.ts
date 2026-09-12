@@ -228,7 +228,7 @@ export async function saveProductKnowledge(formData: FormData) {
     primaryKeyword: text(formData, "primaryKeyword"),
     secondaryKeywords: commaList("secondaryKeywords"),
     specificationKeywords: commaList("specificationKeywords"),
-    applicationKeywords: commaList("applicationKeywords"),
+    applicationKeywords: formData.has("applicationKeywords") ? commaList("applicationKeywords") : existing.applicationKeywords,
     industries: commaList("industries"),
     scenarios: commaList("scenarios"),
     buyerPainPoints: commaList("buyerPainPoints"),
@@ -236,7 +236,7 @@ export async function saveProductKnowledge(formData: FormData) {
     buyerBenefits: commaList("buyerBenefits"),
     relatedProductSlugs: commaList("relatedProductSlugs"),
     relatedApplicationSlugs: commaList("relatedApplicationSlugs"),
-    relatedKnowledgeSlugs: commaList("relatedKnowledgeSlugs"),
+    relatedKnowledgeSlugs: formData.has("relatedKnowledgeSlugs") ? commaList("relatedKnowledgeSlugs") : existing.relatedKnowledgeSlugs,
     prohibitedClaims: commaList("prohibitedClaims"),
   };
   await cmsStore.upsertProductKnowledge(item);
@@ -433,6 +433,7 @@ export async function updateLeadStatus(formData: FormData) {
   await writeStore("inquiries.json", next);
   await audit("update_lead", id);
   revalidatePath("/admin/leads");
+  revalidatePath(`/admin/leads/${id}`);
 }
 
 export async function deleteLead(formData: FormData) {

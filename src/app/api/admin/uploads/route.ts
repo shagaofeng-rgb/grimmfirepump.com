@@ -20,7 +20,7 @@ export async function POST(request: Request) {
       body,
       request,
       onBeforeGenerateToken: async (pathname) => {
-        if (!pathname.startsWith("products/")) throw new Error("Invalid upload path.");
+        if (!pathname.startsWith("products/") && !pathname.startsWith("media/")) throw new Error("Invalid upload path.");
 
         return {
           allowedContentTypes: imageTypes,

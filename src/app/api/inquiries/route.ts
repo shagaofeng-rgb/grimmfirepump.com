@@ -34,6 +34,9 @@ const inquirySchema = z.object({
   utmSource: z.string().trim().max(160).optional().default(""),
   utmMedium: z.string().trim().max(160).optional().default(""),
   utmCampaign: z.string().trim().max(160).optional().default(""),
+  visitorId: z.string().trim().max(120).optional().default(""),
+  sessionId: z.string().trim().max(120).optional().default(""),
+  visitNumber: z.coerce.number().int().min(1).max(100000).optional().default(1),
   website: z.string().trim().max(500).optional().default(""),
 });
 

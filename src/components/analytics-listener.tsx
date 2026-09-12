@@ -30,7 +30,7 @@ function createId() {
     : `v_${Date.now()}_${Math.random().toString(16).slice(2)}`;
 }
 
-function getVisitorContext() {
+export function getVisitorContext() {
   const visitorId = getStoredValue(visitorStorageKey, window.localStorage) || createId();
   const existingSession = getStoredValue(sessionStorageKey, window.sessionStorage);
   const sessionId = existingSession || createId();

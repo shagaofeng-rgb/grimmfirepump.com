@@ -1,64 +1,23 @@
 import { deleteCategory, saveCategory } from "@/app/admin/actions";
 import { AdminShell } from "@/components/admin/admin-shell";
-import { AdminPageHeader, Field, StatusPill, inputClass, textareaClass } from "@/components/admin/admin-widgets";
+import { AdminPagination } from "@/components/admin/admin-pagination";
+import { AdminPageHeader, EmptyState, Field, StatusPill, inputClass, textareaClass } from "@/components/admin/admin-widgets";
 import { listCmsProducts, listProductCategories } from "@/lib/admin-cms";
+import { paginationPageSize, parsePositiveInt } from "@/lib/admin-listing";
+import { paginate } from "@/lib/visitor-analytics";
 
 export const dynamic = "force-dynamic";
+type Props = { searchParams: Promise<Record<string, string | string[] | undefined>> };
+function value(params: Record<string, string | string[] | undefined>, name: string) { const item = params[name]; return Array.isArray(item) ? item[0] || "" : item || ""; }
 
-export default async function ProductCategoriesPage() {
+export default async function ProductCategoriesPage({ searchParams }: Props) {
+  const params = await searchParams;
   const [categories, products] = await Promise.all([listProductCategories(), listCmsProducts()]);
+  const filters = { query: value(params, "query") };
+  const page = parsePositiveInt(value(params, "page"));
+  const pageSize = paginationPageSize(value(params, "pageSize"));
   const productCounts = new Map(categories.map((category) => [category.id, products.filter((product) => product.categoryId === category.id).length]));
-
-  return (
-    <AdminShell>
-      <AdminPageHeader eyebrow="产品分类" title="产品分类与 SEO 管理" description="支持父分类、排序、启用停用、SEO、Canonical、OG 图片和收录开关。" />
-      <div className="mt-8 grid gap-6 xl:grid-cols-[0.95fr_1.05fr]">
-        <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="text-xl font-black text-slate-950">新增 / 编辑分类</h2>
-          <form action={saveCategory} className="mt-5 grid gap-4">
-            <Field label="分类英文名称"><input name="name" required className={inputClass} placeholder="Fire Pump Series" /></Field>
-            <Field label="URL Slug"><input name="slug" required className={inputClass} placeholder="fire-pump-series" /></Field>
-            <Field label="父分类 ID"><input name="parentId" className={inputClass} placeholder="留空为一级分类" /></Field>
-            <Field label="排序"><input name="sortOrder" type="number" defaultValue="10" className={inputClass} /></Field>
-            <Field label="封面图片"><input name="coverImage" className={inputClass} placeholder="/assets/..." /></Field>
-            <Field label="分类简介"><textarea name="summary" rows={3} className={textareaClass} /></Field>
-            <Field label="详细描述"><textarea name="description" rows={4} className={textareaClass} /></Field>
-            <Field label="SEO Title"><input name="seoTitle" className={inputClass} /></Field>
-            <Field label="SEO Description"><textarea name="seoDescription" rows={3} className={textareaClass} /></Field>
-            <Field label="SEO Keywords"><input name="seoKeywords" className={inputClass} /></Field>
-            <Field label="Canonical URL"><input name="canonicalUrl" className={inputClass} /></Field>
-            <Field label="Open Graph 图片"><input name="ogImage" className={inputClass} /></Field>
-            <label className="flex items-center gap-2 text-sm font-bold text-slate-700"><input name="enabled" type="checkbox" defaultChecked /> 启用分类</label>
-            <label className="flex items-center gap-2 text-sm font-bold text-slate-700"><input name="indexable" type="checkbox" defaultChecked /> 允许收录</label>
-            <button className="button button-primary" type="submit">保存分类</button>
-          </form>
-        </section>
-
-        <section className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
-          <table className="w-full min-w-[760px] text-left text-sm">
-            <thead className="bg-slate-50 text-slate-600">
-              <tr>{["分类", "Slug", "产品数", "状态", "排序", "操作"].map((head) => <th key={head} className="px-4 py-3 font-black">{head}</th>)}</tr>
-            </thead>
-            <tbody>
-              {categories.map((category) => (
-                <tr key={category.id} className="border-t border-slate-100">
-                  <td className="px-4 py-4"><strong>{category.name}</strong><p className="mt-1 text-slate-500">{category.summary}</p></td>
-                  <td className="px-4 py-4">{category.slug}</td>
-                  <td className="px-4 py-4">{productCounts.get(category.id) || 0}</td>
-                  <td className="px-4 py-4"><StatusPill value={category.enabled ? "active" : "disabled"} /></td>
-                  <td className="px-4 py-4">{category.sortOrder}</td>
-                  <td className="px-4 py-4">
-                    <form action={deleteCategory}>
-                      <input type="hidden" name="id" value={category.id} />
-                      <button className="rounded-md bg-red-50 px-3 py-2 font-bold text-red-700" type="submit">删除</button>
-                    </form>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </section>
-      </div>
-    </AdminShell>
-  );
+  const filtered = categories.filter((item) => !filters.query || [item.name, item.slug, item.summary].join(" ").toLowerCase().includes(filters.query.toLowerCase())).sort((a, b) => a.sortOrder - b.sortOrder);
+  const paged = paginate(filtered, page, pageSize);
+  return <AdminShell><AdminPageHeader eyebrow="内容管理" title="产品分类" description="维护分类层级、排序、展示状态和搜索信息。" /><div className="mt-8 grid gap-6 xl:grid-cols-[360px_minmax(0,1fr)]"><form action={saveCategory} className="grid content-start gap-4 rounded-lg border border-slate-200 bg-white p-5 shadow-sm"><h2 className="text-xl font-black text-slate-950">新增分类</h2><Field label="分类名称"><input name="name" required className={inputClass} placeholder="Fire Pump Series" /></Field><Field label="路径标识"><input name="slug" required className={inputClass} placeholder="fire-pump-series" /></Field><Field label="上级分类 ID"><input name="parentId" className={inputClass} placeholder="留空为一级分类" /></Field><Field label="排序"><input name="sortOrder" type="number" defaultValue="10" className={inputClass} /></Field><Field label="封面图片"><input name="coverImage" className={inputClass} /></Field><Field label="简介"><textarea name="summary" rows={3} className={textareaClass} /></Field><Field label="SEO Title"><input name="seoTitle" className={inputClass} /></Field><Field label="SEO Description"><textarea name="seoDescription" rows={3} className={textareaClass} /></Field><label className="flex items-center gap-2 text-sm font-bold text-slate-700"><input name="enabled" type="checkbox" defaultChecked /> 启用分类</label><label className="flex items-center gap-2 text-sm font-bold text-slate-700"><input name="indexable" type="checkbox" defaultChecked /> 允许收录</label><button className="button button-primary" type="submit">保存分类</button></form><section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm"><form className="flex gap-3 border-b border-slate-200 bg-slate-50 p-4" method="get"><input name="query" defaultValue={filters.query} className={inputClass} placeholder="搜索分类名称或路径" /><select name="pageSize" defaultValue={String(paged.pageSize)} className={inputClass}><option value="20">20 条 / 页</option><option value="25">25 条 / 页</option><option value="50">50 条 / 页</option><option value="100">100 条 / 页</option></select><button className="button button-primary min-h-11" type="submit">筛选</button></form><div className="overflow-x-auto"><table className="min-w-[760px] w-full text-left text-sm"><thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500"><tr>{["分类", "路径", "产品数", "状态", "排序", "操作"].map((head) => <th key={head} className="px-5 py-3 font-black">{head}</th>)}</tr></thead><tbody className="divide-y divide-slate-100">{paged.items.map((item) => <tr key={item.id} className="hover:bg-slate-50/70"><td className="px-5 py-4"><strong className="block text-slate-950">{item.name}</strong><span className="block max-w-md truncate text-xs text-slate-500">{item.summary}</span></td><td className="px-5 py-4 text-slate-700">{item.slug}</td><td className="px-5 py-4 text-slate-700">{productCounts.get(item.id) || 0}</td><td className="px-5 py-4"><StatusPill value={item.enabled ? "active" : "offline"} /></td><td className="px-5 py-4 text-slate-700">{item.sortOrder}</td><td className="px-5 py-4"><form action={deleteCategory}><input type="hidden" name="id" value={item.id} /><button className="rounded-md border border-slate-200 px-3 py-2 text-xs font-bold text-slate-600">停用</button></form></td></tr>)}</tbody></table>{!paged.items.length ? <div className="p-5"><EmptyState text="没有符合条件的产品分类。" /></div> : null}</div><AdminPagination pathname="/admin/product-categories" query={{ ...filters, pageSize: paged.pageSize }} page={paged.page} totalPages={paged.totalPages} total={paged.total} pageSize={paged.pageSize} label="分类" /></section></div></AdminShell>;
 }

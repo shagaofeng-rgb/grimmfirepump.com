@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { company } from "@/data/site";
+import { getVisitorContext } from "@/components/analytics-listener";
 
 type ProductInquiryFormProps = {
   productTitle: string;
@@ -16,19 +17,20 @@ export function ProductInquiryForm({ productTitle }: ProductInquiryFormProps) {
     setSubmitting(true);
     const form = event.currentTarget;
     const data = Object.fromEntries(new FormData(form).entries());
+    const visitor = getVisitorContext();
 
     try {
       const response = await fetch("/api/inquiries", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...data, product: productTitle, sourcePage: window.location.pathname }),
+        body: JSON.stringify({ ...data, ...visitor, product: productTitle, sourcePage: window.location.pathname }),
       });
       if (!response.ok) throw new Error("Submission failed");
 
       await fetch("/api/analytics", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ event: "inquiry_submit", path: window.location.pathname, label: productTitle }),
+        body: JSON.stringify({ event: "inquiry_submit", path: window.location.pathname, label: productTitle, ...visitor }),
       }).catch(() => undefined);
 
       setMessage(`Inquiry received. We will reply via ${company.email} or WhatsApp.`);
