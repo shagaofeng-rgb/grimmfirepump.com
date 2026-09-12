@@ -6,10 +6,10 @@ import { ArrowRight, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
 const certificates = [
-  { src: "/assets/certificates/home/fire-pump-emc-attestation.png", title: "Machinery & EMC Attestation" },
-  { src: "/assets/certificates/home/iso-45001-ohs.png", title: "ISO 45001 Occupational Health & Safety" },
-  { src: "/assets/certificates/home/iso-9001-quality.png", title: "ISO 9001 Quality Management" },
-  { src: "/assets/certificates/home/iso-14001-environmental.png", title: "ISO 14001 Environmental Management" },
+  { src: "/assets/certificates/public/fire-pump-emc-attestation.jpg", title: "Machinery & EMC Attestation" },
+  { src: "/assets/certificates/public/iso-45001-ohs.jpg", title: "ISO 45001 Occupational Health & Safety" },
+  { src: "/assets/certificates/public/iso-9001-quality.jpg", title: "ISO 9001 Quality Management" },
+  { src: "/assets/certificates/public/iso-14001-environmental.jpg", title: "ISO 14001 Environmental Management" },
 ];
 
 export function CertificationShowcase() {
@@ -53,3 +53,4 @@ export function CertificationShowcase() {
     </section>
   );
 }
+
