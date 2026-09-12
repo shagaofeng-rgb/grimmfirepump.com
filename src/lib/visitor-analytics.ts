@@ -98,3 +98,102 @@ export function paginate<T>(items: T[], page = 1, pageSize = 25) {
     totalPages,
   };
 }
+
+
+export type VisitorProfile = {
+  visitorId: string;
+  firstSeenAt: string;
+  lastSeenAt: string;
+  visits: number;
+  sessions: number;
+  pageViews: number;
+  conversions: number;
+  country: string;
+  countryCode: string;
+  channel: string;
+  ipMasked: string;
+  paths: string[];
+  latestPath: string;
+  latestEvent: string;
+};
+
+export type VisitorSession = {
+  sessionId: string;
+  startedAt: string;
+  endedAt: string;
+  eventCount: number;
+  entryPath: string;
+  exitPath: string;
+  channel: string;
+  country: string;
+  events: AnalyticsEventRecord[];
+};
+
+function latestByCreatedAt(events: AnalyticsEventRecord[]) {
+  return [...events].sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt))[0];
+}
+
+export function getVisitorProfiles(events: AnalyticsEventRecord[], filters: AnalyticsFilters = {}) {
+  const visible = filterAnalyticsEvents(events, filters).filter((event) => Boolean(event.visitorId));
+  const groups = new Map<string, AnalyticsEventRecord[]>();
+  for (const event of visible) {
+    const key = event.visitorId || "";
+    groups.set(key, [...(groups.get(key) || []), event]);
+  }
+
+  return [...groups.entries()].map(([visitorId, records]): VisitorProfile => {
+    const chronological = [...records].sort((a, b) => Date.parse(a.createdAt) - Date.parse(b.createdAt));
+    const latest = latestByCreatedAt(records)!;
+    const pageViews = records.filter((event) => event.event === "page_view");
+    const sessionIds = new Set(records.map((event) => event.sessionId).filter(Boolean));
+    const visitNumbers = new Set(records.map((event) => event.visitNumber).filter(Boolean));
+    const paths = [...new Set(pageViews.map((event) => event.path || "/"))];
+    return {
+      visitorId,
+      firstSeenAt: chronological[0].createdAt,
+      lastSeenAt: latest.createdAt,
+      visits: visitNumbers.size || Math.max(...records.map((event) => event.visitNumber || 1), 1),
+      sessions: sessionIds.size || 1,
+      pageViews: pageViews.length,
+      conversions: records.filter((event) => conversionEvents.has(event.event)).length,
+      country: latest.country || "Unknown",
+      countryCode: latest.countryCode || "",
+      channel: latest.channel || "Direct",
+      ipMasked: latest.ipMasked || "",
+      paths,
+      latestPath: latest.path || "/",
+      latestEvent: latest.event,
+    };
+  }).sort((a, b) => Date.parse(b.lastSeenAt) - Date.parse(a.lastSeenAt));
+}
+
+export function getVisitorSessions(events: AnalyticsEventRecord[], visitorId: string, filters: AnalyticsFilters = {}) {
+  const records = filterAnalyticsEvents(events, filters)
+    .filter((event) => event.visitorId === visitorId)
+    .sort((a, b) => Date.parse(a.createdAt) - Date.parse(b.createdAt));
+  const groups = new Map<string, AnalyticsEventRecord[]>();
+  for (const event of records) {
+    const key = event.sessionId || `legacy-${event.createdAt.slice(0, 10)}`;
+    groups.set(key, [...(groups.get(key) || []), event]);
+  }
+  return [...groups.entries()].map(([sessionId, sessionEvents]): VisitorSession => {
+    const first = sessionEvents[0];
+    const last = sessionEvents[sessionEvents.length - 1];
+    const pathEvents = sessionEvents.filter((event) => event.event === "page_view");
+    return {
+      sessionId,
+      startedAt: first.createdAt,
+      endedAt: last.createdAt,
+      eventCount: sessionEvents.length,
+      entryPath: pathEvents[0]?.path || first.path || "/",
+      exitPath: pathEvents[pathEvents.length - 1]?.path || last.path || "/",
+      channel: first.channel || "Direct",
+      country: first.country || "Unknown",
+      events: sessionEvents,
+    };
+  }).sort((a, b) => Date.parse(b.startedAt) - Date.parse(a.startedAt));
+}
+
+export function getVisitorProfile(events: AnalyticsEventRecord[], visitorId: string, filters: AnalyticsFilters = {}) {
+  return getVisitorProfiles(events, filters).find((profile) => profile.visitorId === visitorId) || null;
+}

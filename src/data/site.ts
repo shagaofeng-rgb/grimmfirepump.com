@@ -374,32 +374,32 @@ export const factoryImages = [
 
 export const certificates = [
   {
-    src: "/assets/certificates/real/fire-pump-machinery-emc-attestation.jpg",
+    src: "/assets/certificates/public/fire-pump-emc-attestation.jpg",
     title: "Fire Pump Machinery & EMC Attestation",
     note: "Attestation covering the Machinery Directive 2006/42/EC and EMC Directive 2014/30/EU for listed fire-pump models.",
     issuer: "UDEM International Certification",
-    validity: "Valid through 08 Jan 2030",
+    validity: "Validity details available on request",
   },
   {
-    src: "/assets/certificates/real/iso-9001.jpg",
+    src: "/assets/certificates/public/iso-9001-quality.jpg",
     title: "ISO 9001 Quality Management System",
     note: "Quality management system certification covering pumps, motors, pump control cabinets and water supply and drainage equipment sales.",
     issuer: "Huayi Certification Center",
-    validity: "Valid through 09 Nov 2026",
+    validity: "Validity details available on request",
   },
   {
-    src: "/assets/certificates/real/iso-14001.jpg",
+    src: "/assets/certificates/public/iso-14001-environmental.jpg",
     title: "ISO 14001 Environmental Management System",
     note: "Environmental management system certification for the company scope stated on the certificate.",
     issuer: "Huayi Certification Center",
-    validity: "Valid through 09 Nov 2026",
+    validity: "Validity details available on request",
   },
   {
-    src: "/assets/certificates/real/iso-45001.jpg",
+    src: "/assets/certificates/public/iso-45001-ohs.jpg",
     title: "ISO 45001 Occupational Health & Safety",
     note: "Occupational health and safety management system certification for the company scope stated on the certificate.",
     issuer: "Huayi Certification Center",
-    validity: "Valid through 09 Nov 2026",
+    validity: "Validity details available on request",
   },
 ];
 
@@ -584,3 +584,4 @@ export const footerColumns = [
 ];
 
 export const toolIcons = { Wrench, Globe2, Mail, MapPinned };
+

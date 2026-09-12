@@ -67,6 +67,7 @@ export type NewsArticle = {
   eventFingerprint: string;
   contentHash: string;
   relatedProducts: Array<{ slug: string; title: string; score: number }>;
+  coverImageKey?: string;
   coverImageUrl: string;
   coverImageSourceUrl: string;
   coverImagePageUrl: string;
@@ -188,28 +189,17 @@ const CANDIDATES_STORE = "news-candidates.json";
 const DELIVERY_CHECKS_STORE = "news-delivery-checks.json";
 const SITE_ID = "grimm-firepump-global";
 
-const fallbackNewsImages = [
-  {
-    url: "/assets/products/diesel-fire-pump.webp",
-    source: company.website,
-    topic: "industrial fire protection pump room",
-  },
-  {
-    url: "/assets/products/electric-fire-pump.webp",
-    source: company.website,
-    topic: "factory engineering equipment",
-  },
-  {
-    url: "/assets/applications/hero-edj.webp",
-    source: company.website,
-    topic: "commercial building fire protection",
-  },
-  {
-    url: "/assets/factory/factory-testing.webp",
-    source: company.website,
-    topic: "infrastructure water system",
-  },
-];
+const ownedNewsImages = [
+  { key: "diesel-engine-pump", url: "/assets/synced/products/diesel-engine-fire-pump.png", alt: "Diesel engine fire pump package", width: 1200, height: 630, productSlugs: ["diesel-engine-fire-pump", "diesel-engine-plus-jockey-pump-set", "edj-fire-pump-set"], tags: ["diesel", "engine", "fire pump", "industrial"] },
+  { key: "diesel-jockey-package", url: "/assets/synced/products/diesel-engine-plus-jockey-pump-set.jpg", alt: "Diesel engine and jockey pump set", width: 1200, height: 630, productSlugs: ["diesel-engine-plus-jockey-pump-set", "edj-fire-pump-set"], tags: ["diesel", "jockey", "pressure", "fire pump"] },
+  { key: "edj-fire-pump", url: "/assets/synced/products/edj-fire-pump-set.jpg", alt: "EDJ fire pump set", width: 1200, height: 630, productSlugs: ["edj-fire-pump-set"], tags: ["edj", "electric", "diesel", "jockey", "fire protection"] },
+  { key: "electric-jockey-package", url: "/assets/synced/products/2-electric-plus-jockey-pump-set.jpg", alt: "Electric fire pump and jockey pump set", width: 1200, height: 630, productSlugs: ["2-electric-plus-jockey-pump-set", "electric-long-shaft-fire-pump"], tags: ["electric", "motor", "jockey", "fire pump"] },
+  { key: "electric-long-shaft", url: "/assets/synced/products/electric-long-shaft-fire-pump.png", alt: "Electric long shaft fire pump", width: 1200, height: 630, productSlugs: ["electric-long-shaft-fire-pump"], tags: ["electric", "long shaft", "vertical", "fire pump"] },
+  { key: "diesel-long-shaft", url: "/assets/synced/products/diesel-engine-long-shaft-fire-pump.png", alt: "Diesel engine long shaft fire pump", width: 1200, height: 630, productSlugs: ["diesel-engine-long-shaft-fire-pump"], tags: ["diesel", "long shaft", "engine", "fire pump"] },
+  { key: "diesel-product", url: "/assets/products/diesel-fire-pump.webp", alt: "Diesel fire pump system", width: 1200, height: 630, productSlugs: ["diesel-engine-fire-pump", "diesel-engine-plus-jockey-pump-set"], tags: ["diesel", "fire water", "pump room"] },
+  { key: "electric-product", url: "/assets/products/electric-fire-pump.webp", alt: "Electric fire pump system", width: 1200, height: 630, productSlugs: ["2-electric-plus-jockey-pump-set"], tags: ["electric", "fire water", "pump room"] },
+  { key: "edj-application", url: "/assets/applications/hero-edj.webp", alt: "EDJ fire protection pump application", width: 1200, height: 630, productSlugs: ["edj-fire-pump-set", "diesel-engine-plus-jockey-pump-set", "2-electric-plus-jockey-pump-set"], tags: ["jockey", "commercial", "fire protection", "water system"] },
+] as const;
 
 const defaultSourceUrls = [
   "https://www.datacenterdynamics.com/en/rss/",
@@ -613,8 +603,8 @@ async function buildArticle(item: FeedItem, relatedProducts: Array<{ slug: strin
     `Industry signal: ${cleanText(item.description || item.title).slice(0, 220)}`,
     `GRIMM PUMP uses this public update only as industry context; it is not a GRIMM PUMP project reference.`,
   ].filter((fact) => fact.length > 12);
-  const image = await resolveNewsImage(primaryProduct?.slug || "", productName);
   const slug = uniqueSlug(item.title, item.publishedAt);
+  const image = await resolveNewsImage(primaryProduct?.slug || "", `${productName} ${item.title}`, siteId);
   const title = trimText(cleanText(item.title), 92);
   const summary = trimText(`An independently edited summary of a ${item.sourceName} update, with source facts and industry context for ${industry.toLowerCase()} readers.`, 160);
   const body = buildEditorialNewsAnalysis({ industry, scenario, sourceName: item.sourceName, sourceDate: item.publishedAt.slice(0, 10), sourceSummary: cleanText(item.description || item.title) });
@@ -654,14 +644,15 @@ async function buildArticle(item: FeedItem, relatedProducts: Array<{ slug: strin
     eventFingerprint: fingerprintForEvent(item.title),
     contentHash: hash(`${item.title} ${cleanText(item.description)}`),
     relatedProducts,
+    coverImageKey: image.key,
     coverImageUrl: image.url,
     coverImageSourceUrl: image.sourceUrl,
     coverImagePageUrl: image.pageUrl,
-    coverImageAlt: `${productName} product image for ${scenario}`,
+    coverImageAlt: image.alt,
     coverImageWidth: image.width,
     coverImageHeight: image.height,
     coverImageFetchedAt: now,
-    coverImageHash: hash(image.url),
+    coverImageHash: hash(`${image.key}:${image.url}`),
     coverImageStatus: image.status,
     seoTitle: trimText(`${title} | GRIMM PUMP`, 60),
     seoDescription: summary,
@@ -698,29 +689,22 @@ function buildEditorialNewsAnalysis(input: { industry: string; scenario: string;
   ];
 }
 
-async function resolveNewsImage(productSlug: string, topic: string) {
-  // External publisher imagery is never copied into automated articles. Use a GRIMM-owned product image instead.
-  const productImageBySlug: Record<string, string> = {
-    "edj-fire-pump-set": "/assets/synced/products/edj-fire-pump-set.jpg",
-    "diesel-engine-fire-pump": "/assets/synced/products/diesel-engine-fire-pump.png",
-    "diesel-engine-plus-jockey-pump-set": "/assets/synced/products/diesel-engine-plus-jockey-pump-set.jpg",
-    "2-electric-plus-jockey-pump-set": "/assets/synced/products/2-electric-plus-jockey-pump-set.jpg",
-    "electric-long-shaft-fire-pump": "/assets/synced/products/electric-long-shaft-fire-pump.png",
-    "diesel-engine-long-shaft-fire-pump": "/assets/synced/products/diesel-engine-long-shaft-fire-pump.png",
-  };
-  if (productImageBySlug[productSlug]) {
-    return { url: productImageBySlug[productSlug], sourceUrl: productImageBySlug[productSlug], pageUrl: company.website, width: 1200, height: 630, status: "ready" as const };
-  }
-  const topicWord = topic.toLowerCase().split(" ")[0];
-  const fallback = fallbackNewsImages.find((image) => image.topic.includes(topicWord)) || fallbackNewsImages[0];
-  return {
-    url: fallback.url,
-    sourceUrl: fallback.url,
-    pageUrl: fallback.source,
-    width: 1200,
-    height: 630,
-    status: "ready" as const,
-  };
+async function resolveNewsImage(productSlug: string, topic: string, siteId = SITE_ID) {
+  // Only GRIMM-owned assets are eligible. Persist the key on each article so
+  // editors can audit or deliberately replace a cover without changing history.
+  const terms = `${productSlug} ${topic}`.toLowerCase();
+  const ranked = ownedNewsImages.map((image) => ({
+    image,
+    score: ((image.productSlugs as readonly string[]).includes(productSlug) ? 100 : 0)
+      + image.tags.reduce((score, tag) => score + (terms.includes(tag) ? 8 : 0), 0),
+  })).sort((left, right) => right.score - left.score || left.image.key.localeCompare(right.image.key));
+  const recent = new Set((await listNewsArticles(siteId)).slice(0, 8).map((article) => article.coverImageKey || article.coverImageUrl));
+  const matched = ranked.filter((entry) => entry.score > 0);
+  const unused = matched.filter((entry) => !recent.has(entry.image.key) && !recent.has(entry.image.url));
+  const candidates = unused.length ? unused : matched.length ? matched : ranked;
+  const seed = Number.parseInt(hash(`${productSlug}|${topic}|${candidates.map((entry) => entry.image.key).join("|")}`).slice(0, 8), 16);
+  const selected = candidates[seed % candidates.length].image;
+  return { key: selected.key, url: selected.url, sourceUrl: selected.url, pageUrl: company.website, alt: selected.alt, width: selected.width, height: selected.height, status: "ready" as const };
 }
 
 function buildOriginalAnalysis(input: {
