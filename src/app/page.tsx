@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
-import { HomeHeader } from "@/components/home/home-header";
+import { Header } from "@/components/header";
 import { Hero } from "@/components/home/hero";
-import { AdvantageSection } from "@/components/home/advantage-section";
-import { ProjectPath } from "@/components/home/project-path";
-import { ProductSection } from "@/components/home/product-section";
-import { FactoryPreviewSection } from "@/components/home/factory-preview-section";
+import { HomeTrustBar } from "@/components/home/home-trust-bar";
+import { HomeCertificationSection } from "@/components/home/home-certification-section";
+import { HomeFeaturedProducts } from "@/components/home/home-featured-products";
+import { HomeFactoryCapability } from "@/components/home/home-factory-capability";
+import { HomeGlobalCoverage } from "@/components/home/home-global-coverage";
+import { ApplicationSection } from "@/components/home/application-section";
+import { HomeFaq } from "@/components/home/home-faq";
 import { HomeCta } from "@/components/home/home-cta";
 import { HomeFooter } from "@/components/home/home-footer";
 import { localizedAlternates } from "@/lib/i18n";
@@ -21,13 +24,16 @@ export const dynamic = "force-dynamic";
 export default function Home() {
   return (
     <div className="home-editorial">
-      <HomeHeader />
+      <Header />
       <main>
         <Hero />
-        <AdvantageSection />
-        <ProjectPath />
-        <ProductSection featuredOnly />
-        <FactoryPreviewSection />
+        <HomeTrustBar />
+        <HomeCertificationSection />
+        <HomeFeaturedProducts />
+        <HomeFactoryCapability />
+        <HomeGlobalCoverage />
+        <ApplicationSection featuredOnly />
+        <HomeFaq />
         <HomeCta />
       </main>
       <HomeFooter />

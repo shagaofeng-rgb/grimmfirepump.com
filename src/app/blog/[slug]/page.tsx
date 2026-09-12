@@ -6,17 +6,12 @@ import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { StickyCta } from "@/components/sticky-cta";
 import { company } from "@/data/site";
-import { getPublicPost, getPublicPosts } from "@/lib/public-cms";
+import { getPublicPost } from "@/lib/public-cms";
 import { ArticleContent } from "@/components/article-content";
 
 type BlogDetailProps = { params: Promise<{ slug: string }> };
 
 export const dynamic = "force-dynamic";
-
-export async function generateStaticParams() {
-  const posts = await getPublicPosts();
-  return posts.map((post) => ({ slug: post.slug }));
-}
 
 export async function generateMetadata({ params }: BlogDetailProps): Promise<Metadata> {
   const { slug } = await params;

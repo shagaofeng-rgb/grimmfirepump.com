@@ -3,18 +3,13 @@ import { notFound } from "next/navigation";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { company } from "@/data/site";
-import { getNewsArticle, listPublishedNews } from "@/lib/news-automation";
+import { getNewsArticle } from "@/lib/news-automation";
 import { ArticleContent } from "@/components/article-content";
 import { safeArticleImageUrl } from "@/lib/article-content";
 
 type NewsDetailProps = { params: Promise<{ slug: string }> };
 
 export const dynamic = "force-dynamic";
-
-export async function generateStaticParams() {
-  const news = await listPublishedNews();
-  return news.map((item) => ({ slug: item.slug }));
-}
 
 export async function generateMetadata({ params }: NewsDetailProps): Promise<Metadata> {
   const { slug } = await params;

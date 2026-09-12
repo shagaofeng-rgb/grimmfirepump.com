@@ -36,11 +36,6 @@ const ignoredTableLabels = new Set(["Pump", "Model", "Capacity(GPM)", "Head(BAR)
 
 export const dynamic = "force-dynamic";
 
-export async function generateStaticParams() {
-  const products = await getPublicProducts();
-  return products.map((product) => ({ slug: product.slug }));
-}
-
 export async function generateMetadata({ params }: ProductMetadataProps): Promise<Metadata> {
   const { slug } = await params;
   const product = await getPublicProduct(slug);
