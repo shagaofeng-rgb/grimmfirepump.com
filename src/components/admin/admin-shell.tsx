@@ -71,16 +71,16 @@ export async function AdminShell({ children }: { children: ReactNode }) {
             <small className="block text-xs font-bold tracking-normal text-slate-400">网站管理中心</small>
           </span>
         </Link>
-        <nav className="mt-7 max-h-[calc(100vh-142px)] space-y-5 overflow-y-auto pr-1">
-          {groups.map((group) => <div key={group}><p className="px-3 pb-1 text-[11px] font-black tracking-[0.12em] text-slate-500">{group}</p>{visibleNav.filter((item) => item.group === group).map((item) => (
-            <Link key={item.href} href={item.href} className="flex min-h-10 items-center gap-3 rounded-md px-3 py-2 text-sm font-bold text-slate-300 hover:bg-white/10 hover:text-white">
+        <nav className="mt-7 max-h-[calc(100vh-142px)] space-y-5 overflow-y-auto pr-1" aria-label="后台功能菜单">
+          {groups.map((group) => <div key={group}><p className="px-3 pb-1 text-[11px] font-black tracking-[0.12em] text-slate-300">{group}</p>{visibleNav.filter((item) => item.group === group).map((item) => (
+            <Link key={item.href} href={item.href} className="flex min-h-10 items-center gap-3 rounded-md border border-transparent bg-transparent px-3 py-2 text-sm font-bold text-slate-100 opacity-100 transition-colors hover:border-white/10 hover:bg-white/10 hover:text-white">
               <item.icon size={17} />
               {item.label}
             </Link>
           ))}</div>)}
         </nav>
         <form action="/admin/logout" method="post" className="absolute bottom-4 left-4 right-4">
-          <button className="flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-left text-sm font-bold text-slate-400 hover:bg-white/10 hover:text-white" type="submit">
+          <button className="flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-left text-sm font-bold text-slate-200 hover:bg-white/10 hover:text-white" type="submit">
             <Lock size={17} />
             安全退出
           </button>

@@ -104,7 +104,7 @@ export async function ProductSection({ featuredOnly = false, group, page = 1 }: 
                   <li key={spec} className="rounded-full bg-blue-50 px-3 py-1.5 text-xs font-bold text-[var(--navy-800)]">{spec}</li>
                 ))}
               </ul>
-              <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-black text-[var(--navy-800)]">View details <ArrowUpRight size={16} /></span>
+              <span className="product-card-cta relative z-20 mt-5 inline-flex items-center gap-1.5 text-sm font-black text-[var(--navy-800)]">View details <ArrowUpRight size={16} /></span>
             </div>
           </article>
         ))}

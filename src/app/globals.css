@@ -132,6 +132,17 @@ video {
   transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
 
+.product-card-cta {
+  color: var(--navy-800);
+  opacity: 1;
+  visibility: visible;
+}
+
+.product-card:hover .product-card-cta,
+.product-card:focus-within .product-card-cta {
+  color: var(--orange-dark);
+}
+
 @media (hover: hover) {
   .card-interactive:hover {
     border-color: #b9c8d5;
