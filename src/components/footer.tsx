@@ -37,7 +37,7 @@ export function Footer() {
           <p className="mt-2 text-sm leading-7">{company.address}</p>
           <div className="mt-4 grid gap-2 text-sm">
             <a className="hover:text-white" href={`mailto:${company.email}`}>{company.email}</a>
-            <a className="hover:text-white" href={company.whatsappUrl} target="_blank" rel="noreferrer" data-event="whatsapp_click">
+            <a className="hover:text-white" href={company.whatsappUrl} target="_blank" rel="noreferrer" data-event="whatsapp_click" data-whatsapp-account="grimm-main" data-whatsapp-placement="footer">
               WhatsApp: {company.phone}
             </a>
             <a className="hover:text-white" href={company.facebookUrl} target="_blank" rel="noreferrer" data-event="facebook_click">

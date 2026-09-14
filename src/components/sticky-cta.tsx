@@ -8,6 +8,8 @@ export function StickyCta() {
       target="_blank"
       rel="noreferrer"
       data-event="whatsapp_click"
+      data-whatsapp-account="grimm-main"
+      data-whatsapp-placement="sticky_float"
       aria-label="Contact GRIMM PUMP on WhatsApp"
       title="WhatsApp"
     >

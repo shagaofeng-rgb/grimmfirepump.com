@@ -53,6 +53,39 @@ export type InquiryRecord = {
   intent?: "A" | "B" | "C" | "unrated";
   owner?: string;
   notes?: string;
+  whatsappClickId?: string;
+  whatsappAccountId?: string;
+  whatsappAccountLabel?: string;
+  whatsappClickSource?: string;
+  whatsappClickPage?: string;
+  whatsappClickedAt?: string;
+};
+
+export type WhatsAppClickRecord = {
+  id: string;
+  createdAt: string;
+  accountId: string;
+  accountLabel: string;
+  targetUrl: string;
+  placement: string;
+  path: string;
+  visitorId?: string;
+  sessionId?: string;
+  visitNumber?: number;
+  country?: string;
+  countryCode?: string;
+  region?: string;
+  city?: string;
+  channel?: string;
+  referrer?: string;
+  utmSource?: string;
+  utmMedium?: string;
+  utmCampaign?: string;
+  ipMasked?: string;
+  userAgent?: string;
+  trafficType?: "real" | "test" | "bot";
+  trafficReason?: string;
+  clientClickId?: string;
 };
 
 export type DownloadLeadRecord = {
@@ -91,10 +124,11 @@ export type AnalyticsEventRecord = {
 };
 
 export async function getAdminData() {
-  const [inquiries, downloadLeads, events, cmsProducts, cmsNews, categories, media, cmsDownloads, pages, users, auditLogs] = await Promise.all([
+  const [inquiries, downloadLeads, events, whatsappClicks, cmsProducts, cmsNews, categories, media, cmsDownloads, pages, users, auditLogs] = await Promise.all([
     readStore<InquiryRecord[]>("inquiries.json", []),
     readStore<DownloadLeadRecord[]>("download-leads.json", []),
     readStore<AnalyticsEventRecord[]>("analytics-events.json", []),
+    readStore<WhatsAppClickRecord[]>("whatsapp-clicks.json", []),
     listCmsProducts(),
     listCmsNews(),
     listProductCategories(),
@@ -115,6 +149,7 @@ export async function getAdminData() {
     inquiries,
     downloadLeads,
     events,
+    whatsappClicks,
     eventCounts,
     cmsProducts,
     cmsNews,
@@ -139,6 +174,7 @@ export async function getAdminData() {
       inquiries: inquiries.length,
       downloadLeads: downloadLeads.length,
       events: events.length,
+      whatsappClicks: whatsappClicks.length,
     },
   };
 }

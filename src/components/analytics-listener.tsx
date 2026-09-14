@@ -71,6 +71,34 @@ function track(event: string, label = "", metadata: Record<string, unknown> = {}
   }).catch(() => undefined);
 }
 
+function trackWhatsAppClick(target: HTMLElement, label: string) {
+  const context = getVisitorContext();
+  const targetUrl = target.getAttribute("href") || "";
+  const placement = target.dataset.whatsappPlacement || "website";
+  const accountId = target.dataset.whatsappAccount || "grimm-main";
+  const clientClickId = createId();
+  window.gtag?.("event", "whatsapp_click", {
+    event_label: label,
+    page_path: window.location.pathname,
+    whatsapp_placement: placement,
+    whatsapp_account: accountId,
+  });
+  return fetch("/api/whatsapp/click", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    keepalive: true,
+    body: JSON.stringify({
+      accountId,
+      targetUrl,
+      placement,
+      path: window.location.pathname,
+      label,
+      clientClickId,
+      ...context,
+    }),
+  }).catch(() => undefined);
+}
+
 export function AnalyticsListener() {
   const pathname = usePathname();
 
@@ -96,6 +124,10 @@ export function AnalyticsListener() {
       if (!target) return;
       const eventName = target.dataset.event || "cta_click";
       const label = target.dataset.label || target.textContent?.trim() || target.getAttribute("href") || "";
+      if (eventName === "whatsapp_click") {
+        void trackWhatsAppClick(target, label.slice(0, 120));
+        return;
+      }
       void track(eventName, label.slice(0, 120), { href: target.getAttribute("href") || "" });
     }
     document.addEventListener("click", onClick);

@@ -52,6 +52,7 @@ function adminRouteAllowed(pathname: string, role = "") {
   if (pathname.startsWith("/admin/media") || pathname.startsWith("/admin/downloads")) return role === "content_manager" || role === "product_manager";
   if (pathname.startsWith("/admin/leads") || pathname.startsWith("/admin/forms")) return role === "sales";
   if (pathname.startsWith("/admin/analytics")) return role === "analyst";
+  if (pathname.startsWith("/admin/whatsapp")) return role === "sales" || role === "analyst";
   return pathname === "/admin" || pathname.startsWith("/admin/dashboard");
 }
 

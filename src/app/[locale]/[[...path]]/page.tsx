@@ -81,7 +81,7 @@ function LocalizedHeader({ locale }: { locale: LocalizedLocale }) {
             </Link>
           ))}
         </nav>
-        <a className="button button-primary hidden min-h-[42px] px-4 text-sm sm:inline-flex" href={company.whatsappUrl} target="_blank" rel="noreferrer">
+        <a className="button button-primary hidden min-h-[42px] px-4 text-sm sm:inline-flex" href={company.whatsappUrl} target="_blank" rel="noreferrer" data-event="whatsapp_click" data-whatsapp-account="grimm-main" data-whatsapp-placement="localized_header">
           {content.labels.whatsapp}
         </a>
         <details className="relative lg:hidden">
@@ -94,7 +94,7 @@ function LocalizedHeader({ locale }: { locale: LocalizedLocale }) {
                 {content.nav[navPath]}
               </Link>
             ))}
-            <a className="button button-primary mt-2 min-h-[42px] text-sm sm:hidden" href={company.whatsappUrl} target="_blank" rel="noreferrer">
+            <a className="button button-primary mt-2 min-h-[42px] text-sm sm:hidden" href={company.whatsappUrl} target="_blank" rel="noreferrer" data-event="whatsapp_click" data-whatsapp-account="grimm-main" data-whatsapp-placement="localized_mobile_menu">
               {content.labels.whatsapp}
             </a>
           </nav>
@@ -315,7 +315,7 @@ function ContactPanel({ locale }: { locale: LocalizedLocale }) {
         <p className="eyebrow mb-3">{content.pages["/contact"].eyebrow}</p>
         <h2 className="text-3xl font-black">{content.home.contactTitle}</h2>
         <div className="mt-6 grid gap-3 text-slate-200">
-          <a className="font-bold text-white" href={company.whatsappUrl} target="_blank" rel="noreferrer">
+          <a className="font-bold text-white" href={company.whatsappUrl} target="_blank" rel="noreferrer" data-event="whatsapp_click" data-whatsapp-account="grimm-main" data-whatsapp-placement="localized_contact">
             {content.labels.whatsapp}: {company.phone}
           </a>
           <a className="font-bold text-white" href={`mailto:${company.email}`}>
@@ -324,7 +324,7 @@ function ContactPanel({ locale }: { locale: LocalizedLocale }) {
           <p>{company.address}</p>
         </div>
         <div className="mt-8 flex flex-wrap gap-4">
-          <a className="button button-primary" href={company.whatsappUrl} target="_blank" rel="noreferrer">
+          <a className="button button-primary" href={company.whatsappUrl} target="_blank" rel="noreferrer" data-event="whatsapp_click" data-whatsapp-account="grimm-main" data-whatsapp-placement="localized_contact_cta">
             {content.labels.whatsapp}
           </a>
           <Link className="button button-secondary" href="/contact">

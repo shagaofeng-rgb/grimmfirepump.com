@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { isAdminAuthenticated } from "@/lib/admin-auth";
+import type { WhatsAppClickRecord } from "@/lib/admin-data";
 import { appendStore, createId, readStore } from "@/lib/local-store";
 import { scoreLead } from "@/lib/lead-scoring";
 import { checkRequestRateLimit } from "@/lib/request-rate-limit";
@@ -63,15 +64,29 @@ export async function POST(request: Request) {
   }
 
   const scoring = scoreLead(parsed.data);
+  const whatsappClicks = await readStore<WhatsAppClickRecord[]>("whatsapp-clicks.json", []);
+  const submittedAt = new Date().toISOString();
+  const whatsappAttribution = whatsappClicks
+    .filter((click) => click.trafficType === "real" && Date.parse(click.createdAt) <= Date.parse(submittedAt))
+    .filter((click) => (parsed.data.sessionId && click.sessionId === parsed.data.sessionId) || (parsed.data.visitorId && click.visitorId === parsed.data.visitorId))
+    .sort((left, right) => Date.parse(right.createdAt) - Date.parse(left.createdAt))[0];
   const inquiry = {
     id: createId("inq"),
-    createdAt: new Date().toISOString(),
+    createdAt: submittedAt,
     stage: scoring.status,
     status: "new",
     intent: scoring.score >= 70 ? "A" : scoring.score >= 45 ? "B" : "C",
     score: scoring.score,
     userAgent: request.headers.get("user-agent") || "",
     ...parsed.data,
+    ...(whatsappAttribution ? {
+      whatsappClickId: whatsappAttribution.id,
+      whatsappAccountId: whatsappAttribution.accountId,
+      whatsappAccountLabel: whatsappAttribution.accountLabel,
+      whatsappClickSource: whatsappAttribution.placement,
+      whatsappClickPage: whatsappAttribution.path,
+      whatsappClickedAt: whatsappAttribution.createdAt,
+    } : {}),
   };
 
   await appendStore("inquiries.json", inquiry);

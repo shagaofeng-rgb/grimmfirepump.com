@@ -86,6 +86,8 @@ export function Header() {
             target="_blank"
             rel="noreferrer"
             data-event="whatsapp_click"
+            data-whatsapp-account="grimm-main"
+            data-whatsapp-placement="header"
           >
             <MessageCircle size={18} />
             WhatsApp

@@ -62,7 +62,7 @@ export function QuoteSection() {
           </div>
           <div className="mt-9 text-sm leading-7 text-slate-400">
             <a className="font-bold text-white" href={"mailto:" + company.email}>{company.email}</a><br />
-            <a className="font-bold text-white" href={company.whatsappUrl} data-event="whatsapp_click">WhatsApp: {company.phone}</a>
+            <a className="font-bold text-white" href={company.whatsappUrl} target="_blank" rel="noreferrer" data-event="whatsapp_click" data-whatsapp-account="grimm-main" data-whatsapp-placement="home_quote">WhatsApp: {company.phone}</a>
           </div>
         </div>
 
