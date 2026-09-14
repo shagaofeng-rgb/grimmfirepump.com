@@ -109,6 +109,7 @@ export const company = {
   whatsapp: "8618101616808",
   whatsappUrl: "https://wa.me/message/JV3PVHGQYO5SB1",
   facebookUrl: "https://www.facebook.com/grimmpump",
+  youtubeUrl: "https://www.youtube.com/@Grimmpump",
   address: "No.2, Weilong Road, Nianli Town, Qujiang District, Quzhou City, Zhejiang Province",
 };
 

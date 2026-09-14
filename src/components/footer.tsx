@@ -43,6 +43,9 @@ export function Footer() {
             <a className="hover:text-white" href={company.facebookUrl} target="_blank" rel="noreferrer" data-event="facebook_click">
               Facebook
             </a>
+            <a className="hover:text-white" href={company.youtubeUrl} target="_blank" rel="noreferrer" data-event="youtube_click">
+              YouTube
+            </a>
           </div>
         </div>
         {footerColumns.map((column) => (
