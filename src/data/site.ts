@@ -107,8 +107,8 @@ export const company = {
   email: "Cain@grimmfirepump.com",
   phone: "+86-18101616808",
   whatsapp: "8618101616808",
-  whatsappUrl: "https://wa.me/8618101616808",
-  facebookUrl: "https://www.facebook.com/profile.php?id=61587114525850",
+  whatsappUrl: "https://wa.me/message/JV3PVHGQYO5SB1",
+  facebookUrl: "https://www.facebook.com/grimmpump",
   address: "No.2, Weilong Road, Nianli Town, Qujiang District, Quzhou City, Zhejiang Province",
 };
 

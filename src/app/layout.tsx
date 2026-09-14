@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { headers } from "next/headers";
 import "./globals.css";
+import "./whatsapp-float.css";
 import { company } from "@/data/site";
 import { AnalyticsListener } from "@/components/analytics-listener";
 

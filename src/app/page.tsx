@@ -7,6 +7,7 @@ import { CertificationShowcase } from "@/components/home/certification-showcase"
 import { FactoryPreviewSection } from "@/components/home/factory-preview-section";
 import { HomeCta } from "@/components/home/home-cta";
 import { HomeFooter } from "@/components/home/home-footer";
+import { StickyCta } from "@/components/sticky-cta";
 import { localizedAlternates } from "@/lib/i18n";
 
 export const metadata: Metadata = {
@@ -31,6 +32,7 @@ export default function Home() {
         <HomeCta />
       </main>
       <HomeFooter />
+      <StickyCta />
     </div>
   );
 }
