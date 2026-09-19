@@ -3,7 +3,6 @@ import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { cmsStore, listCmsNews, logAudit, type CmsNews } from "@/lib/admin-cms";
-import { markSitemapDirty } from "@/lib/sitemap-dirty";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -160,6 +159,9 @@ export async function POST(request: Request) {
     const articles = await listCmsNews();
     const existing = articles.find((article) => article.id === id);
     const slug = existing?.slug || uniqueSlug(toSlug(parsed.data.title, fingerprint), id, articles);
+    // External generators may submit material for an editor to use, but they
+    // cannot create an indexable public page. Publishing remains an explicit
+    // action in the CMS after topic, originality and factual checks.
     const item: CmsNews = {
       id,
       createdAt: existing?.createdAt || now,
@@ -173,24 +175,21 @@ export async function POST(request: Request) {
       coverImage: validImage(parsed.data.image_url),
       excerpt: content.slice(0, 220),
       content,
-      status: "published",
+      status: "draft",
       featured: false,
       pinned: false,
       source: "",
       publishAt: existing?.publishAt || now,
       seoTitle: parsed.data.title.slice(0, 60),
       seoDescription: content.slice(0, 160),
-      indexable: true,
+      indexable: false,
     };
 
-    // The deterministic id makes transport retries update the same article instead of duplicating it.
+    // The deterministic id makes transport retries update the same draft instead of duplicating it.
     await cmsStore.upsertNews(item);
-    await logAudit({ actor: "blog_webhook", action: existing ? "update_webhook_blog" : "publish_webhook_blog", target: item.id, result: "success" });
-    await markSitemapDirty("external_blog_webhook");
+    await logAudit({ actor: "blog_webhook", action: existing ? "update_webhook_draft" : "queue_webhook_draft", target: item.id, result: "success" });
     revalidatePublicBlog(item.slug);
-    revalidatePath("/sitemap.xml");
-    revalidatePath("/sitemaps/[file]", "page");
-    return response(1, "发布成功");
+    return response(1, "文章已接收，等待审核");
   } catch (error) {
     console.error("Blog webhook publish failed", error);
     await recordFailure("webhook_publish_failed", "blog");

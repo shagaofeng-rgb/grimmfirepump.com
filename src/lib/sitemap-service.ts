@@ -187,7 +187,7 @@ async function buildSitemapBundleUncached(): Promise<SitemapBundle> {
   const knowledgeDates = knowledgePosts.map((item) => item.date);
   add("categories", "/products", latestDate(productDates));
   add("categories", "/applications", STATIC_CONTENT_UPDATED_AT);
-  add("categories", "/blog", latestDate(blogDates));
+  if (blogDates.length) add("categories", "/blog", latestDate(blogDates));
   add("categories", "/news", latestDate(newsDates, STATIC_CONTENT_UPDATED_AT));
   add("categories", "/knowledge", latestDate(knowledgeDates));
   for (const application of applications) add("categories", `/applications/${application.slug}`, STATIC_CONTENT_UPDATED_AT);
@@ -199,8 +199,8 @@ async function buildSitemapBundleUncached(): Promise<SitemapBundle> {
     entries,
     chunks,
     indexXml: buildSitemapIndexXml(getSiteOrigin(), chunks, [
-      { url: absoluteUrl("/blog-sitemap.xml"), lastModified: latestDate(blogDates) },
-      { url: absoluteUrl("/news-sitemap.xml"), lastModified: latestDate(newsDates) },
+      ...(blogDates.length ? [{ url: absoluteUrl("/blog-sitemap.xml"), lastModified: latestDate(blogDates) }] : []),
+      ...(newsDates.length ? [{ url: absoluteUrl("/news-sitemap.xml"), lastModified: latestDate(newsDates) }] : []),
     ]),
     skipped,
     errors,
