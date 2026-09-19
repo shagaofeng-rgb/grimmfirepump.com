@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { company, footerColumns } from "@/data/site";
+import { FacebookIcon, WhatsAppIcon, YouTubeIcon } from "@/components/social-platform-icons";
 
 export function Footer() {
   const footerLinks: Record<string, string> = {
@@ -37,14 +38,17 @@ export function Footer() {
           <p className="mt-2 text-sm leading-7">{company.address}</p>
           <div className="mt-4 grid gap-2 text-sm">
             <a className="hover:text-white" href={`mailto:${company.email}`}>{company.email}</a>
-            <a className="hover:text-white" href={company.whatsappUrl} target="_blank" rel="noreferrer" data-event="whatsapp_click" data-whatsapp-account="grimm-main" data-whatsapp-placement="footer">
-              WhatsApp: {company.phone}
+            <span>{company.phone}</span>
+          </div>
+          <div className="mt-5 flex items-center gap-3">
+            <a className="grid h-9 w-9 place-items-center rounded-full border border-white/25 text-white transition hover:-translate-y-0.5 hover:border-white hover:bg-white hover:text-[#1877f2] focus:outline-none focus:ring-2 focus:ring-white/70" href={company.facebookUrl} target="_blank" rel="noreferrer" data-event="facebook_click" aria-label="Follow GRIMM PUMP on Facebook" title="Facebook">
+              <FacebookIcon className="h-4 w-4" />
             </a>
-            <a className="hover:text-white" href={company.facebookUrl} target="_blank" rel="noreferrer" data-event="facebook_click">
-              Facebook
+            <a className="grid h-9 w-9 place-items-center rounded-full border border-white/25 text-white transition hover:-translate-y-0.5 hover:border-white hover:bg-white hover:text-[#ff0000] focus:outline-none focus:ring-2 focus:ring-white/70" href={company.youtubeUrl} target="_blank" rel="noreferrer" data-event="youtube_click" aria-label="Watch GRIMM PUMP on YouTube" title="YouTube">
+              <YouTubeIcon className="h-4 w-4" />
             </a>
-            <a className="hover:text-white" href={company.youtubeUrl} target="_blank" rel="noreferrer" data-event="youtube_click">
-              YouTube
+            <a className="grid h-9 w-9 place-items-center rounded-full border border-white/25 text-white transition hover:-translate-y-0.5 hover:border-white hover:bg-white hover:text-[#25d366] focus:outline-none focus:ring-2 focus:ring-white/70" href={company.whatsappUrl} target="_blank" rel="noreferrer" data-event="whatsapp_click" data-whatsapp-account="grimm-main" data-whatsapp-placement="footer_social" aria-label="Contact GRIMM PUMP on WhatsApp" title="WhatsApp">
+              <WhatsAppIcon className="h-4 w-4" />
             </a>
           </div>
         </div>

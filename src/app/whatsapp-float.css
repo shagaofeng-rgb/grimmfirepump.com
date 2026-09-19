@@ -29,6 +29,11 @@
 
 .whatsapp-float svg { width: 30px; height: 30px; fill: currentColor; }
 
+.whatsapp-float:focus-visible {
+  outline: 3px solid #0b5fff;
+  outline-offset: 3px;
+}
+
 .whatsapp-float:hover {
   color: #fff;
   background: #1fbd5c;
@@ -37,8 +42,9 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .whatsapp-float { animation: whatsapp-float-glow 2.8s ease-in-out infinite; }
+  .whatsapp-float { animation: whatsapp-float-glow 2.8s ease-in-out infinite, whatsapp-float-lift 2.8s ease-in-out infinite; }
   .whatsapp-float::before { animation: whatsapp-float-ring 2.8s ease-out infinite; }
+  .whatsapp-float svg { animation: whatsapp-float-icon 2.8s ease-in-out infinite; }
 }
 
 @keyframes whatsapp-float-glow {
@@ -50,4 +56,16 @@
   0%, 35% { opacity: 0; transform: scale(.88); }
   42% { opacity: .7; }
   78%, 100% { opacity: 0; transform: scale(1.32); }
+}
+
+@keyframes whatsapp-float-lift {
+  0%, 100% { margin-top: 0; }
+  48% { margin-top: -4px; }
+  58% { margin-top: 0; }
+}
+
+@keyframes whatsapp-float-icon {
+  0%, 38%, 100% { transform: scale(1); }
+  48% { transform: scale(1.1); }
+  58% { transform: scale(.96); }
 }
