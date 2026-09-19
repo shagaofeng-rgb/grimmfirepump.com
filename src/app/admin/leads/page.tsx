@@ -47,7 +47,7 @@ export default async function LeadsPage({ searchParams }: PageProps) {
   const sourceOptions = [...new Set(inquiries.map((lead) => lead.sourceType).filter(Boolean))];
 
   return <AdminShell>
-    <AdminPageHeader eyebrow="客户管理" title="客户询盘" description="查看真实网站询盘及其来源、项目需求、销售跟进和已关联访问记录。" action={<a className="button button-secondary" href="/api/admin/export?type=leads">导出当前线索</a>} />
+    <AdminPageHeader eyebrow="客户与销售" title="客户线索" action={<a className="button button-secondary" href="/api/admin/export?type=leads">导出线索</a>} />
     <section className="mt-8 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
       <form className="grid gap-3 border-b border-slate-200 bg-slate-50 p-4 md:grid-cols-2 xl:grid-cols-4" method="get">
         <div className="xl:col-span-4"><DateRangeFilter pathname="/admin/leads" query={filters} preset={range.preset} from={range.from} to={range.to} /></div>

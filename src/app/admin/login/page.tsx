@@ -20,10 +20,10 @@ export default async function AdminLoginPage() {
           <span className="grid h-12 w-12 place-items-center rounded-md bg-white p-1.5">
             <Image src="/assets/images/logo.png" alt="GRIMM PUMP logo" width={40} height={29} className="h-auto w-full object-contain" priority />
           </span>
-          <p className="text-sm font-black text-orange-200">GRIMM 管理后台</p>
+          <p className="text-sm font-black text-orange-200">GRIMM PUMP</p>
         </div>
-        <h1 className="mt-5 text-4xl font-black leading-tight text-white">登录网站管理中心</h1>
-        <p className="mt-4 leading-7 text-slate-400">管理产品、内容、客户询盘、下载资料和网站运营数据。</p>
+        <h1 className="mt-5 text-4xl font-black leading-tight text-white">运营后台登录</h1>
+        <p className="mt-4 leading-7 text-slate-400">GRIMM PUMP 网站运营后台</p>
         {!isAdminConfigured() ? (
           <div className="mt-8 rounded-lg border border-orange-300/30 bg-orange-300/10 p-4 text-sm leading-6 text-orange-100">
             管理员登录尚未启用，请联系网站管理员完成账号配置。

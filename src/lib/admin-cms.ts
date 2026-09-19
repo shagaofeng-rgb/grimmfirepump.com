@@ -365,10 +365,7 @@ const pageSeeds: ManagedPage[] = [
 
 export async function listProductCategories() {
   const items = await readStore<CmsProductCategory[]>("cms-product-categories.json", []);
-  if (items.length) {
-    const existing = new Set(items.map((item) => item.slug));
-    return [...items, ...categorySeeds.filter((item) => !existing.has(item.slug))].sort((a, b) => a.sortOrder - b.sortOrder);
-  }
+  if (items.length) return [...items].sort((a, b) => a.sortOrder - b.sortOrder);
   await writeStore("cms-product-categories.json", categorySeeds);
   return categorySeeds;
 }
@@ -388,13 +385,10 @@ export async function listCmsNews() {
     const normalizedItems = items.map((item) => legacyBlogExclusions.has(item.slug) && (item.status !== "archived" || item.indexable)
       ? { ...item, status: "archived" as const, indexable: false, updatedAt: new Date().toISOString() }
       : item);
-    const existing = new Set(normalizedItems.map((item) => item.slug));
-    const missingSeeds = newsSeeds.filter((item) => !existing.has(item.slug) && !legacyBlogExclusions.has(item.slug));
-    const persistedItems = [...normalizedItems, ...missingSeeds];
-    if (normalizedItems.some((item, index) => item !== items[index]) || missingSeeds.length) {
-      await writeStore("cms-news.json", persistedItems);
+    if (normalizedItems.some((item, index) => item !== items[index])) {
+      await writeStore("cms-news.json", normalizedItems);
     }
-    return persistedItems.sort(
+    return normalizedItems.sort(
       (a, b) => new Date(b.publishAt).getTime() - new Date(a.publishAt).getTime(),
     );
   }
@@ -436,20 +430,14 @@ export async function listMediaFiles() {
 
 export async function listDownloadAssets() {
   const items = await readStore<DownloadAsset[]>("cms-downloads.json", []);
-  if (items.length) {
-    const existing = new Set(items.map((item) => item.title));
-    return [...items, ...downloadSeeds.filter((item) => !existing.has(item.title))];
-  }
+  if (items.length) return [...items];
   await writeStore("cms-downloads.json", downloadSeeds);
   return downloadSeeds;
 }
 
 export async function listManagedPages() {
   const items = await readStore<ManagedPage[]>("cms-pages.json", []);
-  if (items.length) {
-    const existing = new Set(items.map((item) => item.slug));
-    return [...items, ...pageSeeds.filter((item) => !existing.has(item.slug))];
-  }
+  if (items.length) return [...items];
   await writeStore("cms-pages.json", pageSeeds);
   return pageSeeds;
 }

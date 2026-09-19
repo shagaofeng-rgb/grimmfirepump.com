@@ -60,10 +60,10 @@ export default async function AdminAnalyticsPage({ searchParams }: PageProps) {
 
   return (
     <AdminShell>
-      <AdminPageHeader eyebrow="访客分析" title="访客、来源和转化运营中心" description="按统一时间范围查看正常网站访问、客户来源与访问路径。" action={<AnalyticsRefresh />} />
+      <AdminPageHeader eyebrow="数据概览" title="访问与转化数据" action={<AnalyticsRefresh />} />
 
       <section className="mt-8 overflow-hidden rounded-xl bg-[#091b32] p-5 text-white shadow-[0_20px_60px_rgba(15,23,42,0.18)] md:p-6">
-        <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between"><div><p className="text-xs font-black uppercase tracking-[0.18em] text-orange-300">Visitor overview</p><h2 className="mt-2 text-2xl font-black">统一查看网站访问数据</h2><p className="mt-2 max-w-2xl text-sm leading-6 text-slate-300">时间、国家、来源渠道会同时作用于指标、客户档案、事件与导出。</p></div><div className="rounded-md border border-white/10 bg-white/5 px-4 py-3 text-sm"><span className="text-slate-300">当前数据范围</span><strong className="ml-2 text-lg text-orange-300">正常网站访问</strong></div></div>
+        <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between"><div><p className="text-xs font-black uppercase tracking-[0.18em] text-orange-300">GRIMM PUMP</p><h2 className="mt-2 text-2xl font-black">访问表现</h2></div><div className="rounded-md border border-white/10 bg-white/5 px-4 py-3 text-sm"><span className="text-slate-300">当前范围</span><strong className="ml-2 text-lg text-orange-300">{range.label}</strong></div></div>
         <form className="mt-6 grid gap-3 xl:grid-cols-[1.3fr_repeat(4,minmax(0,1fr))]" method="get">
           <DateRangeFilter pathname="/admin/analytics" query={baseQuery} preset={range.preset} from={range.from} to={range.to} compact />
           <select name="country" defaultValue={filters.country} className="min-h-11 rounded-md border border-white/15 bg-white px-3 text-sm text-slate-900"><option value="all">全部国家</option>{availableCountries.map(([code, name]) => <option key={code} value={code}>{name}</option>)}</select>
@@ -73,17 +73,17 @@ export default async function AdminAnalyticsPage({ searchParams }: PageProps) {
       </section>
 
       <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-5">
-        <StatCard label="真实独立访客" value={summary.uniqueVisitors} hint="按首方 visitor ID 去重" />
-        <StatCard label="访问会话" value={summary.uniqueSessions} hint="每次浏览器会话独立统计" />
+        <StatCard label="独立访客" value={summary.uniqueVisitors} hint="去重后统计" />
+        <StatCard label="访问会话" value={summary.uniqueSessions} hint="网站访问记录" />
         <StatCard label="页面浏览" value={summary.pageViews.length} hint={range.label} />
         <StatCard label="回访访客" value={summary.returningVisitors} hint="访问次数大于 1" />
         <StatCard label="转化动作" value={summary.conversions.length} hint="询盘、下载、WhatsApp、报价" />
       </div>
 
       <div className="mt-8 grid gap-6 xl:grid-cols-[1.25fr_0.75fr]">
-        <AdminCard title="实时真实访客活动">
-          <div className="mb-5 flex items-center justify-between gap-4 rounded-md bg-emerald-50 px-3 py-2 text-sm font-bold text-emerald-800"><span className="flex items-center gap-2"><Activity size={16} /> 最近访客活动</span><span>{summary.recentActivity.length} 条最近活动</span></div>
-          <div className="grid gap-3">{summary.recentActivity.map((event) => <div key={event.id} className="grid gap-3 rounded-lg border border-slate-200 p-3 sm:grid-cols-[120px_1fr_auto] sm:items-center"><div className="text-xs font-bold text-slate-500">{formatDate(event.createdAt)}<br />{event.country || "Unknown"} · {event.ipMasked || "IP 已隐藏"}</div><div className="min-w-0">{event.visitorId ? <Link href={`/admin/analytics/visitors/${encodeURIComponent(event.visitorId)}?range=${range.preset}&from=${range.from}&to=${range.to}`} className="block truncate font-black text-slate-900 hover:text-orange-700">{event.path || "/"}</Link> : <p className="truncate font-black text-slate-900">{event.path || "/"}</p>}<p className="mt-1 truncate text-xs text-slate-500">{event.channel || "Direct"} · {event.referrer || "无外部来源"} · 第 {event.visitNumber || 1} 次访问</p></div><span className="w-fit rounded-full bg-orange-50 px-2.5 py-1 text-xs font-black text-orange-700">{event.event}</span></div>)}{!summary.recentActivity.length ? <EmptyState text="当前筛选条件下暂无真实访客活动。" /> : null}</div>
+        <AdminCard title="最近访问">
+          <div className="mb-5 flex items-center justify-between gap-4 rounded-md bg-emerald-50 px-3 py-2 text-sm font-bold text-emerald-800"><span className="flex items-center gap-2"><Activity size={16} /> 最近活动</span><span>{summary.recentActivity.length} 条</span></div>
+          <div className="grid gap-3">{summary.recentActivity.map((event) => <div key={event.id} className="grid gap-3 rounded-lg border border-slate-200 p-3 sm:grid-cols-[120px_1fr_auto] sm:items-center"><div className="text-xs font-bold text-slate-500">{formatDate(event.createdAt)}<br />{event.country || "Unknown"}</div><div className="min-w-0">{event.visitorId ? <Link href={`/admin/analytics/visitors/${encodeURIComponent(event.visitorId)}?range=${range.preset}&from=${range.from}&to=${range.to}`} className="block truncate font-black text-slate-900 hover:text-orange-700">{event.path || "/"}</Link> : <p className="truncate font-black text-slate-900">{event.path || "/"}</p>}<p className="mt-1 truncate text-xs text-slate-500">{event.channel || "Direct"} · 第 {event.visitNumber || 1} 次访问</p></div><span className="w-fit rounded-full bg-orange-50 px-2.5 py-1 text-xs font-black text-orange-700">{event.event}</span></div>)}{!summary.recentActivity.length ? <EmptyState text="当前筛选条件下暂无访问记录。" /> : null}</div>
         </AdminCard>
         <section className="grid gap-6"><AdminCard title="来源渠道"><MiniList items={summary.channels} empty="暂无渠道数据。" /></AdminCard><AdminCard title="国家 / 地区"><MiniList items={summary.countries} empty="暂无地理数据。" /></AdminCard></section>
       </div>
