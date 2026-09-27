@@ -31,10 +31,10 @@ const certificates = [
   },
 ];
 
-function CertificatePreview({ certificate, sizes }: { certificate: typeof certificates[number]; sizes: string }) {
+function CertificatePreview({ certificate, sizes, priority = false }: { certificate: typeof certificates[number]; sizes: string; priority?: boolean }) {
   return (
     <>
-      <Image src={certificate.src} alt={certificate.title} fill className="object-contain" sizes={sizes} priority unoptimized />
+      <Image src={certificate.src} alt={certificate.title} fill className="object-contain" sizes={sizes} priority={priority} quality={60} />
       {certificate.redactions.map((area, index) => (
         <span
           key={`${certificate.title}-${index}`}
@@ -81,7 +81,7 @@ export function CertificationShowcase() {
         <div className="home-certificate-dialog-backdrop" role="presentation" onMouseDown={() => setSelected(null)}>
           <div className="home-certificate-dialog" role="dialog" aria-modal="true" aria-label={certificates[selected].title} onMouseDown={(event) => event.stopPropagation()}>
             <button type="button" onClick={() => setSelected(null)} aria-label="Close certificate preview"><X size={22} /></button>
-            <CertificatePreview certificate={certificates[selected]} sizes="90vw" />
+            <CertificatePreview certificate={certificates[selected]} sizes="90vw" priority />
           </div>
         </div>
       ) : null}

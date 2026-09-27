@@ -1084,7 +1084,7 @@ video {
 .home-input-grid svg { color: var(--orange); }
 .home-input-grid article > div { text-align: left; }
 .home-input-grid strong { display: block; font-family: Georgia, "Times New Roman", serif; font-size: 25px; line-height: .9; }
-.home-input-grid h3 { margin: 5px 0 0; color: #213446; font-size: 11px; font-weight: 700; }
+.home-input-label { display: block; margin: 5px 0 0; color: #213446; font-size: 11px; font-weight: 700; }
 
 .home-systems { padding-block: 42px 54px; color: #0b1f3a; background: #f1f5f7; }
 .home-section-heading { display: grid; grid-template-columns: 1.2fr 1fr auto; align-items: end; gap: 28px; }
@@ -1120,7 +1120,7 @@ video {
 .home-certificate-card-1:hover { transform: translateY(-10px) rotate(1deg); }
 .home-certificate-card-2:hover { transform: translateY(-10px) rotate(-.5deg); }
 .home-certificate-card-3:hover { transform: translateY(-10px) rotate(2deg); }
-.home-certificate-stage > p { position: absolute; right: 3%; bottom: 0; margin: 0; color: #697682; font-size: 8px; font-weight: 900; letter-spacing: .22em; }
+.home-certificate-stage > p { position: absolute; right: 3%; bottom: 0; margin: 0; color: #51616c; font-size: 8px; font-weight: 900; letter-spacing: .22em; }
 .home-certificate-dialog-backdrop { position: fixed; z-index: 100; inset: 0; display: grid; padding: 26px; place-items: center; background: rgba(6,21,36,.86); }
 .home-certificate-dialog { position: relative; width: min(690px, 90vw); height: min(88vh, 900px); background: #fff; }
 .home-certificate-dialog > button { position: absolute; z-index: 2; top: 10px; right: 10px; display: grid; width: 38px; height: 38px; place-items: center; color: #0b1f3a; background: #fff; border: 1px solid #d8e0e8; border-radius: 50%; }
@@ -1222,7 +1222,7 @@ video {
 .home-inputs { padding-block: 15px; }
 .home-input-grid { max-width: 1200px; }
 .home-input-grid article { min-height: 48px; padding-inline: 28px; gap: 13px; }
-.home-input-grid strong { font-size: 22px; }.home-input-grid h3 { font-size: 9px; }
+.home-input-grid strong { font-size: 22px; }.home-input-label { font-size: 9px; }
 
 .home-systems { padding-block: 29px 38px; background: #f4f7f8; }
 .home-section-inner { max-width: 1280px; }

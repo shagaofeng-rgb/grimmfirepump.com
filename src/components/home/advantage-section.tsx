@@ -15,7 +15,7 @@ export function AdvantageSection() {
           {inputs.map(({ value, title, Icon }) => (
             <article key={title}>
               <Icon size={30} strokeWidth={1.55} />
-              <div><strong>{value}</strong><h3>{title}</h3></div>
+              <div><strong>{value}</strong><span className="home-input-label">{title}</span></div>
             </article>
           ))}
         </div>
