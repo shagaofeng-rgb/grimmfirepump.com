@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import { NEWS_AUTOMATION_ENABLED } from "@/lib/news-automation-policy";
 import { company } from "@/data/site";
 import { getPublicProducts, type PublicProduct } from "@/lib/public-cms";
 import { getProductKnowledge } from "@/lib/product-knowledge";
@@ -388,8 +389,8 @@ export async function getNewsAutomationHealth(siteId = SITE_ID, now = Date.now()
     availableCandidates,
     latestJob: latestJob || null,
     graceMinutes: newsPublishGraceMinutes(),
-    productionEnabled: config.publishing.productionEnabled,
-    autoPublishEnabled: process.env.NEWS_AUTO_PUBLISH !== "false",
+    productionEnabled: NEWS_AUTOMATION_ENABLED && config.publishing.productionEnabled,
+    autoPublishEnabled: NEWS_AUTOMATION_ENABLED && process.env.NEWS_AUTO_PUBLISH !== "false",
   };
 }
 
@@ -415,6 +416,7 @@ function candidateScore(item: FeedItem, sourceTrustScore: number) {
  * candidates. It deliberately has no article composition, CMS, Sitemap or cache side effect.
  */
 export async function runNewsIngest(reason = "scheduled", options: { siteId?: string; includeFallback?: boolean; dryRun?: boolean } = {}) {
+  if (!NEWS_AUTOMATION_ENABLED) return { ok: true, skipped: true, message: "News automation is disabled.", stats: { discovered: 0, candidates: 0 } };
   const siteId = options.siteId || SITE_ID;
   const config = validateSiteNewsConfig(siteId);
   const release = await acquireTaskLock(`news:ingest:${siteId}:${cycleKey(config.news.ingestIntervalHours)}`, 11 * 60 * 60 * 1000);
@@ -514,6 +516,7 @@ async function archiveSupersededRetryAttempts(siteId: string) {
 
 /** 48-hour task. A run is successful only after the public News list and detail verify. */
 export async function runNewsPublish(reason = "scheduled", options: { siteId?: string; dryRun?: boolean } = {}) {
+  if (!NEWS_AUTOMATION_ENABLED) return { ok: true, skipped: true, message: "News automation is disabled.", stats: { published: 0 } };
   const siteId = options.siteId || SITE_ID;
   const config = validateSiteNewsConfig(siteId);
   const release = await acquireTaskLock(`news:publish:${siteId}:${cycleKey(config.news.publishIntervalHours)}`, 47 * 60 * 60 * 1000);

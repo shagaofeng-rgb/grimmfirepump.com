@@ -1,47 +1,29 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import {
-  GOOGLE_SITEMAP_SUBMIT_INTERVAL_MS,
-  getLastGoogleSubmissionWindowAt,
-  getNextGoogleSubmissionAt,
-  isGoogleSubmissionDue,
-} from "../src/lib/sitemap-submit-schedule.ts";
+import { readFileSync } from "node:fs";
+import { isGoogleSubmissionDue, getNextGoogleSubmissionAt } from "../src/lib/sitemap-submit-schedule.ts";
+import { NEWS_AUTOMATION_ENABLED } from "../src/lib/news-automation-policy.ts";
 
-test("a site with no submission history is due immediately", () => {
-  assert.equal(isGoogleSubmissionDue([], Date.parse("2026-08-31T03:00:00Z")), true);
+test("only Monday after 11:00 Shanghai is eligible", () => {
+  assert.equal(isGoogleSubmissionDue([], Date.parse("2026-10-01T03:00:00Z")), false);
+  assert.equal(isGoogleSubmissionDue([], Date.parse("2026-10-05T02:59:59Z")), false);
+  assert.equal(isGoogleSubmissionDue([], Date.parse("2026-10-05T03:00:00Z")), true);
+  assert.equal(getNextGoogleSubmissionAt([], Date.parse("2026-10-01T03:00:00Z")), "2026-10-05T03:00:00.000Z");
 });
 
-test("the gate uses a strict 48-hour interval across month boundaries", () => {
-  const runs = [{
-    trigger: "cron",
-    finishedAt: "2026-08-31T03:00:00Z",
-    googleSubmissionWindow: true,
-  }];
-  assert.equal(isGoogleSubmissionDue(runs, Date.parse("2026-09-01T03:00:00Z")), false);
-  assert.equal(isGoogleSubmissionDue(runs, Date.parse("2026-09-02T02:59:59Z")), false);
-  assert.equal(isGoogleSubmissionDue(runs, Date.parse("2026-09-02T03:00:00Z")), true);
-  assert.equal(getNextGoogleSubmissionAt(runs), "2026-09-02T03:00:00.000Z");
+test("duplicates are blocked without skipping next Monday", () => {
+  const runs = [{ googleSubmissionWindow: true, finishedAt: "2026-10-05T03:05:00Z" }];
+  assert.equal(isGoogleSubmissionDue(runs, Date.parse("2026-10-05T04:00:00Z")), false);
+  assert.equal(getNextGoogleSubmissionAt(runs, Date.parse("2026-10-05T04:00:00Z")), "2026-10-12T03:00:00.000Z");
+  assert.equal(isGoogleSubmissionDue(runs, Date.parse("2026-10-12T03:00:00Z")), true);
 });
 
-test("daily non-submission runs do not move the 48-hour anchor", () => {
-  const runs = [
-    { trigger: "cron", finishedAt: "2026-09-02T03:00:00Z", googleSubmissionWindow: false },
-    { trigger: "cron", finishedAt: "2026-09-01T03:00:00Z", googleSubmissionWindow: false },
-    { trigger: "cron", finishedAt: "2026-08-31T03:00:00Z", googleSubmissionWindow: true },
-  ];
-  assert.equal(getLastGoogleSubmissionWindowAt(runs), Date.parse("2026-08-31T03:00:00Z"));
-  assert.equal(isGoogleSubmissionDue(runs, Date.parse("2026-09-03T03:00:00Z")), true);
+test("weekly schedule crosses year boundaries", () => {
+  assert.equal(getNextGoogleSubmissionAt([], Date.parse("2026-12-31T12:00:00Z")), "2027-01-04T03:00:00.000Z");
 });
 
-test("legacy cron history is retained as the migration anchor", () => {
-  const runs = [
-    { trigger: "cron", finishedAt: "2026-08-31T03:00:00Z" },
-    { trigger: "manual-api", finishedAt: "2026-08-31T08:00:00Z" },
-  ];
-  assert.equal(getLastGoogleSubmissionWindowAt(runs), Date.parse("2026-08-31T03:00:00Z"));
-  assert.equal(isGoogleSubmissionDue(runs, Date.parse("2026-09-01T03:00:00Z")), false);
-});
-
-test("the production interval remains exactly 48 hours", () => {
-  assert.equal(GOOGLE_SITEMAP_SUBMIT_INTERVAL_MS, 172_800_000);
+test("News disabled and production only has Monday SEO cron", () => {
+  assert.equal(NEWS_AUTOMATION_ENABLED, false);
+  const config = JSON.parse(readFileSync(new URL("../vercel.json", import.meta.url)));
+  assert.deepEqual(config.crons, [{ path: "/api/cron/sitemap", schedule: "0 3 * * 1" }]);
 });

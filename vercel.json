@@ -4,8 +4,6 @@
   "buildCommand": "npm run build:vercel",
   "devCommand": "npm run dev",
   "crons": [
-    { "path": "/api/cron/news-ingest", "schedule": "0 0,12 * * *" },
-    { "path": "/api/cron/news-publish", "schedule": "30 0,12 * * *" },
-    { "path": "/api/cron/sitemap", "schedule": "0 3 * * *" }
+    { "path": "/api/cron/sitemap", "schedule": "0 3 * * 1" }
   ]
 }

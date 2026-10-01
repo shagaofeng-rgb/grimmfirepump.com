@@ -2,6 +2,12 @@ import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseSourceCatalog } from "../src/lib/news/source-catalog.ts";
+import { NEWS_AUTOMATION_ENABLED } from "../src/lib/news-automation-policy.ts";
+
+if (!NEWS_AUTOMATION_ENABLED) {
+  console.log("News automation disabled; source network probe skipped.");
+  process.exit(0);
+}
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const reportPath = path.join(root, "reports", "news-source-validation.csv");
