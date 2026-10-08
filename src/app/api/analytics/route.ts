@@ -63,6 +63,7 @@ async function classifyTraffic(request: Request, input: z.infer<typeof eventSche
   const excludedIps = [process.env.ANALYTICS_EXCLUDED_IPS || "", settings.analyticsExcludedIps].join(",").split(",").map((item) => item.trim()).filter(Boolean);
   const excludedAgents = [process.env.ANALYTICS_EXCLUDED_USER_AGENTS || "", settings.analyticsExcludedUserAgents].join(",").split(",").map((item) => item.trim().toLowerCase()).filter(Boolean);
   const flaggedByClient = input.metadata.testTraffic === true || input.metadata.previewTraffic === true;
+  if (/^\/admin(?:\/|$|\?)/.test(input.path)) return { trafficType: "test" as const, trafficReason: "admin_page" };
   if (host.endsWith(".vercel.app") || host.includes("localhost") || flaggedByClient) return { trafficType: "test" as const, trafficReason: "preview_or_test_environment" };
   if (excludedIps.includes(ip)) return { trafficType: "test" as const, trafficReason: "excluded_ip" };
   if (excludedAgents.some((item) => ua.toLowerCase().includes(item))) return { trafficType: "test" as const, trafficReason: "excluded_user_agent" };

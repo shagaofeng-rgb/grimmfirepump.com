@@ -4,7 +4,7 @@ import { AdminPagination, adminQuery } from "@/components/admin/admin-pagination
 import { DateRangeFilter } from "@/components/admin/date-range-filter";
 import { AdminPageHeader, EmptyState, StatusPill, inputClass } from "@/components/admin/admin-widgets";
 import { getSiteSettings, listAuditLogs } from "@/lib/admin-cms";
-import { paginationPageSize, parsePositiveInt, resolveDateRange } from "@/lib/admin-listing";
+import { isWithinReportingDateRange, paginationPageSize, parsePositiveInt, resolveDateRange } from "@/lib/admin-listing";
 import { readStore } from "@/lib/local-store";
 import { paginate } from "@/lib/visitor-analytics";
 
@@ -25,11 +25,6 @@ type Props = { searchParams: Promise<Record<string, string | string[] | undefine
 function value(params: Record<string, string | string[] | undefined>, key: string) {
   const item = params[key];
   return Array.isArray(item) ? item[0] || "" : item || "";
-}
-
-function inRange(createdAt: string, from: string, to: string) {
-  const date = Date.parse(createdAt);
-  return (!from || date >= Date.parse(`${from}T00:00:00`)) && (!to || date <= Date.parse(`${to}T23:59:59.999`));
 }
 
 export default async function LogsPage({ searchParams }: Props) {
@@ -56,12 +51,12 @@ export default async function LogsPage({ searchParams }: Props) {
     readStore<LoginLog[]>("login-logs.json", []),
   ]);
   const loginRecords = loginLogs
-    .filter((item) => inRange(item.createdAt, range.from, range.to)
+    .filter((item) => isWithinReportingDateRange(item.createdAt, range.from, range.to, settings.timezone || "Asia/Shanghai")
       && (!filters.query || [item.username, item.reason].join(" ").toLowerCase().includes(filters.query.toLowerCase()))
       && (filters.result === "all" || (filters.result === "success") === item.success))
     .sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt));
   const activityRecords = auditLogs
-    .filter((item) => inRange(item.createdAt, range.from, range.to)
+    .filter((item) => isWithinReportingDateRange(item.createdAt, range.from, range.to, settings.timezone || "Asia/Shanghai")
       && (!filters.query || [item.actor, item.action, item.target].join(" ").toLowerCase().includes(filters.query.toLowerCase()))
       && (filters.result === "all" || item.result === filters.result))
     .sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt));

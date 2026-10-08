@@ -34,7 +34,7 @@ export default async function VisitorDetailPage({ params, searchParams }: Props)
     to: value(raw, "to"),
     timeZone: settings.timezone || "Asia/Shanghai",
   });
-  const filters: AnalyticsFilters = { from: range.from, to: range.to, traffic: "real" };
+  const filters: AnalyticsFilters = { from: range.from, to: range.to, timeZone: settings.timezone || "Asia/Shanghai", traffic: "real" };
   const page = parsePositiveInt(value(raw, "page"));
   const pageSize = paginationPageSize(value(raw, "pageSize"));
   const { events, inquiries, downloadLeads } = await getAdminData();

@@ -1,8 +1,10 @@
 import type { AnalyticsEventRecord } from "@/lib/admin-data";
+import { isWithinReportingDateRange } from "@/lib/admin-listing";
 
 export type AnalyticsFilters = {
   from?: string;
   to?: string;
+  timeZone?: string;
   country?: string;
   channel?: string;
   traffic?: "real" | "test" | "bot" | "all";
@@ -26,17 +28,8 @@ export type AnalyticsSummary = {
 
 const conversionEvents = new Set(["inquiry_submit", "download_click", "whatsapp_click", "quote_request"]);
 
-export function normalizeDateBoundary(value: string | undefined, end = false) {
-  if (!value) return null;
-  const date = new Date(value + (end ? "T23:59:59.999Z" : "T00:00:00.000Z"));
-  return Number.isNaN(date.getTime()) ? null : date;
-}
-
 export function isWithinDateRange(createdAt: string, filters: AnalyticsFilters) {
-  const date = new Date(createdAt);
-  const from = normalizeDateBoundary(filters.from);
-  const to = normalizeDateBoundary(filters.to, true);
-  return (!from || date >= from) && (!to || date <= to);
+  return isWithinReportingDateRange(createdAt, filters.from || "", filters.to || "", filters.timeZone);
 }
 
 export function countBy(items: AnalyticsEventRecord[], select: (item: AnalyticsEventRecord) => string) {
@@ -52,6 +45,7 @@ export function filterAnalyticsEvents(events: AnalyticsEventRecord[], filters: A
   const traffic = filters.traffic || "real";
   const query = filters.query?.trim().toLowerCase();
   return events.filter((item) => {
+    if (/^\/admin(?:\/|$|\?)/.test(item.path || "")) return false;
     if (!isWithinDateRange(item.createdAt, filters)) return false;
     if (traffic !== "all" && item.trafficType !== traffic) return false;
     if (filters.country && filters.country !== "all" && item.countryCode !== filters.country) return false;

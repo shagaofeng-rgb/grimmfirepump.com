@@ -6,13 +6,13 @@ import { DateRangeFilter } from "@/components/admin/date-range-filter";
 import { AdminPageHeader, EmptyState, Field, StatusPill, inputClass } from "@/components/admin/admin-widgets";
 import { getAdminData } from "@/lib/admin-data";
 import { getSiteSettings } from "@/lib/admin-cms";
-import { paginationPageSize, parsePositiveInt, resolveDateRange } from "@/lib/admin-listing";
+import { isWithinReportingDateRange, paginationPageSize, parsePositiveInt, resolveDateRange } from "@/lib/admin-listing";
 import { paginate } from "@/lib/visitor-analytics";
 
 export const dynamic = "force-dynamic";
 type Props = { searchParams: Promise<Record<string, string | string[] | undefined>> };
 function value(params: Record<string, string | string[] | undefined>, key: string) { const item = params[key]; return Array.isArray(item) ? item[0] || "" : item || ""; }
-function inRange(createdAt: string | undefined, from: string, to: string) { const date = Date.parse(createdAt || ""); return (!from || date >= Date.parse(`${from}T00:00:00`)) && (!to || date <= Date.parse(`${to}T23:59:59.999`)); }
+function inRange(createdAt: string | undefined, from: string, to: string, timeZone: string) { return isWithinReportingDateRange(createdAt, from, to, timeZone); }
 
 export default async function AdminDownloadsPage({ searchParams }: Props) {
   const params = await searchParams;
@@ -23,8 +23,8 @@ export default async function AdminDownloadsPage({ searchParams }: Props) {
   const page = parsePositiveInt(value(params, "page"));
   const pageSize = paginationPageSize(value(params, "pageSize"));
   const { cmsDownloads, downloadLeads } = await getAdminData();
-  const assets = cmsDownloads.filter((item) => inRange(item.createdAt, range.from, range.to) && (filters.status === "all" || item.status === filters.status) && (!filters.query || [item.title, item.category, item.relatedProduct, item.language].join(" ").toLowerCase().includes(filters.query.toLowerCase()))).sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt));
-  const leads = downloadLeads.filter((item) => inRange(item.createdAt, range.from, range.to) && (!filters.query || [item.name, item.email, item.country, item.assetTitle].join(" ").toLowerCase().includes(filters.query.toLowerCase()))).sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt));
+  const assets = cmsDownloads.filter((item) => inRange(item.createdAt, range.from, range.to, settings.timezone || "Asia/Shanghai") && (filters.status === "all" || item.status === filters.status) && (!filters.query || [item.title, item.category, item.relatedProduct, item.language].join(" ").toLowerCase().includes(filters.query.toLowerCase()))).sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt));
+  const leads = downloadLeads.filter((item) => inRange(item.createdAt, range.from, range.to, settings.timezone || "Asia/Shanghai") && (!filters.query || [item.name, item.email, item.country, item.assetTitle].join(" ").toLowerCase().includes(filters.query.toLowerCase()))).sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt));
   const pagedAssets = paginate(assets, page, pageSize);
   const pagedLeads = paginate(leads, page, pageSize);
   const pagination = view === "assets" ? pagedAssets : pagedLeads;

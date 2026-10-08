@@ -7,7 +7,7 @@ export type ResolvedDateRange = {
   label: string;
 };
 
-function dateParts(date: Date, timeZone: string) {
+export function dateParts(date: Date, timeZone: string) {
   const parts = new Intl.DateTimeFormat("en-CA", {
     timeZone,
     year: "numeric",
@@ -16,6 +16,12 @@ function dateParts(date: Date, timeZone: string) {
   }).formatToParts(date);
   const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
   return `${values.year}-${values.month}-${values.day}`;
+}
+
+export function isWithinReportingDateRange(createdAt: string | undefined, from: string, to: string, timeZone = "Asia/Shanghai") {
+  if (!createdAt || Number.isNaN(Date.parse(createdAt))) return false;
+  const day = dateParts(new Date(createdAt), timeZone);
+  return (!from || day >= from) && (!to || day <= to);
 }
 
 function shiftDate(date: string, days: number) {

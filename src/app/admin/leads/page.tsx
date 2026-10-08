@@ -5,7 +5,7 @@ import { DateRangeFilter } from "@/components/admin/date-range-filter";
 import { AdminPageHeader, EmptyState, StatusPill, inputClass } from "@/components/admin/admin-widgets";
 import { getAdminData, type InquiryRecord } from "@/lib/admin-data";
 import { getSiteSettings } from "@/lib/admin-cms";
-import { paginationPageSize, parsePositiveInt, resolveDateRange } from "@/lib/admin-listing";
+import { isWithinReportingDateRange, paginationPageSize, parsePositiveInt, resolveDateRange } from "@/lib/admin-listing";
 import { paginate } from "@/lib/visitor-analytics";
 
 export const dynamic = "force-dynamic";
@@ -40,8 +40,7 @@ export default async function LeadsPage({ searchParams }: PageProps) {
     if (filters.source !== "all" && lead.sourceType !== filters.source) return false;
     if (filters.status !== "all" && (lead.status || lead.stage || "new") !== filters.status) return false;
     if (filters.intent !== "all" && lead.intent !== filters.intent) return false;
-    const created = Date.parse(lead.createdAt);
-    return (!filters.from || created >= Date.parse(`${filters.from}T00:00:00`)) && (!filters.to || created <= Date.parse(`${filters.to}T23:59:59.999`));
+    return isWithinReportingDateRange(lead.createdAt, filters.from, filters.to, settings.timezone || "Asia/Shanghai");
   }).sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt));
   const paged = paginate(filtered, page, pageSize);
   const sourceOptions = [...new Set(inquiries.map((lead) => lead.sourceType).filter(Boolean))];

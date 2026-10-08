@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { resolveDateRange } from "../src/lib/admin-listing.ts";
+import { isWithinReportingDateRange, resolveDateRange } from "../src/lib/admin-listing.ts";
 
 test("date presets respect the configured reporting timezone", () => {
   const now = new Date("2026-09-07T16:30:00.000Z");
@@ -23,4 +23,11 @@ test("custom and all ranges stay explicit", () => {
   const all = resolveDateRange("all", { timeZone: "Asia/Shanghai" });
   assert.equal(all.from, "");
   assert.equal(all.to, "");
+});
+
+test("reporting dates include the complete local day, not the UTC day", () => {
+  assert.equal(isWithinReportingDateRange("2026-10-07T16:00:00.000Z", "2026-10-08", "2026-10-08", "Asia/Shanghai"), true);
+  assert.equal(isWithinReportingDateRange("2026-10-08T15:59:59.999Z", "2026-10-08", "2026-10-08", "Asia/Shanghai"), true);
+  assert.equal(isWithinReportingDateRange("2026-10-08T16:00:00.000Z", "2026-10-08", "2026-10-08", "Asia/Shanghai"), false);
+  assert.equal(isWithinReportingDateRange("invalid", "", "", "Asia/Shanghai"), false);
 });
