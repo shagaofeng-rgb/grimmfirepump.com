@@ -2,15 +2,17 @@ import { saveProduct } from "@/app/admin/actions";
 import { Field, inputClass, textareaClass } from "@/components/admin/admin-widgets";
 import { ProductMediaFields } from "@/components/admin/product-media-fields";
 import type { CmsProduct, CmsProductCategory } from "@/lib/admin-cms";
+import { ArrowLeft, FileText, Image as ImageIcon, Info, Save, Search } from "lucide-react";
 
 export function ProductForm({ product, categories }: { product?: CmsProduct; categories: CmsProductCategory[] }) {
   const parameters = product?.parameters.map((item) => `${item.name}|${item.value}|${item.unit}`).join("\n") || "";
 
   return (
-    <form action={saveProduct} className="grid gap-6">
+    <form action={saveProduct} className="admin-editor-form">
       <input type="hidden" name="id" value={product?.id || ""} />
+      <div className="admin-editor-main">
       <section className="grid gap-4 rounded-lg border border-slate-200 bg-white p-6 shadow-sm md:grid-cols-2">
-        <h2 className="text-xl font-black text-slate-950 md:col-span-2">基础信息</h2>
+        <h2 className="text-xl font-black text-slate-950 md:col-span-2"><Info size={19} />基础信息</h2>
         <Field label="产品名称"><input name="title" required defaultValue={product?.title} className={inputClass} /></Field>
         <Field label="英文产品名"><input name="englishName" defaultValue={product?.englishName} className={inputClass} /></Field>
         <Field label="副标题"><input name="subtitle" defaultValue={product?.subtitle} className={inputClass} /></Field>
@@ -49,7 +51,7 @@ export function ProductForm({ product, categories }: { product?: CmsProduct; cat
       </section>
 
       <section className="grid gap-4 rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-        <h2 className="text-xl font-black text-slate-950">产品内容</h2>
+        <h2 className="text-xl font-black text-slate-950"><FileText size={19} />产品内容</h2>
         <Field label="简短描述"><textarea name="summary" rows={3} defaultValue={product?.summary} className={textareaClass} /></Field>
         <Field label="完整介绍"><textarea name="description" rows={7} defaultValue={product?.description} className={textareaClass} /></Field>
         <Field label="产品卖点"><textarea name="sellingPoints" rows={4} defaultValue={product?.sellingPoints} className={textareaClass} /></Field>
@@ -59,15 +61,17 @@ export function ProductForm({ product, categories }: { product?: CmsProduct; cat
         <Field label="安装说明"><textarea name="installation" rows={4} defaultValue={product?.installation} className={textareaClass} /></Field>
         <Field label="售后支持"><textarea name="afterSales" rows={4} defaultValue={product?.afterSales} className={textareaClass} /></Field>
       </section>
+      </div>
 
+      <aside className="admin-editor-aside">
       <section className="grid gap-4 rounded-lg border border-slate-200 bg-white p-6 shadow-sm md:grid-cols-2">
-        <h2 className="text-xl font-black text-slate-950 md:col-span-2">媒体与技术参数</h2>
+        <h2 className="text-xl font-black text-slate-950 md:col-span-2"><ImageIcon size={19} />媒体与技术参数</h2>
         <ProductMediaFields initialMainImage={product?.mainImage} initialGallery={product?.gallery} initialOgImage={product?.ogImage} />
         <Field label="动态技术参数：参数名|参数值|单位，每行一个"><textarea name="parameters" rows={8} defaultValue={parameters} className={textareaClass} /></Field>
       </section>
 
       <section className="grid gap-4 rounded-lg border border-slate-200 bg-white p-6 shadow-sm md:grid-cols-2">
-        <h2 className="text-xl font-black text-slate-950 md:col-span-2">SEO 设置</h2>
+        <h2 className="text-xl font-black text-slate-950 md:col-span-2"><Search size={19} />SEO 设置</h2>
         <Field label="SEO Title"><input name="seoTitle" defaultValue={product?.seoTitle} className={inputClass} /></Field>
         <Field label="Canonical URL"><input name="canonicalUrl" defaultValue={product?.canonicalUrl} className={inputClass} /></Field>
         <Field label="SEO Keywords"><input name="seoKeywords" defaultValue={product?.seoKeywords} className={inputClass} /></Field>
@@ -76,10 +80,11 @@ export function ProductForm({ product, categories }: { product?: CmsProduct; cat
           <input name="indexable" type="checkbox" defaultChecked={product?.indexable ?? true} /> 允许搜索引擎收录
         </label>
       </section>
+      </aside>
 
-      <div className="flex gap-3">
-        <button className="button button-primary" type="submit">保存产品</button>
-        <a className="button button-secondary" href="/admin/products">返回列表</a>
+      <div className="admin-editor-actions">
+        <a className="button button-secondary" href="/admin/products"><ArrowLeft size={16} />返回列表</a>
+        <button className="button button-primary" type="submit"><Save size={16} />保存产品</button>
       </div>
     </form>
   );

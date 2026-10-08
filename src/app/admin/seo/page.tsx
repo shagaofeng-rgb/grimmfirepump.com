@@ -27,7 +27,7 @@ export default async function SeoPage({ searchParams }: PageProps) {
   const pagedIssues = paginate(seoIssues, parsePositiveInt(param(params, "page")), pageSize);
   return (
     <AdminShell>
-      <AdminPageHeader eyebrow="SEO 管理" title="SEO、GEO 和搜索数据配置" description="管理页面 SEO、搜索验证、统计代码和基础页面审计。" />
+      <AdminPageHeader eyebrow="数据概览" title="搜索优化" description="管理页面 SEO、搜索验证、统计代码和基础页面审计。" />
       <div className="mt-8 grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
         <AdminCard title="网站级 SEO 设置">
           <div className="grid gap-3 text-sm text-slate-600">

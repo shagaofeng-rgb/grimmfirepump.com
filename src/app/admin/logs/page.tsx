@@ -79,7 +79,7 @@ export default async function LogsPage({ searchParams }: Props) {
 
   return (
     <AdminShell>
-      <AdminPageHeader eyebrow="系统设置" title="网站记录" description="按时间范围查看后台操作记录与账号登录记录。" />
+      <AdminPageHeader eyebrow="系统管理" title="操作记录" description="按时间范围查看后台操作记录与账号登录记录。" />
 
       <section className="mt-8 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
         <nav className="flex flex-wrap gap-2 border-b border-slate-200 bg-slate-50 p-3" aria-label="网站记录分类">

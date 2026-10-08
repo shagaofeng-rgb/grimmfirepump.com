@@ -1,6 +1,6 @@
 "use client";
 
-import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { Eye, EyeOff, Loader2, LogIn } from "lucide-react";
 import { useState } from "react";
 import { useActionState } from "react";
 import { loginAdmin } from "./actions";
@@ -10,7 +10,7 @@ export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
 
   return (
-    <form action={action} className="mt-8 grid gap-4 rounded-lg bg-white p-6 text-slate-900 shadow-2xl">
+    <form action={action} className="admin-login-form mt-7 grid gap-5 rounded-lg border border-[#dce4e9] bg-white p-6 text-slate-900 shadow-sm sm:p-8">
       <label className="grid gap-2 text-sm font-black text-slate-700">
         后台账号
         <input
@@ -49,7 +49,7 @@ export function LoginForm() {
         记住登录状态 14 天
       </label>
       <button type="submit" className="button button-primary gap-2" disabled={pending}>
-        {pending ? <Loader2 className="animate-spin" size={18} /> : null}
+        {pending ? <Loader2 className="animate-spin" size={18} /> : <LogIn size={18} />}
         {pending ? "登录中..." : "登录后台"}
       </button>
       {state?.error ? <p className="text-sm font-bold text-red-600">{state.error}</p> : null}

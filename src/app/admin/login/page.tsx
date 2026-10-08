@@ -14,18 +14,18 @@ export default async function AdminLoginPage() {
   }
 
   return (
-    <main className="grid min-h-screen place-items-center bg-slate-950 px-6 py-16">
+    <main className="admin-login grid min-h-screen place-items-center bg-[#f5f7f8] px-5 py-12">
       <section className="w-full max-w-md">
         <div className="flex items-center gap-3">
-          <span className="grid h-12 w-12 place-items-center rounded-md bg-white p-1.5">
+          <span className="grid h-12 w-12 place-items-center rounded-md bg-white p-1.5 shadow-sm">
             <Image src="/assets/images/logo.png" alt="GRIMM PUMP logo" width={40} height={29} className="h-auto w-full object-contain" priority />
           </span>
-          <p className="text-sm font-black text-orange-200">GRIMM PUMP</p>
+          <p className="text-sm font-bold text-[#183543]">GRIMM PUMP</p>
         </div>
-        <h1 className="mt-5 text-4xl font-black leading-tight text-white">运营后台登录</h1>
-        <p className="mt-4 leading-7 text-slate-400">GRIMM PUMP 网站运营后台</p>
+        <h1 className="mt-9 text-[28px] font-bold leading-tight text-[#183543]">运营后台登录</h1>
+        <p className="mt-2 text-sm text-slate-600">GRIMM PUMP 网站运营后台</p>
         {!isAdminConfigured() ? (
-          <div className="mt-8 rounded-lg border border-orange-300/30 bg-orange-300/10 p-4 text-sm leading-6 text-orange-100">
+          <div className="mt-8 rounded-md border border-orange-200 bg-orange-50 p-4 text-sm leading-6 text-orange-800">
             管理员登录尚未启用，请联系网站管理员完成账号配置。
           </div>
         ) : null}

@@ -40,7 +40,7 @@ export function DateRangeFilter({
   const values = Object.fromEntries(Object.entries(query).filter(([, value]) => Boolean(value))) as Record<string, string>;
 
   return (
-    <div className={compact ? "grid gap-2" : "grid gap-3"}>
+    <div className={compact ? "admin-date-filter grid gap-2" : "admin-date-filter grid gap-3"}>
       <div className="flex flex-wrap gap-2" aria-label="时间范围">
         {options.map((item) => (
           <Link
@@ -54,19 +54,12 @@ export function DateRangeFilter({
           </Link>
         ))}
       </div>
-      <div className={compact ? "grid gap-2" : "grid gap-2 sm:grid-cols-3"}>
-        <select
-          name="range"
-          defaultValue={preset}
-          className="min-h-10 rounded-md border border-slate-300 bg-white px-3 text-sm font-bold text-slate-900"
-          aria-label="日期范围模式"
-        >
-          {options.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}
-        </select>
+      {preset === "custom" ? <div className="grid gap-2 sm:grid-cols-[1fr_1fr_auto]">
+        <input type="hidden" name="range" value="custom" />
         <input type="date" name="from" defaultValue={from} className="min-h-10 rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-900" aria-label="开始日期" />
         <input type="date" name="to" defaultValue={to} className="min-h-10 rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-900" aria-label="结束日期" />
-      </div>
-      <p className="text-xs font-bold text-slate-500">可快捷切换预设范围，或选择“自定义”并填写日期后应用筛选。日期按后台时区计算。</p>
+        {compact ? <button type="submit" className="min-h-10 rounded-md border border-slate-300 bg-white px-4 text-xs font-bold text-slate-900 hover:bg-slate-50">应用日期</button> : null}
+      </div> : null}
     </div>
   );
 }

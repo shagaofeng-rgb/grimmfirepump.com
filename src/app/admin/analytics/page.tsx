@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Activity, ArrowRight, MousePointerClick, UserRound } from "lucide-react";
+import { Activity, ArrowRight, Download, Filter, MousePointerClick } from "lucide-react";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { AdminPagination } from "@/components/admin/admin-pagination";
 import { AnalyticsRefresh } from "@/components/admin/analytics-refresh";
@@ -62,13 +62,13 @@ export default async function AdminAnalyticsPage({ searchParams }: PageProps) {
     <AdminShell>
       <AdminPageHeader eyebrow="数据概览" title="访问与转化数据" action={<AnalyticsRefresh />} />
 
-      <section className="mt-8 overflow-hidden rounded-xl bg-[#091b32] p-5 text-white shadow-[0_20px_60px_rgba(15,23,42,0.18)] md:p-6">
-        <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between"><div><p className="text-xs font-black uppercase tracking-[0.18em] text-orange-300">GRIMM PUMP</p><h2 className="mt-2 text-2xl font-black">访问表现</h2></div><div className="rounded-md border border-white/10 bg-white/5 px-4 py-3 text-sm"><span className="text-slate-300">当前范围</span><strong className="ml-2 text-lg text-orange-300">{range.label}</strong></div></div>
+      <section className="admin-filter-band mt-8 rounded-md border border-slate-200 bg-white p-5 md:p-6">
+        <div className="flex flex-col gap-2 xl:flex-row xl:items-center xl:justify-between"><h2 className="flex items-center gap-2 text-base font-bold text-slate-800"><Activity size={18} className="text-[#b64d29]" />访问表现</h2><span className="text-sm text-slate-500">当前范围 <strong className="ml-1 text-slate-800">{range.label}</strong></span></div>
         <form className="mt-6 grid gap-3 xl:grid-cols-[1.3fr_repeat(4,minmax(0,1fr))]" method="get">
           <DateRangeFilter pathname="/admin/analytics" query={baseQuery} preset={range.preset} from={range.from} to={range.to} compact />
           <select name="country" defaultValue={filters.country} className="min-h-11 rounded-md border border-white/15 bg-white px-3 text-sm text-slate-900"><option value="all">全部国家</option>{availableCountries.map(([code, name]) => <option key={code} value={code}>{name}</option>)}</select>
           <select name="channel" defaultValue={filters.channel} className="min-h-11 rounded-md border border-white/15 bg-white px-3 text-sm text-slate-900"><option value="all">全部渠道</option>{availableChannels.map((channel) => <option key={channel} value={channel}>{channel}</option>)}</select>
-          <div className="flex gap-2 xl:col-span-2"><input name="query" defaultValue={filters.query} placeholder="页面、访客或来源..." className="min-h-11 min-w-0 flex-1 rounded-md border border-white/15 bg-white px-3 text-sm text-slate-900" /><button className="button button-primary min-h-11" type="submit">应用筛选</button></div>
+          <div className="flex gap-2 xl:col-span-2"><input name="query" defaultValue={filters.query} placeholder="页面、访客或来源..." className="min-h-11 min-w-0 flex-1 rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-900" /><button className="button button-primary min-h-11" type="submit"><Filter size={16} />应用筛选</button></div>
         </form>
       </section>
 
@@ -95,7 +95,7 @@ export default async function AdminAnalyticsPage({ searchParams }: PageProps) {
       </section>
 
       <section className="mt-8 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-        <div className="flex flex-col gap-3 border-b border-slate-200 p-5 md:flex-row md:items-center md:justify-between"><div><p className="text-sm font-black text-orange-700">访问事件明细</p><h2 className="mt-1 text-xl font-black text-slate-950">可筛选、可分页的原始记录</h2></div><a className="button button-secondary min-h-10 text-sm" href="/api/admin/export?type=events">导出筛选结果 CSV</a></div>
+        <div className="flex flex-col gap-3 border-b border-slate-200 p-5 md:flex-row md:items-center md:justify-between"><div><p className="text-sm font-black text-orange-700">访问事件明细</p><h2 className="mt-1 text-xl font-black text-slate-950">可筛选、可分页的原始记录</h2></div><a className="button button-secondary min-h-10 text-sm" href="/api/admin/export?type=events"><Download size={16} />导出筛选结果 CSV</a></div>
         <div className="overflow-x-auto"><table className="min-w-[980px] w-full text-left text-sm"><thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500"><tr><th className="px-5 py-3">时间 / 访客</th><th className="px-5 py-3">页面</th><th className="px-5 py-3">国家 / IP</th><th className="px-5 py-3">渠道</th><th className="px-5 py-3">行为</th><th className="px-5 py-3">类型</th></tr></thead><tbody className="divide-y divide-slate-100">{pagedEvents.items.map((event) => <tr key={event.id} className="hover:bg-slate-50/70"><td className="px-5 py-4"><strong className="block text-slate-900">{formatDate(event.createdAt)}</strong>{event.visitorId ? <Link className="text-xs text-orange-700 hover:underline" href={`/admin/analytics/visitors/${encodeURIComponent(event.visitorId)}?range=${range.preset}&from=${range.from}&to=${range.to}`}>第 {event.visitNumber || 1} 次 · 查看档案</Link> : <span className="text-xs text-slate-500">历史记录</span>}</td><td className="max-w-[280px] px-5 py-4"><span className="block truncate font-bold text-slate-800">{event.path || "/"}</span><span className="block truncate text-xs text-slate-500">{event.label || "—"}</span></td><td className="px-5 py-4">{event.country || "Unknown"}<span className="block text-xs text-slate-500">{event.ipMasked || "—"}</span></td><td className="px-5 py-4">{event.channel || "Direct"}</td><td className="px-5 py-4"><span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2.5 py-1 font-bold text-slate-700"><MousePointerClick size={13} />{event.event}</span></td><td className="px-5 py-4"><span className={event.trafficType === "real" ? "rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-black text-emerald-700" : "rounded-full bg-slate-100 px-2.5 py-1 text-xs font-black text-slate-600"}>{event.trafficType || "real"}</span></td></tr>)}</tbody></table>{!pagedEvents.items.length ? <div className="p-5"><EmptyState text="没有符合条件的访问记录。" /></div> : null}</div>
         <AdminPagination pathname="/admin/analytics" query={baseQuery} page={pagedEvents.page} totalPages={pagedEvents.totalPages} total={pagedEvents.total} pageSize={pagedEvents.pageSize} label="访问记录" />
       </section>

@@ -7,7 +7,11 @@ import { useRouter } from "next/navigation";
 export function AnalyticsRefresh() {
   const router = useRouter();
   const [enabled, setEnabled] = useState(true);
-  const [updatedAt, setUpdatedAt] = useState(() => new Date());
+  const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
+
+  useEffect(() => {
+    setUpdatedAt(new Date());
+  }, []);
 
   useEffect(() => {
     if (!enabled) return;
@@ -25,7 +29,7 @@ export function AnalyticsRefresh() {
       <button type="button" className="font-black text-orange-700" onClick={() => setEnabled((value) => !value)}>
         {enabled ? "暂停" : "开启"}
       </button>
-      <span className="hidden border-l border-slate-200 pl-2 sm:inline">{updatedAt.toLocaleTimeString()}</span>
+      {updatedAt ? <span className="hidden border-l border-slate-200 pl-2 sm:inline">{updatedAt.toLocaleTimeString("zh-CN", { hour12: false })}</span> : null}
     </div>
   );
 }

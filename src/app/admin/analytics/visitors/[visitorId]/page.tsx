@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeft, Globe2, Mail, MousePointerClick, Route, UserRound } from "lucide-react";
+import { ArrowLeft, CalendarDays, Filter, Globe2, Mail, MousePointerClick, Route, UserRound } from "lucide-react";
 import { notFound } from "next/navigation";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { AdminPagination } from "@/components/admin/admin-pagination";
@@ -52,13 +52,11 @@ export default async function VisitorDetailPage({ params, searchParams }: Props)
       <Link href="/admin/analytics" className="inline-flex items-center gap-2 text-sm font-black text-orange-700"><ArrowLeft size={16} /> 返回访问分析</Link>
       <AdminPageHeader eyebrow="访问档案" title={`访客 ${profile.visitorId.slice(0, 12)}`} description="查看同一浏览器下的访问、会话、行为与已关联客户信息。" />
 
-      <section className="mt-7 rounded-xl bg-[#091b32] p-5 text-white shadow-[0_20px_60px_rgba(15,23,42,0.18)]">
-        <DateRangeFilter pathname={`/admin/analytics/visitors/${encodeURIComponent(visitorId)}`} query={query} preset={range.preset} from={range.from} to={range.to} />
-        <form method="get" className="mt-3 flex justify-end gap-2">
-          <input type="hidden" name="range" value="custom" />
-          <input type="hidden" name="from" value={range.from} />
-          <input type="hidden" name="to" value={range.to} />
-          <button className="rounded-md bg-white px-4 py-2 text-sm font-black text-slate-900" type="submit">应用时间范围</button>
+      <section className="admin-filter-band mt-7 rounded-md border border-slate-200 bg-white p-5">
+        <h2 className="mb-4 flex items-center gap-2 text-base font-bold text-slate-800"><CalendarDays size={18} className="text-[#b64d29]" />访问时间范围</h2>
+        <form method="get">
+          <DateRangeFilter pathname={`/admin/analytics/visitors/${encodeURIComponent(visitorId)}`} query={query} preset={range.preset} from={range.from} to={range.to} />
+          {range.preset === "custom" ? <div className="mt-3 flex justify-end"><button className="button button-primary min-h-10 text-sm" type="submit"><Filter size={16} />应用时间范围</button></div> : null}
         </form>
       </section>
 

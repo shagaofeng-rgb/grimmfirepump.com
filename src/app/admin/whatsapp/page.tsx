@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ExternalLink, MessageCircle } from "lucide-react";
+import { ExternalLink, Filter, MessageCircle } from "lucide-react";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { AdminPagination } from "@/components/admin/admin-pagination";
 import { DateRangeFilter } from "@/components/admin/date-range-filter";
@@ -57,9 +57,9 @@ export default async function WhatsAppConversionPage({ searchParams }: PageProps
 
   return <AdminShell>
     <AdminPageHeader eyebrow="客户与销售" title="WhatsApp 线索" />
-    <section className="mt-7 rounded-xl bg-[#091b32] p-5 text-white shadow-[0_20px_60px_rgba(15,23,42,0.18)] md:p-6">
-      <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between"><div><p className="text-xs font-black uppercase tracking-[0.18em] text-orange-300">GRIMM PUMP</p><h2 className="mt-2 flex items-center gap-2 text-2xl font-black"><MessageCircle size={23} /> 官方 WhatsApp</h2></div><a className="inline-flex min-h-11 items-center gap-2 self-start rounded-md border border-white/20 px-4 py-2 text-sm font-black text-white hover:bg-white/10" href="https://wa.me/message/JV3PVHGQYO5SB1" target="_blank" rel="noreferrer">打开账号 <ExternalLink size={15} /></a></div>
-      <form className="mt-6 grid gap-3 xl:grid-cols-[1.4fr_280px_auto]" method="get"><DateRangeFilter pathname="/admin/whatsapp" query={query} preset={range.preset} from={range.from} to={range.to} compact /><select name="placement" defaultValue={placement} className="min-h-11 rounded-md border border-white/15 bg-white px-3 text-sm text-slate-900"><option value="all">全部网站入口</option>{placements.map((item) => <option key={item} value={item}>{item}</option>)}</select><button className="button button-primary min-h-11" type="submit">应用筛选</button></form>
+    <section className="admin-filter-band mt-7 rounded-md border border-slate-200 bg-white p-5 md:p-6">
+      <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between"><h2 className="flex items-center gap-2 text-base font-bold text-slate-800"><MessageCircle size={18} className="text-[#b64d29]" />官方 WhatsApp</h2><a className="admin-inline-action self-start" href="https://wa.me/message/JV3PVHGQYO5SB1" target="_blank" rel="noreferrer">打开账号 <ExternalLink size={15} /></a></div>
+      <form className="mt-6 grid gap-3 xl:grid-cols-[1.4fr_280px_auto]" method="get"><DateRangeFilter pathname="/admin/whatsapp" query={query} preset={range.preset} from={range.from} to={range.to} compact /><select name="placement" defaultValue={placement} className="min-h-11 rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-900"><option value="all">全部网站入口</option>{placements.map((item) => <option key={item} value={item}>{item}</option>)}</select><button className="button button-primary min-h-11" type="submit"><Filter size={16} />应用筛选</button></form>
     </section>
 
     <div className="mt-6 grid gap-4 md:grid-cols-3">
