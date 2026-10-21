@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import dynamic from "next/dynamic";
-import { ArrowRight, ChevronDown, Menu, MessageCircle, Package, X } from "lucide-react";
+import { ArrowRight, ChevronDown, Globe2, Menu, MessageCircle, Package, X } from "lucide-react";
 import { useState } from "react";
 import { company, navItems } from "@/data/site";
 import type { ProductNavigationGroup } from "@/lib/product-navigation";
@@ -12,6 +12,15 @@ const ProductMegaMenu = dynamic(
   () => import("@/components/product-mega-menu").then((module) => module.ProductMegaMenu),
   { ssr: false },
 );
+
+const languages = [
+  { name: "English", href: "/" },
+  { name: "Español", href: "/es" },
+  { name: "Русский", href: "/ru" },
+  { name: "العربية", href: "/ar" },
+  { name: "Français", href: "/fr" },
+  { name: "Português", href: "/pt" },
+];
 
 export function HeaderClient({ groups }: { groups: ProductNavigationGroup[] }) {
   const [open, setOpen] = useState(false);
@@ -87,6 +96,12 @@ export function HeaderClient({ groups }: { groups: ProductNavigationGroup[] }) {
         </nav>
 
         <div className="flex items-center gap-3">
+          <details className="relative hidden xl:block">
+            <summary className="flex min-h-11 cursor-pointer list-none items-center gap-1 text-sm font-bold text-[var(--navy-800)] [&::-webkit-details-marker]:hidden" aria-label="Select language"><Globe2 size={17} aria-hidden="true" /> EN <ChevronDown size={13} aria-hidden="true" /></summary>
+            <nav className="absolute right-0 top-full z-50 grid min-w-40 rounded-md border border-slate-200 bg-white p-2 shadow-xl" aria-label="Languages">
+              {languages.map((language) => <Link key={language.href} href={language.href} className="rounded px-3 py-2 text-sm hover:bg-slate-100">{language.name}</Link>)}
+            </nav>
+          </details>
           <a
             className="hidden items-center gap-2 text-sm font-extrabold text-[var(--navy-800)] md:flex"
             href={company.whatsappUrl}
@@ -138,6 +153,9 @@ export function HeaderClient({ groups }: { groups: ProductNavigationGroup[] }) {
           <Link className="button button-primary mt-5 w-full" href="/contact" onClick={closeMobileMenu}>
             Get Quote
           </Link>
+          <div className="mt-4 flex flex-wrap gap-2" aria-label="Languages">
+            {languages.map((language) => <Link key={language.href} href={language.href} className="rounded border border-slate-200 px-3 py-2 text-xs font-bold" onClick={closeMobileMenu}>{language.name}</Link>)}
+          </div>
         </nav>
       ) : null}
     </header>

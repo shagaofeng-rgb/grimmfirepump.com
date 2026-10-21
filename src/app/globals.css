@@ -1205,14 +1205,6 @@ video {
 .home-header-cta { min-width: 104px; min-height: 38px; padding-inline: 13px; font-size: 10px; }
 .home-search-link, .home-language-link { width: 47px; height: 38px; border-left: 1px solid #e5e8ec; display: inline-flex; align-items: center; justify-content: center; }
 .home-language-link { width: 54px; gap: 2px; color: #0b1f3a; font-size: 10px; font-weight: 800; }
-.home-language-menu { position: relative; }
-.home-language-menu > summary { list-style: none; cursor: pointer; }
-.home-language-menu > summary::-webkit-details-marker { display: none; }
-.home-language-menu > nav { position: absolute; z-index: 40; right: 0; top: 100%; display: grid; min-width: 150px; padding: 6px; background: #fff; border: 1px solid #d8e0e8; box-shadow: 0 12px 28px #0b1f3a24; }
-.home-language-menu > nav a { display: block; padding: 9px 12px; color: #0b1f3a; font-size: 12px; white-space: nowrap; }
-.home-language-menu > nav a:hover, .home-language-menu > nav a:focus-visible { background: #eef3f6; }
-.home-mobile-languages { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 0; }
-.home-mobile-languages a { color: #0b1f3a; background: #edf2f5; padding: 8px 10px; font-size: 12px; }
 
 .home-hero-inner { max-width: 1440px; min-height: 450px; grid-template-columns: 46% 54%; }
 .home-hero-copy { position: relative; z-index: 2; padding: 39px 38px 25px 67px; background:#061524; }
