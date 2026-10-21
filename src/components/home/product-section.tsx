@@ -11,36 +11,9 @@ type ProductSectionProps = {
   page?: number;
 };
 
-const homepageSystems = [
-  {
-    title: "End Suction Fire Pumps",
-    text: "Reliable, efficient and widely used for building and industrial applications.",
-    image: "/assets/products/electric-fire-pump-clean.webp",
-    href: "/products/electric-horizontal-split-end-suction-pump",
-  },
-  {
-    title: "Vertical Turbine Fire Pumps",
-    text: "Designed for deep well and large flow applications.",
-    image: "/assets/products/vertical-turbine-fire-pump.webp",
-    href: "/products/vertical-stainless-steel-multistage-pump-jockey-pump",
-  },
-  {
-    title: "Fire Pump Packages",
-    text: "Complete electric, diesel and jockey-pump configurations for reliable operation.",
-    image: "/assets/products/edj-package.webp",
-    href: "/products/edj-fire-pump-set",
-  },
-  {
-    title: "Fire Pump Control Panels",
-    text: "Diesel, electric and jockey pump controllers for reliable operation.",
-    image: "/assets/factory/real/controller-assembly.webp",
-    imageClassName: "object-cover",
-    href: "/products",
-  },
-];
-
 export async function ProductSection({ featuredOnly = false, group, page = 1 }: ProductSectionProps) {
   if (featuredOnly) {
+    const homepageSystems = (await getPublicProducts()).slice(0, 4);
     return (
       <section className="home-systems">
         <div className="home-section-inner">
@@ -51,13 +24,13 @@ export async function ProductSection({ featuredOnly = false, group, page = 1 }: 
           </div>
           <div className="home-system-grid">
             {homepageSystems.map((item) => (
-              <Link href={item.href} key={item.title} className="home-system-card">
+              <Link href={`/products/${item.slug}`} key={item.slug} className="home-system-card">
                 <figure>
-                  <Image src={item.image} alt={item.title} fill className={item.imageClassName || "object-cover"} sizes="(min-width: 768px) 33vw, 38vw" />
+                  <Image src={item.image} alt={item.title} fill className="object-contain" sizes="(min-width: 768px) 33vw, 38vw" />
                 </figure>
                 <div>
                   <h3>{item.title}</h3>
-                  <p>{item.text}</p>
+                  <p>{item.summary}</p>
                   <span>Learn More <ArrowRight size={15} /></span>
                 </div>
               </Link>

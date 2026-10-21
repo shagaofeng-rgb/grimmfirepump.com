@@ -1100,6 +1100,7 @@ video {
 .home-system-card > div { display: block; min-height: 164px; padding: 19px 20px 17px; }
 .home-system-card h3 { color: #10263d; font-size: 16px; }
 .home-system-card > div > p { margin: 10px 0 0; color: #4d6274; font-size: 11px; line-height: 1.42; }
+.home-system-card > div > p { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
 .home-system-card > div > span { display: inline-flex; margin-top: 13px; align-items: center; gap: 6px; color: var(--orange); font-size: 11px; font-weight: 900; }
 
 .home-certifications { padding-block: 61px 43px; background: #f7f2e9; }

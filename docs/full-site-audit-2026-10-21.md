@@ -21,6 +21,7 @@ The Maige domain and repository mentioned in the original checklist are not in s
 6. The homepage footer's Quality link pointed to missing `/quality`; it now points to `/certificates`. The decorative English selector now links to the six existing language home pages, including mobile navigation.
 7. The Search Console submission cron remains Monday 03:00 UTC (`0 3 * * 1`, Monday 11:00 Shanghai). The previous maintenance path suppressed a due Monday submission whenever the sitemap was unchanged; that condition was removed. The weekly schedule gate and single cron remain intact. This change must be verified after the next scheduled production run; no claim is made that Google has indexed any URL.
 8. Privacy and terms pages were added to the sitemap.
+9. The homepage's hard-coded featured product cards contained a material mismatch: the Vertical Turbine label opened a Jockey Pump detail. Featured cards now use the first four published CMS products and their actual titles, summaries, images and detail URLs.
 
 ## Automation inventory and conflict review
 
@@ -34,12 +35,13 @@ The Maige domain and repository mentioned in the original checklist are not in s
 - Local TypeScript check, sitemap tests, and optimized Next.js build: see release command output. Existing focused tests had 31 passing checks before the final navigation edit; final type/build/sitemap checks were rerun.
 - Locally built site: 110 public URLs in five shards, zero deep-audit failures, 23/23 self-audit routes passed. Local median 1,752 ms, p95 4,300 ms, reflecting remote database latency from the developer machine; not a production speed regression comparison.
 - Homepage, downloads, Blog, product pages, protected admin routes, unauthorized API responses, and real inquiry/download submissions were exercised. Production post-deployment checks are recorded in the release response.
+- Browser checks on the production homepage, product list/detail, downloads, Blog and contact pages found no horizontal overflow at 390, 768 or 1440 px; visible first-viewport images were not broken at 390 px. Mobile navigation and all six language links were opened and inspected. Browser console reported no errors in the checked session.
 
 ## External limitations and follow-up
 
 - `_dmarc.grimmfirepump.com` currently resolves to three separate DMARC TXT records. DNS is hosted at DNSPod, outside this repository and Vercel project. Consolidate them into exactly one valid DMARC TXT record. SPF was observed; DKIM selector and actual notification delivery could not be validated. Form data writes were tested, but no SMTP/transactional-mail integration was proven.
 - No active GA4 measurement ID or authenticated GA4/Search Console report access was available during this audit. Admin analytics were validated as first-party event data, not represented as GA4 or Search Console data. Consent opt-in will intentionally reduce first-party event counts relative to unconsented traffic.
-- Browser automation was unavailable during this session, so complete desktop/tablet/mobile screenshot, console, keyboard and regional network verification is not marked passed. HTTP, HTML, build and API coverage cannot replace visual/device QA.
+- Automated browser checks covered six primary routes and three viewport widths, but not every product/article/detail URL, physical devices, every browser engine, all keyboard paths or all layout states. Those broader visual and accessibility checks are not marked passed.
 - The provided checklist mentioned `info@maigebio.com`; that address is unrelated to GRIMM and was not configured as a notification destination. A verified GRIMM notification mailbox and service credentials are required to test email delivery.
 - International probes from Middle East, Africa, Southeast Asia and South America were not available. Public HTTP timings above are from the local audit location only.
 
