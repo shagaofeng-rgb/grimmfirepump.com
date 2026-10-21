@@ -71,7 +71,7 @@ async function refreshSitemap(reason: string) {
 const categorySchema = z.object({
   id: z.string().optional(),
   name: z.string().min(2),
-  slug: z.string().min(2),
+  slug: z.string().min(2).regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Use lowercase letters, numbers and hyphens for category URLs."),
   parentId: z.string().optional().default(""),
   sortOrder: z.number(),
   enabled: z.boolean(),
@@ -108,7 +108,17 @@ export async function saveCategory(formData: FormData) {
     ogImage: text(formData, "ogImage"),
     indexable: checkbox(formData, "indexable"),
   });
-  const existing = (await listProductCategories()).find((item) => item.id === parsed.id);
+  const categories = await listProductCategories();
+  const existing = categories.find((item) => item.id === parsed.id);
+  if (categories.some((item) => item.id !== parsed.id && item.slug.toLowerCase() === parsed.slug.toLowerCase())) {
+    throw new Error("This category URL slug is already in use.");
+  }
+  if (parsed.parentId) {
+    const parent = categories.find((item) => item.id === parsed.parentId);
+    if (!parent || !parent.enabled || parent.parentId || parent.id === parsed.id) {
+      throw new Error("Choose an enabled top-level parent category.");
+    }
+  }
   const item: CmsProductCategory = {
     ...parsed,
     id: parsed.id || createId("cat"),
@@ -117,6 +127,9 @@ export async function saveCategory(formData: FormData) {
   };
   await cmsStore.upsertCategory(item);
   await audit("save_category", item.id);
+  revalidateTag("cms-product-categories");
+  revalidatePath("/");
+  revalidatePath("/products");
   revalidatePath("/admin/product-categories");
   await refreshSitemap("category_saved");
 }
@@ -125,13 +138,20 @@ export async function deleteCategory(formData: FormData) {
   await requireAdmin(["super_admin", "product_manager"]);
   const id = text(formData, "id");
   const products = await listCmsProducts();
+  const categories = await listProductCategories();
+  if (categories.some((item) => item.parentId === id && item.enabled)) {
+    throw new Error("Disable child categories before archiving their parent.");
+  }
   if (products.some((item) => item.categoryId === id)) {
     await audit("delete_category_blocked", id, "failed");
     redirect("/admin/product-categories?error=category-in-use");
   }
-  const category = (await listProductCategories()).find((item) => item.id === id);
+  const category = categories.find((item) => item.id === id);
   if (category) await cmsStore.upsertCategory({ ...category, enabled: false, indexable: false, updatedAt: new Date().toISOString() });
   await audit("delete_category", id);
+  revalidateTag("cms-product-categories");
+  revalidatePath("/");
+  revalidatePath("/products");
   revalidatePath("/admin/product-categories");
   await refreshSitemap("category_archived");
 }
@@ -140,10 +160,15 @@ export async function saveProduct(formData: FormData) {
   await requireAdmin(["super_admin", "product_manager"]);
   const now = new Date().toISOString();
   const id = text(formData, "id") || createId("prod");
-  const existing = (await listCmsProducts()).find((item) => item.id === id);
+  const allProducts = await listCmsProducts();
+  const existing = allProducts.find((item) => item.id === id);
   const categories = await listProductCategories();
-  const categoryId = text(formData, "categoryId") || categories[0]?.id || "";
+  const categoryId = text(formData, "categoryId");
   const category = categories.find((item) => item.id === categoryId);
+  if (!category || !category.enabled) throw new Error("Choose an enabled product category before saving.");
+  if (category.parentId && !categories.some((item) => item.id === category.parentId && item.enabled)) {
+    throw new Error("The selected category has no enabled parent.");
+  }
   const status = statusSchema.parse(text(formData, "status", "draft")) as PublishStatus;
   const item: CmsProduct = {
     id,
@@ -190,6 +215,9 @@ export async function saveProduct(formData: FormData) {
     indexable: checkbox(formData, "indexable"),
   };
   z.object({ title: z.string().min(2), slug: z.string().min(2) }).parse(item);
+  if (allProducts.some((product) => product.id !== id && product.slug.trim().toLowerCase() === item.slug.trim().toLowerCase())) {
+    throw new Error("This product URL slug is already in use.");
+  }
   await cmsStore.upsertProduct(item);
   revalidateTag("cms-products");
   await audit("save_product", item.id);
@@ -197,6 +225,7 @@ export async function saveProduct(formData: FormData) {
   revalidatePath("/");
   revalidatePath("/products");
   revalidatePath(`/products/${item.slug}`);
+  if (existing && existing.slug !== item.slug) revalidatePath(`/products/${existing.slug}`);
   await refreshSitemap("product_saved");
   redirect(`/admin/products/${item.id}/edit?saved=1`);
 }

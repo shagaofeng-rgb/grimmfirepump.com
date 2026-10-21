@@ -2,14 +2,14 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
-import { productMegaMenuGroups } from "@/data/site";
+import { ArrowRight, Package } from "lucide-react";
+import type { ProductNavigationGroup } from "@/lib/product-navigation";
 
-export function ProductMegaMenu() {
+export function ProductMegaMenu({ groups }: { groups: ProductNavigationGroup[] }) {
   return (
-    <div className="fixed left-1/2 top-[72px] z-50 max-h-[calc(100vh-88px)] w-[min(1160px,calc(100vw-48px))] -translate-x-1/2 overflow-y-auto pt-3">
+    <div className="fixed left-1/2 top-[72px] z-50 w-[min(1160px,calc(100vw-48px))] -translate-x-1/2 pt-3">
       <div className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-[0_30px_80px_rgba(7,20,38,0.18)]">
-        <div className="grid grid-cols-[260px_1fr]">
+        <div className="grid max-h-[calc(100vh-96px)] grid-cols-[260px_1fr]">
           <div className="bg-[var(--navy-950)] p-6 text-white">
             <h2 className="text-2xl font-black leading-tight">Pump systems organized for project buyers.</h2>
             <p className="mt-3 text-sm font-bold text-orange-200">Product categories</p>
@@ -22,18 +22,18 @@ export function ProductMegaMenu() {
             </Link>
           </div>
 
-          <div className="grid gap-0 divide-x divide-y divide-slate-100 lg:grid-cols-3 xl:grid-cols-5 xl:divide-y-0">
-            {productMegaMenuGroups.map((group) => (
-              <section key={group.title} className="flex min-h-[340px] flex-col p-4">
+          <div className="grid max-h-[calc(100vh-96px)] auto-rows-max content-start gap-0 divide-x divide-y divide-slate-100 overflow-y-auto lg:grid-cols-3">
+            {groups.map((group) => (
+              <section key={group.slug} className="flex min-h-[280px] flex-col p-4">
                 <Link href={group.href} className="group/card block">
                   <figure className="relative mb-4 h-28 overflow-hidden rounded-md bg-slate-50">
-                    <Image
+                    {group.image ? <Image
                       src={group.image}
                       alt={group.title}
                       fill
                       className="object-contain p-3 transition duration-300 group-hover/card:scale-[1.04]"
                       sizes="220px"
-                    />
+                    /> : <span className="flex h-full items-center justify-center text-slate-400"><Package size={42} aria-hidden="true" /></span>}
                   </figure>
                   <h3 className="text-[15px] font-black leading-snug text-[var(--navy-950)]">{group.title}</h3>
                   <p className="mt-2 min-h-[60px] text-xs leading-5 text-slate-500">{group.description}</p>

@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { ChevronDown, Menu, Search, X } from "lucide-react";
-import { productMegaMenuGroups } from "@/data/site";
+import type { ProductNavigationGroup } from "@/lib/product-navigation";
 
 const nav = [
   { label: "Home", href: "/" },
@@ -17,7 +17,7 @@ const nav = [
   { label: "Contact", href: "/contact" },
 ];
 
-export function HomeHeader() {
+export function HomeHeader({ groups }: { groups: ProductNavigationGroup[] }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [productsOpen, setProductsOpen] = useState(false);
@@ -86,7 +86,7 @@ export function HomeHeader() {
               >
                 <ChevronDown size={13} aria-hidden="true" />
               </button>
-              <HomeProductFlyout open={productsOpen} close={() => setProductsOpen(false)} />
+              <HomeProductFlyout groups={groups} open={productsOpen} close={() => setProductsOpen(false)} />
             </div>
           ) : <Link key={item.href} href={item.href}>{item.label}</Link>)}
         </nav>
@@ -120,7 +120,7 @@ export function HomeHeader() {
                 Products
                 <ChevronDown size={17} className={mobileProductsOpen ? "is-open" : ""} aria-hidden="true" />
               </button>
-              {mobileProductsOpen ? <HomeMobileProductMenu close={closeMobileMenu} /> : null}
+              {mobileProductsOpen ? <HomeMobileProductMenu groups={groups} close={closeMobileMenu} /> : null}
             </div>
           ) : (
             <Link key={item.href} href={item.href} onClick={closeMobileMenu}>{item.label}</Link>
@@ -132,7 +132,7 @@ export function HomeHeader() {
   );
 }
 
-function HomeProductFlyout({ open, close }: { open: boolean; close: () => void }) {
+function HomeProductFlyout({ groups, open, close }: { groups: ProductNavigationGroup[]; open: boolean; close: () => void }) {
   return (
     <section
       id="home-product-navigation"
@@ -146,7 +146,7 @@ function HomeProductFlyout({ open, close }: { open: boolean; close: () => void }
         <Link href="/products" onClick={close}>Explore all products <b aria-hidden="true">→</b></Link>
       </div>
       <div className="home-product-flyout-groups">
-        {productMegaMenuGroups.map((group) => (
+        {groups.map((group) => (
           <article key={group.slug}>
             <Link href={group.href} className="home-product-group-image" onClick={close} tabIndex={open ? 0 : -1}>
               <Image src={group.image} alt="" fill sizes="150px" className="object-contain" />
@@ -167,11 +167,11 @@ function HomeProductFlyout({ open, close }: { open: boolean; close: () => void }
   );
 }
 
-function HomeMobileProductMenu({ close }: { close: () => void }) {
+function HomeMobileProductMenu({ groups, close }: { groups: ProductNavigationGroup[]; close: () => void }) {
   return (
     <div className="home-mobile-product-panel">
       <Link href="/products" className="home-mobile-all-products" onClick={close}>View all products <span aria-hidden="true">→</span></Link>
-      {productMegaMenuGroups.map((group) => (
+      {groups.map((group) => (
         <section key={group.slug}>
           <Link href={group.href} onClick={close}>{group.title}<span aria-hidden="true">→</span></Link>
           {group.items.slice(0, 3).map((product) => (

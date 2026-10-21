@@ -3,9 +3,7 @@ import Link from "next/link";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { SectionHeading } from "@/components/section-heading";
 import { ContentPagination, getPageSlice } from "@/components/content-pagination";
-import { productMegaMenuGroups } from "@/data/site";
-import { getPublicProducts } from "@/lib/public-cms";
-import { getProductFamily } from "@/lib/product-taxonomy";
+import { getPublicProductNavigation, getPublicProducts } from "@/lib/public-cms";
 
 type ProductSectionProps = {
   featuredOnly?: boolean;
@@ -70,10 +68,10 @@ export async function ProductSection({ featuredOnly = false, group, page = 1 }: 
     );
   }
 
-  const products = await getPublicProducts();
-  const activeGroup = productMegaMenuGroups.find((item) => item.slug === group);
+  const [products, groups] = await Promise.all([getPublicProducts(), getPublicProductNavigation()]);
+  const activeGroup = groups.find((item) => item.slug === group);
   const groupedProducts = activeGroup
-    ? products.filter((product) => getProductFamily(product.slug, product.title, product.category).id === activeGroup.slug)
+    ? products.filter((product) => product.groupSlug === activeGroup.slug)
     : products;
   const pagedProducts = getPageSlice(groupedProducts, page, 6);
 
@@ -88,6 +86,19 @@ export async function ProductSection({ featuredOnly = false, group, page = 1 }: 
           </Link>
         }
       />
+      <nav aria-label="Product categories" className="container-shell mb-6 flex gap-2 overflow-x-auto pb-2">
+        <Link href="/products" aria-current={!activeGroup ? "page" : undefined} className={`shrink-0 rounded-md border px-4 py-2.5 text-sm font-bold ${!activeGroup ? "border-[var(--navy-950)] bg-[var(--navy-950)] text-white" : "border-slate-200 bg-white text-[var(--navy-900)] hover:border-[var(--orange)]"}`}>All products</Link>
+        {groups.map((item) => (
+          <Link key={item.slug} href={item.href} aria-current={item.slug === activeGroup?.slug ? "page" : undefined} className={`shrink-0 rounded-md border px-4 py-2.5 text-sm font-bold ${item.slug === activeGroup?.slug ? "border-[var(--navy-950)] bg-[var(--navy-950)] text-white" : "border-slate-200 bg-white text-[var(--navy-900)] hover:border-[var(--orange)]"}`}>{item.title}</Link>
+        ))}
+      </nav>
+      {activeGroup && !groupedProducts.length ? (
+        <div className="container-shell py-12 text-center">
+          <h3 className="text-xl font-black text-[var(--navy-950)]">Products in this category are being prepared.</h3>
+          <p className="mt-3 text-sm text-slate-600">Contact our team for current models and technical specifications.</p>
+          <Link className="button button-primary mt-6 inline-flex" href="/contact">Contact our team <ArrowRight size={16} /></Link>
+        </div>
+      ) : null}
       <div className="container-shell grid gap-5 md:grid-cols-2 xl:grid-cols-3">
         {pagedProducts.items.map((product) => (
           <article key={product.slug} className="product-card card card-interactive group relative flex min-h-[385px] flex-col overflow-hidden">

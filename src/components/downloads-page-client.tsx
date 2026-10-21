@@ -1,9 +1,6 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { Header } from "@/components/header";
-import { Footer } from "@/components/footer";
-import { StickyCta } from "@/components/sticky-cta";
 import { downloads } from "@/data/site";
 
 export function DownloadsPageClient() {
@@ -43,7 +40,6 @@ export function DownloadsPageClient() {
 
   return (
     <>
-      <Header />
       <main>
         <section className="dark-gradient px-6 py-16 md:py-20">
           <div className="mx-auto max-w-[1240px]">
@@ -81,8 +77,6 @@ export function DownloadsPageClient() {
           </form>
         </div>
       ) : null}
-      <Footer />
-      <StickyCta />
     </>
   );
 }

@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import { DownloadsPageClient } from "@/components/downloads-page-client";
+import { Header } from "@/components/header";
+import { Footer } from "@/components/footer";
+import { StickyCta } from "@/components/sticky-cta";
 import { localizedAlternates } from "@/lib/i18n";
 
 export const metadata: Metadata = {
@@ -9,5 +12,5 @@ export const metadata: Metadata = {
 };
 
 export default function DownloadsPage() {
-  return <DownloadsPageClient />;
+  return <><Header /><DownloadsPageClient /><Footer /><StickyCta /></>;
 }

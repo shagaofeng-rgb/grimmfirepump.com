@@ -1,8 +1,10 @@
-import { isLegacyImportedBlogSlug, listCmsNews, listCmsProducts, type CmsNews, type CmsProduct } from "@/lib/admin-cms";
+import { isLegacyImportedBlogSlug, listCmsNews, listCmsProducts, listProductCategories, type CmsNews, type CmsProduct, type CmsProductCategory } from "@/lib/admin-cms";
 import { unstable_cache } from "next/cache";
 import { getProductDisplayName, getProductFamily } from "@/lib/product-taxonomy";
+import { buildProductNavigation, publicCategorySlug, publicProductCategory } from "@/lib/product-navigation";
 
 const cachedCmsProducts = unstable_cache(listCmsProducts, ["public-cms-products-v2"], { revalidate: 300, tags: ["cms-products"] });
+const cachedProductCategories = unstable_cache(listProductCategories, ["public-cms-product-categories-v1"], { revalidate: 300, tags: ["cms-product-categories"] });
 const cachedCmsNews = unstable_cache(listCmsNews, ["public-cms-blog-v3"], { revalidate: 300, tags: ["cms-blog"] });
 
 export type PublicProduct = {
@@ -13,6 +15,7 @@ export type PublicProduct = {
   sourceUrl: string;
   title: string;
   category: string;
+  groupSlug: string;
   releaseTime: string;
   image: string;
   summary: string;
@@ -21,6 +24,9 @@ export type PublicProduct = {
   keywords: string;
   detailLines: string[];
   detailImages: Array<{ src: string; alt: string }>;
+  structureItems: string[];
+  applicationItems: string[];
+  technicalParameters: string[];
 };
 
 export type PublicPost = {
@@ -73,11 +79,13 @@ function productDetailLines(item: CmsProduct) {
   ].flatMap(lines);
 }
 
-function mapProduct(item: CmsProduct): PublicProduct {
+function mapProduct(item: CmsProduct, categories: Map<string, CmsProductCategory>): PublicProduct {
   // The CMS historically contains mixed-case slugs. Public URLs are normalized
   // to lowercase so links, canonical tags and Sitemaps describe one URL only.
   const slug = item.slug.trim().toLowerCase();
   const family = getProductFamily(item.slug, item.title, item.categoryName);
+  const category = publicProductCategory(item.categoryId, categories);
+  const publicCategory = category && [...categories.values()].find((entry) => entry.slug === publicCategorySlug(category.slug));
   const image = item.mainImage || "/assets/products/edj-package.webp";
   const gallery = item.gallery.length ? item.gallery : [image];
   return {
@@ -87,7 +95,8 @@ function mapProduct(item: CmsProduct): PublicProduct {
     indexable: item.indexable,
     sourceUrl: "",
     title: getProductDisplayName(item.slug, item.title),
-    category: family.name,
+    category: publicCategory?.name || category?.name || family.name,
+    groupSlug: category ? publicCategorySlug(category.slug) : family.id,
     releaseTime: item.createdAt.slice(0, 10),
     image,
     summary: item.summary || item.description,
@@ -96,6 +105,9 @@ function mapProduct(item: CmsProduct): PublicProduct {
     keywords: item.seoKeywords || item.title,
     detailLines: productDetailLines(item),
     detailImages: gallery.map((src) => ({ src, alt: item.title })),
+    structureItems: lines(item.structure),
+    applicationItems: lines(item.applications),
+    technicalParameters: item.parameters.map((param) => `${param.name}: ${[param.value, param.unit].filter(Boolean).join(" ")}`),
   };
 }
 
@@ -117,12 +129,18 @@ function mapPost(item: CmsNews): PublicPost {
 }
 
 export async function getPublicProducts() {
-  const cmsProducts = await cachedCmsProducts();
+  const [cmsProducts, categories] = await Promise.all([cachedCmsProducts(), cachedProductCategories()]);
+  const byId = new Map(categories.map((category) => [category.id, category]));
   const cmsMapped = cmsProducts
-    .filter((item) => item.status === "published")
+    .filter((item) => item.status === "published" && publicProductCategory(item.categoryId, byId))
     .sort((a, b) => a.sortOrder - b.sortOrder)
-    .map(mapProduct);
+    .map((item) => mapProduct(item, byId));
   return cmsMapped;
+}
+
+export async function getPublicProductNavigation() {
+  const [categories, products] = await Promise.all([cachedProductCategories(), getPublicProducts()]);
+  return buildProductNavigation(categories, products);
 }
 
 export async function getPublicProduct(slug: string) {

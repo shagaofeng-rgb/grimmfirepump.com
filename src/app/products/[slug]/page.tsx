@@ -8,9 +8,10 @@ import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { StickyCta } from "@/components/sticky-cta";
 import { ProductInquiryForm } from "@/components/product-inquiry-form";
-import { company, productMegaMenuGroups } from "@/data/site";
+import { company } from "@/data/site";
 import { getRelatedNewsForProduct } from "@/lib/news-automation";
-import { getPublicProduct, getPublicProducts, type PublicProduct } from "@/lib/public-cms";
+import { getPublicProduct, getPublicProductNavigation, getPublicProducts, type PublicProduct } from "@/lib/public-cms";
+import type { ProductNavigationGroup } from "@/lib/product-navigation";
 import { getProductKnowledge } from "@/lib/product-knowledge";
 
 type ProductPageProps = {
@@ -105,102 +106,8 @@ function groupTechnicalLines(lines: string[]) {
   return groups.filter((group) => group.lines.length);
 }
 
-function getStructureItems(product: Product) {
-  const title = product.title.toLowerCase();
-  const category = product.category.toLowerCase();
-
-  if (title.includes("edj")) {
-    return [
-      "Main electric fire pump for regular emergency operation.",
-      "Diesel engine standby pump for backup water supply.",
-      "Jockey pump for pressure maintenance and small leakage compensation.",
-      "Control panel, base frame, valves and pipe fittings configured as a package.",
-    ];
-  }
-
-  if (title.includes("diesel") && title.includes("jockey")) {
-    return [
-      "Diesel-engine-driven main fire pump selected to the verified duty point.",
-      "Jockey pump for standby pressure maintenance and small leakage compensation.",
-      "Controller, base frame, valves and pipe fittings configured to the approved project scope.",
-      "No electric main pump is assumed unless it is identified in the approved configuration.",
-    ];
-  }
-
-  if ((title.includes("electric") || title.startsWith("2 electric")) && title.includes("jockey")) {
-    return [
-      "Electric-motor-driven main fire pump selected to the verified duty point.",
-      "Jockey pump for standby pressure maintenance and small leakage compensation.",
-      "Controller, base frame, valves and pipe fittings configured to the approved project scope.",
-      "No diesel standby pump is assumed unless it is identified in the approved configuration.",
-    ];
-  }
-
-  if (title.includes("jockey")) {
-    return [
-      "Vertical multistage jockey pump for pressure maintenance in a fire-water system.",
-      "Pressure switch or control arrangement selected by the approved system design.",
-      "Small leakage compensation to reduce unnecessary starts of the main fire pump.",
-      "A jockey pump is not presented as a substitute for a main fire pump.",
-    ];
-  }
-
-  if (category.includes("water")) {
-    return [
-      "Booster pump unit matched with project flow and head.",
-      "Variable-frequency control cabinet for constant pressure operation.",
-      "Pressure sensor and pressure tank for stable system response.",
-      "Compact skid arrangement for domestic and utility water supply rooms.",
-    ];
-  }
-
-  if (category.includes("sewage")) {
-    return [
-      "Submersible or integrated lifting pump configuration for wastewater transfer.",
-      "Pump body and motor selected by flow, head and medium condition.",
-      "Optional cutting, stirring and anti-clogging structures for difficult sewage.",
-      "Pump station or drainage package can be configured for project site layout.",
-    ];
-  }
-
-  if (title.includes("trailer") || title.includes("irrigation")) {
-    return [
-      "Diesel engine drive for independent operation on remote sites.",
-      "Mobile trailer chassis for temporary drainage and water transfer.",
-      "Self-priming pump configuration for fast emergency use.",
-      "Large-caliber suction and discharge connections selected by site demand.",
-    ];
-  }
-
-  return [
-    "Pump body selected by application, flow and pressure condition.",
-    "Motor or diesel driver matched with required power and frequency.",
-    "Suction and discharge connections configured for project piping.",
-    "Factory assembly and testing support export project documentation.",
-  ];
-}
-
-function getApplicationItems(product: Product) {
-  const title = product.title.toLowerCase();
-  const category = product.category.toLowerCase();
-
-  if (category.includes("sewage")) {
-    return ["Basement sewage lifting", "Municipal drainage", "Farm wastewater discharge", "Integrated pump station projects"];
-  }
-
-  if (category.includes("water")) {
-    return ["High-rise building water supply", "Hospital and school water supply", "Water tank pressurization", "Booster room renovation"];
-  }
-
-  if (title.includes("trailer") || title.includes("irrigation")) {
-    return ["Emergency drainage", "Irrigation projects", "Temporary water transfer", "Flood control and construction sites"];
-  }
-
-  return ["Fire pump room", "Industrial plant", "Warehouse fire protection", "Commercial building and infrastructure projects"];
-}
-
 function relatedProducts(product: Product, products: Product[]) {
-  const sameCategory = products.filter((item) => item.slug !== product.slug && item.category === product.category);
+  const sameCategory = products.filter((item) => item.slug !== product.slug && item.groupSlug === product.groupSlug);
   const fallback = products.filter((item) => item.slug !== product.slug && !sameCategory.some((same) => same.slug === item.slug));
   return [...sameCategory, ...fallback].slice(0, 6);
 }
@@ -265,7 +172,7 @@ function RelatedProductCarousel({ title, items }: { title: string; items: Produc
   );
 }
 
-function ProductSidebar({ activeSlug }: { activeSlug: string }) {
+function ProductSidebar({ activeSlug, groups }: { activeSlug: string; groups: ProductNavigationGroup[] }) {
   return (
     <aside className="hidden lg:block">
       <div className="sticky top-24 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-[0_18px_50px_rgba(7,20,38,0.08)]">
@@ -274,7 +181,7 @@ function ProductSidebar({ activeSlug }: { activeSlug: string }) {
           <h2 className="mt-2 text-xl font-black">Browse by category</h2>
         </div>
         <div className="max-h-[calc(100vh-220px)] overflow-y-auto p-4">
-          {productMegaMenuGroups.map((group) => {
+          {groups.map((group) => {
             const groupHasActiveProduct = group.items.some((item) => item.href.endsWith(`/${activeSlug}`));
 
             return (
@@ -353,7 +260,7 @@ function ProductViewNavigation({ slug, activeView }: { slug: string; activeView:
 export default async function ProductDetailPage({ params, searchParams }: ProductPageProps) {
   const { slug } = await params;
   const { view: viewParam } = await searchParams;
-  const [products, relatedNews] = await Promise.all([getPublicProducts(), getRelatedNewsForProduct(slug, 3)]);
+  const [products, groups, relatedNews] = await Promise.all([getPublicProducts(), getPublicProductNavigation(), getRelatedNewsForProduct(slug, 3)]);
   const product = products.find((item) => item.slug === slug);
   if (!product) notFound();
 
@@ -362,9 +269,9 @@ export default async function ProductDetailPage({ params, searchParams }: Produc
     product.description,
     ...detailLines.filter((line) => !line.includes(":") && line.length > 40).slice(0, 3),
   ]).slice(0, 4);
-  const technicalLines = uniqueLines([...product.specs, ...detailLines.filter((line) => line.includes(":"))]).slice(0, 20);
-  const structureItems = getStructureItems(product);
-  const applicationItems = getApplicationItems(product);
+  const technicalLines = uniqueLines(product.technicalParameters).slice(0, 20);
+  const structureItems = product.structureItems;
+  const applicationItems = product.applicationItems;
   const related = relatedProducts(product, products);
   const detailImages = getDetailImages(product);
   const overviewImages = detailImages.slice(0, 3);
@@ -461,7 +368,7 @@ export default async function ProductDetailPage({ params, searchParams }: Produc
         </section>
 
         <section className="container-shell grid gap-8 py-12 lg:grid-cols-[290px_1fr]">
-          <ProductSidebar activeSlug={product.slug} />
+          <ProductSidebar activeSlug={product.slug} groups={groups} />
 
           <div className="grid min-w-0 content-start gap-7">
             <ProductViewNavigation slug={product.slug} activeView={activeView} />
@@ -476,6 +383,7 @@ export default async function ProductDetailPage({ params, searchParams }: Produc
             </ContentCard> : null}
 
             {activeView === "configuration" ? <ContentCard id="configuration" eyebrow="Configuration" title="Main structure and package scope">
+              {!structureItems.length ? <p className="text-sm leading-7 text-slate-600">Configuration details are confirmed for the selected model and project duty point. Contact our team for the current technical file.</p> : null}
               <div className="grid gap-4 md:grid-cols-2">
                 {structureItems.map((item, index) => (
                   <div key={item} className="rounded-md bg-slate-50 p-5">
@@ -488,6 +396,7 @@ export default async function ProductDetailPage({ params, searchParams }: Produc
             </ContentCard> : null}
 
             {activeView === "applications" ? <ContentCard id="applications" eyebrow="Applications" title="Recommended project applications">
+              {!applicationItems.length ? <p className="text-sm leading-7 text-slate-600">Application suitability depends on the required flow, head and installation conditions. Please share your project brief for confirmation.</p> : null}
               <div className="grid gap-4 md:grid-cols-2">
                 {applicationItems.map((item) => (
                   <div key={item} className="flex items-center gap-3 rounded-md border border-slate-200 p-4">
@@ -504,6 +413,7 @@ export default async function ProductDetailPage({ params, searchParams }: Produc
             </ContentCard> : null}
 
             {activeView === "technical" ? <ContentCard id="technical" eyebrow="Technical data" title="Specifications and selection data">
+              {!technicalGroups.length ? <p className="text-sm leading-7 text-slate-600">Model-specific performance data is available on request. Share your flow, head and power requirements for a verified selection.</p> : null}
               <div className="grid gap-5 xl:grid-cols-3">
                 {technicalGroups.map((group) => (
                   <section key={group.title} className="rounded-md border border-slate-200 bg-slate-50 p-5">
