@@ -17,6 +17,15 @@ const nav = [
   { label: "Contact", href: "/contact" },
 ];
 
+const languages = [
+  { label: "English", href: "/" },
+  { label: "Español", href: "/es" },
+  { label: "Русский", href: "/ru" },
+  { label: "العربية", href: "/ar" },
+  { label: "Français", href: "/fr" },
+  { label: "Português", href: "/pt" },
+];
+
 export function HomeHeader({ groups }: { groups: ProductNavigationGroup[] }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
@@ -94,7 +103,10 @@ export function HomeHeader({ groups }: { groups: ProductNavigationGroup[] }) {
         <div className="home-header-actions">
           <Link href="/contact" className="home-header-cta">Get a Quote <span aria-hidden="true">→</span></Link>
           <Link href="/search" className="home-search-link" aria-label="Search"><Search size={18} /></Link>
-          <Link href="/" className="home-language-link" aria-label="English language site">EN <ChevronDown size={13} /></Link>
+          <details className="home-language-menu">
+            <summary className="home-language-link" aria-label="Select language">EN <ChevronDown size={13} /></summary>
+            <nav aria-label="Languages">{languages.map((language) => <Link key={language.href} href={language.href}>{language.label}</Link>)}</nav>
+          </details>
         </div>
 
         <button
@@ -126,6 +138,7 @@ export function HomeHeader({ groups }: { groups: ProductNavigationGroup[] }) {
             <Link key={item.href} href={item.href} onClick={closeMobileMenu}>{item.label}</Link>
           ))}
           <Link href="/contact" className="home-mobile-nav-cta" onClick={closeMobileMenu}>Send project brief</Link>
+          <div className="home-mobile-languages" aria-label="Languages">{languages.map((language) => <Link key={language.href} href={language.href} onClick={closeMobileMenu}>{language.label}</Link>)}</div>
         </nav>
       ) : null}
     </header>

@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { Menu } from "lucide-react";
 import { StickyCta } from "@/components/sticky-cta";
-import { applications, certificates, company, downloads, knowledgePosts, products, projects } from "@/data/site";
+import { applications, certificates, company, knowledgePosts, projects } from "@/data/site";
 import { localizedSite } from "@/data/localized-site";
 import {
   isLocalizedLocale,
@@ -18,7 +18,10 @@ import {
   type LocalizedLocale,
   type LocalizedPath,
 } from "@/lib/i18n";
-import { getPublicPosts } from "@/lib/public-cms";
+import { getPublicPosts, getPublicProducts } from "@/lib/public-cms";
+import { listDownloadAssets } from "@/lib/admin-cms";
+
+export const dynamic = "force-dynamic";
 
 type LocalizedPageProps = { params: Promise<{ locale: string; path?: string[] }> };
 
@@ -160,8 +163,9 @@ function ProofSection({ locale }: { locale: LocalizedLocale }) {
   );
 }
 
-function ProductCards({ locale }: { locale: LocalizedLocale }) {
+async function ProductCards({ locale }: { locale: LocalizedLocale }) {
   const content = localizedSite[locale];
+  const products = await getPublicProducts();
   return (
     <section className="section bg-[var(--grey-50)]" lang={content.htmlLang} dir={content.dir}>
       <div className="container-shell mb-8 flex flex-wrap items-end justify-between gap-4">
@@ -171,7 +175,7 @@ function ProductCards({ locale }: { locale: LocalizedLocale }) {
         </Link>
       </div>
       <div className="container-shell grid gap-5 md:grid-cols-3">
-        {products.slice(0, 3).map((product) => (
+        {products.slice(0, 6).map((product) => (
           <article key={product.slug} className="card overflow-hidden">
             <div className="relative h-52 bg-slate-50">
               <Image src={product.image} alt={product.title} fill className="object-contain p-5" sizes="(min-width: 768px) 33vw, 100vw" />
@@ -267,11 +271,18 @@ function LocalizedFooter({ locale }: { locale: LocalizedLocale }) {
 async function ResourceCards({ locale, path }: { locale: LocalizedLocale; path: LocalizedPath }) {
   const content = localizedSite[locale];
   const blogPosts = path === "/blog" ? await getPublicPosts() : [];
+  const downloadRecords = path === "/downloads" ? (await listDownloadAssets()).filter((item) => item.status === "published" && (item.fileUrl.startsWith("/") && !item.fileUrl.startsWith("//") || item.fileUrl.startsWith("https://"))) : [];
+  const downloadUrls = new Set<string>();
+  const availableDownloads = downloadRecords.filter((item) => {
+    if (downloadUrls.has(item.fileUrl)) return false;
+    downloadUrls.add(item.fileUrl);
+    return true;
+  });
   const cards =
     path === "/projects"
       ? projects.map((item) => ({ title: item.title, text: `${item.region} · ${item.meta}`, image: item.image, href: "/projects" }))
       : path === "/downloads"
-        ? downloads.map((item) => ({ title: item.title, text: item.text, image: "/assets/applications/hero-edj.webp", href: "/downloads" }))
+        ? availableDownloads.map((item) => ({ title: item.title, text: `${item.category} · ${item.language}`, image: "/assets/applications/hero-edj.webp", href: "/downloads" }))
         : path === "/certificates"
           ? certificates.map((item) => ({ title: item.title, text: item.note, image: item.src, href: "/certificates" }))
           : path === "/blog"

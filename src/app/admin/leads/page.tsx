@@ -34,7 +34,7 @@ export default async function LeadsPage({ searchParams }: PageProps) {
   const filters = { range: range.preset, query: param(params, "query"), source: param(params, "source") || "all", status: param(params, "status") || "all", intent: param(params, "intent") || "all", from: range.from, to: range.to };
   const page = parsePositiveInt(param(params, "page"));
   const pageSize = paginationPageSize(param(params, "pageSize"));
-  const { inquiries } = await getAdminData();
+  const { inquiries } = await getAdminData(["inquiries"]);
   const filtered = inquiries.filter((lead) => {
     if (!matches(lead, filters.query)) return false;
     if (filters.source !== "all" && lead.sourceType !== filters.source) return false;

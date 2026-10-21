@@ -126,14 +126,14 @@ async function buildSitemapBundleUncached(): Promise<SitemapBundle> {
   };
 
   const managedPageBySlug = new Map(managedPages.map((page) => [page.slug === "/" ? "/" : `/${page.slug.replace(/^\//, "")}`, page]));
-  const pagePaths = ["/", "/about", "/projects", "/factory", "/testing", "/certificates", "/downloads", "/contact", "/tools/fire-pump-selector"];
+  const pagePaths = ["/", "/about", "/projects", "/factory", "/testing", "/certificates", "/downloads", "/contact", "/privacy", "/terms", "/tools/fire-pump-selector"];
   for (const pathname of pagePaths) {
     const managed = managedPageBySlug.get(pathname);
     if (managed && managed.status !== "published") {
       skipped.push(`${pathname}: page status is ${managed.status}`);
       continue;
     }
-    add("pages", pathname, managed?.updatedAt || STATIC_CONTENT_UPDATED_AT);
+    add("pages", pathname, managed?.updatedAt || (["/privacy", "/terms"].includes(pathname) ? "2026-10-21T00:00:00.000Z" : STATIC_CONTENT_UPDATED_AT));
   }
 
   for (const locale of localizedLocales) {
@@ -290,12 +290,12 @@ export async function runSitemapMaintenance(options: {
       await writeStore(DIRTY_STORE, []);
     }
 
-    // A sitemap is a crawl hint, not a per-run push queue. Submit only when the
-    // 48-hour window is open and the canonical URL set actually changed.
-    const googleSubmissionWindow = Boolean(options.submit && !options.dryRun && changed);
+    // The weekly Search Console submission runs on Monday even when URLs are
+    // unchanged. The scheduler prevents another attempt in the same window.
+    const googleSubmissionWindow = Boolean(options.submit && !options.dryRun);
     const searchConsole = googleSubmissionWindow
       ? await submitSitemapToSearchConsole()
-      : { attempted: false, success: false, status: "disabled" as const, message: changed ? "Google submission window is not due." : "Sitemap is unchanged; Google submission was not repeated." };
+      : { attempted: false, success: false, status: "disabled" as const, message: "Google submission window is not due." };
     const finishedAt = new Date().toISOString();
     const run: SitemapRun = {
       id: createId("sitemap_run"),

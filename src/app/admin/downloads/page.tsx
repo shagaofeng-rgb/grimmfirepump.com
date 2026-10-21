@@ -22,8 +22,8 @@ export default async function AdminDownloadsPage({ searchParams }: Props) {
   const filters = { range: range.preset, from: range.from, to: range.to, view, query: value(params, "query"), status: value(params, "status") || "all" };
   const page = parsePositiveInt(value(params, "page"));
   const pageSize = paginationPageSize(value(params, "pageSize"));
-  const { cmsDownloads, downloadLeads } = await getAdminData();
-  const assets = cmsDownloads.filter((item) => inRange(item.createdAt, range.from, range.to, settings.timezone || "Asia/Shanghai") && (filters.status === "all" || item.status === filters.status) && (!filters.query || [item.title, item.category, item.relatedProduct, item.language].join(" ").toLowerCase().includes(filters.query.toLowerCase()))).sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt));
+  const { cmsDownloads, downloadLeads } = await getAdminData(["cmsDownloads", "downloadLeads"]);
+  const assets = cmsDownloads.filter((item) => inRange(item.createdAt, range.from, range.to, settings.timezone || "Asia/Shanghai") && (filters.status === "all" || item.status === filters.status) && (!filters.query || [item.title, item.category, item.relatedProduct, item.language].join(" ").toLowerCase().includes(filters.query.toLowerCase()))).map((item) => ({ ...item, downloads: downloadLeads.filter((lead) => lead.assetId === item.id || (!lead.assetId && lead.assetTitle === item.title)).length })).sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt));
   const leads = downloadLeads.filter((item) => inRange(item.createdAt, range.from, range.to, settings.timezone || "Asia/Shanghai") && (!filters.query || [item.name, item.email, item.country, item.assetTitle].join(" ").toLowerCase().includes(filters.query.toLowerCase()))).sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt));
   const pagedAssets = paginate(assets, page, pageSize);
   const pagedLeads = paginate(leads, page, pageSize);

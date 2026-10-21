@@ -49,7 +49,7 @@ export default async function AdminAnalyticsPage({ searchParams }: PageProps) {
   const page = parsePositiveInt(param(params, "page"));
   const visitorPage = parsePositiveInt(param(params, "visitorPage"));
   const pageSize = paginationPageSize(param(params, "pageSize"));
-  const { events } = await getAdminData();
+  const { events } = await getAdminData(["events"]);
   const summary = getAnalyticsSummary(events, filters);
   const visibleEvents = filterAnalyticsEvents(events, filters).sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt));
   const profiles = getVisitorProfiles(events, filters);

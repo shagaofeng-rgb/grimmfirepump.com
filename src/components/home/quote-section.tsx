@@ -4,7 +4,7 @@ import { FormEvent, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { company } from "@/data/site";
-import { getVisitorContext } from "@/components/analytics-listener";
+import { getVisitorContext, hasAnalyticsConsent } from "@/components/analytics-listener";
 
 export function QuoteSection() {
   const [message, setMessage] = useState("Tell us your project requirement and our team will reply by email or WhatsApp.");
@@ -26,11 +26,11 @@ export function QuoteSection() {
         body: JSON.stringify({ ...data, ...visitor, sourcePage: window.location.pathname }),
       });
       if (!response.ok) throw new Error("Submission failed");
-      await fetch("/api/analytics", {
+      if (hasAnalyticsConsent()) void fetch("/api/analytics", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ event: "inquiry_submit", path: window.location.pathname, label: String(data.product || "project brief"), ...visitor }),
-      });
+      }).catch(() => undefined);
       setSubmitted(true);
       setMessage("Project brief received. Our team will reply using the contact details you provided.");
       form.reset();
@@ -101,6 +101,7 @@ export function QuoteSection() {
             {submitting ? "Submitting..." : "Send project brief"}
             {!submitting ? <ArrowRight size={17} /> : null}
           </button>
+          <p className="text-xs text-slate-500 md:col-span-2">We use your details to reply to this request. <Link href="/privacy" className="underline">Privacy Policy</Link></p>
           <p className={submitted ? "text-sm text-emerald-700 md:col-span-2" : "text-sm text-slate-500 md:col-span-2"} aria-live="polite">
             {message}
           </p>

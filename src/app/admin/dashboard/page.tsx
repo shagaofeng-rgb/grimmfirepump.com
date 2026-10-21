@@ -22,7 +22,7 @@ function dateLabel(value: string) {
 
 export default async function AdminDashboardPage({ searchParams }: Props) {
   const params = await searchParams;
-  const [data, settings] = await Promise.all([getAdminData(), getSiteSettings()]);
+  const [data, settings] = await Promise.all([getAdminData(["events", "inquiries", "whatsappClicks"]), getSiteSettings()]);
   const range = resolveDateRange(value(params, "range") || "today", { from: value(params, "from"), to: value(params, "to"), timeZone: settings.timezone || "Asia/Shanghai" });
   const timeZone = settings.timezone || "Asia/Shanghai";
   const traffic = getAnalyticsSummary(data.events, { from: range.from, to: range.to, timeZone, traffic: "real" });

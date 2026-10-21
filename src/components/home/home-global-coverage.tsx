@@ -15,7 +15,7 @@ export function HomeGlobalCoverage() {
         </div>
         <div className="mt-9 overflow-hidden rounded-lg border border-slate-200 bg-white">
           <div className="relative aspect-[16/9] min-h-[230px]">
-            <Image src="/assets/coverage/global-market-coverage-map.png" alt="GRIMM PUMP priority market coverage map" fill className="object-cover" sizes="(min-width: 1280px) 1240px, 100vw" />
+            <Image src="/assets/coverage/global-market-coverage-map.webp" alt="GRIMM PUMP priority market coverage map" fill className="object-cover" sizes="(min-width: 1280px) 1240px, 100vw" />
           </div>
           <div className="flex flex-wrap gap-2 border-t border-slate-200 p-5">
             {markets.map((market) => <span key={market} className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-black text-[var(--navy-900)]">{market}</span>)}

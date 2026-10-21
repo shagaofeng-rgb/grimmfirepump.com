@@ -91,6 +91,7 @@ export type WhatsAppClickRecord = {
 export type DownloadLeadRecord = {
   id: string;
   createdAt: string;
+  assetId?: string;
   assetTitle: string;
   name: string;
   email: string;
@@ -123,20 +124,23 @@ export type AnalyticsEventRecord = {
   trafficReason?: string;
 };
 
-export async function getAdminData() {
+type AdminDataSection = "inquiries" | "downloadLeads" | "events" | "whatsappClicks" | "cmsProducts" | "cmsNews" | "categories" | "media" | "cmsDownloads" | "pages" | "users" | "auditLogs";
+
+export async function getAdminData(selected?: AdminDataSection[]) {
+  const wants = (section: AdminDataSection) => !selected || selected.includes(section);
   const [inquiries, downloadLeads, events, whatsappClicks, cmsProducts, cmsNews, categories, media, cmsDownloads, pages, users, auditLogs] = await Promise.all([
-    readStore<InquiryRecord[]>("inquiries.json", []),
-    readStore<DownloadLeadRecord[]>("download-leads.json", []),
-    readStore<AnalyticsEventRecord[]>("analytics-events.json", []),
-    readStore<WhatsAppClickRecord[]>("whatsapp-clicks.json", []),
-    listCmsProducts(),
-    listCmsNews(),
-    listProductCategories(),
-    listMediaFiles(),
-    listDownloadAssets(),
-    listManagedPages(),
-    listAdminUsers(),
-    listAuditLogs(),
+    wants("inquiries") ? readStore<InquiryRecord[]>("inquiries.json", []) : [],
+    wants("downloadLeads") ? readStore<DownloadLeadRecord[]>("download-leads.json", []) : [],
+    wants("events") ? readStore<AnalyticsEventRecord[]>("analytics-events.json", []) : [],
+    wants("whatsappClicks") ? readStore<WhatsAppClickRecord[]>("whatsapp-clicks.json", []) : [],
+    wants("cmsProducts") ? listCmsProducts() : [],
+    wants("cmsNews") ? listCmsNews() : [],
+    wants("categories") ? listProductCategories() : [],
+    wants("media") ? listMediaFiles() : [],
+    wants("cmsDownloads") ? listDownloadAssets() : [],
+    wants("pages") ? listManagedPages() : [],
+    wants("users") ? listAdminUsers() : [],
+    wants("auditLogs") ? listAuditLogs() : [],
   ]);
 
   const eventCounts = events.reduce<Record<string, number>>((acc, item) => {

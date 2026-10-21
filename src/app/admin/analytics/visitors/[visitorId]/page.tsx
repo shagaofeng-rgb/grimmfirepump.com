@@ -37,7 +37,7 @@ export default async function VisitorDetailPage({ params, searchParams }: Props)
   const filters: AnalyticsFilters = { from: range.from, to: range.to, timeZone: settings.timezone || "Asia/Shanghai", traffic: "real" };
   const page = parsePositiveInt(value(raw, "page"));
   const pageSize = paginationPageSize(value(raw, "pageSize"));
-  const { events, inquiries, downloadLeads } = await getAdminData();
+  const { events, inquiries, downloadLeads } = await getAdminData(["events", "inquiries", "downloadLeads"]);
   const profile = getVisitorProfile(events, visitorId, filters);
   if (!profile) notFound();
 

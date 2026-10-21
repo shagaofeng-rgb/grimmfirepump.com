@@ -3,9 +3,10 @@ import { z } from "zod";
 import { isAdminAuthenticated } from "@/lib/admin-auth";
 import { appendStore, createId, readStore } from "@/lib/local-store";
 import { checkRequestRateLimit } from "@/lib/request-rate-limit";
+import { listDownloadAssets } from "@/lib/admin-cms";
 
 const downloadLeadSchema = z.object({
-  assetTitle: z.string().trim().min(2).max(180),
+  assetId: z.string().trim().min(2).max(180),
   name: z.string().trim().min(2).max(120),
   email: z.string().trim().email().max(254),
   country: z.string().trim().max(120).optional().default(""),
@@ -36,12 +37,20 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true });
   }
 
+  const published = (await listDownloadAssets()).filter((item) => item.status === "published" && item.fileUrl);
+  const asset = published.find((item) => item.id === parsed.data.assetId);
+  const uniqueAsset = asset && published.find((item) => item.fileUrl === asset.fileUrl)?.id === asset.id;
+  if (!asset || !uniqueAsset || !asset.gated || !(asset.fileUrl.startsWith("/") && !asset.fileUrl.startsWith("//") || asset.fileUrl.startsWith("https://"))) {
+    return NextResponse.json({ error: "Document unavailable" }, { status: 404 });
+  }
+
   const lead = {
     id: createId("dl"),
     createdAt: new Date().toISOString(),
     ...parsed.data,
+    assetTitle: asset.title,
   };
 
   await appendStore("download-leads.json", lead);
-  return NextResponse.json({ ok: true, id: lead.id, file: "/assets/downloads/grimm-fire-pump-catalog.pdf" }, { headers: { "Cache-Control": "no-store" } });
+  return NextResponse.json({ ok: true, id: lead.id, file: asset.fileUrl }, { headers: { "Cache-Control": "no-store" } });
 }

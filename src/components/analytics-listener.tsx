@@ -1,13 +1,23 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
+import Link from "next/link";
 
 const gaMeasurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || process.env.NEXT_PUBLIC_GA_ID || "";
 const visitorStorageKey = "grimm_visitor_id";
 const visitStorageKey = "grimm_visit_number";
 const sessionStorageKey = "grimm_session_id";
 const sessionReferrerKey = "grimm_session_referrer";
+const consentStorageKey = "grimm_analytics_consent";
+const consentCopy: Record<string, { message: string; policy: string; allow: string; decline: string }> = {
+  en: { message: "We use optional analytics to understand visits and improve this site. You can continue without analytics.", policy: "Privacy Policy", allow: "Allow analytics", decline: "Decline" },
+  es: { message: "Usamos analíticas opcionales para mejorar este sitio. Puede continuar sin ellas.", policy: "Política de privacidad", allow: "Permitir analíticas", decline: "Rechazar" },
+  ru: { message: "Мы используем необязательную аналитику для улучшения сайта. Вы можете продолжить без нее.", policy: "Политика конфиденциальности", allow: "Разрешить аналитику", decline: "Отказаться" },
+  ar: { message: "نستخدم تحليلات اختيارية لتحسين الموقع. يمكنك المتابعة بدونها.", policy: "سياسة الخصوصية", allow: "السماح بالتحليلات", decline: "رفض" },
+  fr: { message: "Nous utilisons des analyses facultatives pour améliorer ce site. Vous pouvez continuer sans elles.", policy: "Politique de confidentialité", allow: "Autoriser les analyses", decline: "Refuser" },
+  pt: { message: "Usamos análises opcionais para melhorar este site. Pode continuar sem elas.", policy: "Política de privacidade", allow: "Permitir análises", decline: "Recusar" },
+};
 
 declare global {
   interface Window {
@@ -31,16 +41,19 @@ function createId() {
 }
 
 export function getVisitorContext() {
-  const visitorId = getStoredValue(visitorStorageKey, window.localStorage) || createId();
-  const existingSession = getStoredValue(sessionStorageKey, window.sessionStorage);
-  const sessionId = existingSession || createId();
-  const currentVisit = Number(getStoredValue(visitStorageKey, window.localStorage) || "0");
-  const visitNumber = existingSession ? Math.max(1, currentVisit) : currentVisit + 1;
-  setStoredValue(visitorStorageKey, visitorId, window.localStorage);
-  setStoredValue(sessionStorageKey, sessionId, window.sessionStorage);
-  setStoredValue(visitStorageKey, String(visitNumber), window.localStorage);
-  const referrer = getStoredValue(sessionReferrerKey, window.sessionStorage) || document.referrer || "";
-  setStoredValue(sessionReferrerKey, referrer, window.sessionStorage);
+  const allowed = hasAnalyticsConsent();
+  const visitorId = allowed ? getStoredValue(visitorStorageKey, window.localStorage) || createId() : "";
+  const existingSession = allowed ? getStoredValue(sessionStorageKey, window.sessionStorage) : "";
+  const sessionId = allowed ? existingSession || createId() : "";
+  const currentVisit = allowed ? Number(getStoredValue(visitStorageKey, window.localStorage) || "0") : 0;
+  const visitNumber = allowed ? (existingSession ? Math.max(1, currentVisit) : currentVisit + 1) : 1;
+  if (allowed) {
+    setStoredValue(visitorStorageKey, visitorId, window.localStorage);
+    setStoredValue(sessionStorageKey, sessionId, window.sessionStorage);
+    setStoredValue(visitStorageKey, String(visitNumber), window.localStorage);
+  }
+  const referrer = allowed ? getStoredValue(sessionReferrerKey, window.sessionStorage) || document.referrer || "" : document.referrer || "";
+  if (allowed) setStoredValue(sessionReferrerKey, referrer, window.sessionStorage);
   const params = new URLSearchParams(window.location.search);
   return {
     visitorId,
@@ -54,7 +67,12 @@ export function getVisitorContext() {
   };
 }
 
+export function hasAnalyticsConsent() {
+  return typeof window !== "undefined" && getStoredValue(consentStorageKey, window.localStorage) === "accepted";
+}
+
 function track(event: string, label = "", metadata: Record<string, unknown> = {}) {
+  if (!hasAnalyticsConsent()) return Promise.resolve();
   const context = getVisitorContext();
   window.gtag?.("event", event, { event_label: label, page_path: window.location.pathname, ...metadata });
   return fetch("/api/analytics", {
@@ -72,6 +90,7 @@ function track(event: string, label = "", metadata: Record<string, unknown> = {}
 }
 
 function trackWhatsAppClick(target: HTMLElement, label: string) {
+  if (!hasAnalyticsConsent()) return Promise.resolve();
   const context = getVisitorContext();
   const targetUrl = target.getAttribute("href") || "";
   const placement = target.dataset.whatsappPlacement || "website";
@@ -101,9 +120,27 @@ function trackWhatsAppClick(target: HTMLElement, label: string) {
 
 export function AnalyticsListener() {
   const pathname = usePathname();
+  const [consent, setConsent] = useState<"accepted" | "declined" | "unset">("unset");
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    if (!gaMeasurementId || document.querySelector(`script[data-grimm-ga="${gaMeasurementId}"]`)) return;
+    const saved = getStoredValue(consentStorageKey, window.localStorage);
+    setConsent(saved === "accepted" || saved === "declined" ? saved : "unset");
+    setReady(true);
+  }, []);
+
+  function choose(value: "accepted" | "declined") {
+    setStoredValue(consentStorageKey, value, window.localStorage);
+    if (value === "declined") {
+      for (const key of [visitorStorageKey, visitStorageKey]) window.localStorage.removeItem(key);
+      for (const key of [sessionStorageKey, sessionReferrerKey]) window.sessionStorage.removeItem(key);
+      window.gtag?.("consent", "update", { analytics_storage: "denied" });
+    }
+    setConsent(value);
+  }
+
+  useEffect(() => {
+    if (pathname.startsWith("/admin") || consent !== "accepted" || !gaMeasurementId || document.querySelector(`script[data-grimm-ga="${gaMeasurementId}"]`)) return;
     window.gtag = window.gtag || function gtag(...args: unknown[]) { (window.dataLayer = window.dataLayer || []).push(args); };
     window.gtag("js", new Date());
     window.gtag("config", gaMeasurementId, { send_page_view: false });
@@ -112,11 +149,11 @@ export function AnalyticsListener() {
     script.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(gaMeasurementId)}`;
     script.dataset.grimmGa = gaMeasurementId;
     document.head.appendChild(script);
-  }, []);
+  }, [consent, pathname]);
 
   useEffect(() => {
-    void track("page_view", document.title, { pageTitle: document.title });
-  }, [pathname]);
+    if (!pathname.startsWith("/admin") && consent === "accepted") void track("page_view", document.title, { pageTitle: document.title });
+  }, [pathname, consent]);
 
   useEffect(() => {
     function onClick(event: MouseEvent) {
@@ -134,5 +171,16 @@ export function AnalyticsListener() {
     return () => document.removeEventListener("click", onClick);
   }, []);
 
-  return null;
+  if (!ready || consent !== "unset" || pathname.startsWith("/admin")) return null;
+  const locale = pathname.split("/")[1];
+  const copy = consentCopy[locale] || consentCopy.en;
+  return (
+    <aside className="fixed bottom-4 left-4 right-4 z-[100] mx-auto max-w-2xl rounded-md border border-slate-200 bg-white p-4 text-sm text-slate-800 shadow-xl" aria-label="Analytics preferences" dir={locale === "ar" ? "rtl" : "ltr"}>
+      <p>{copy.message} <Link href="/privacy" className="font-semibold underline">{copy.policy}</Link>.</p>
+      <div className="mt-3 flex flex-wrap gap-2">
+        <button type="button" onClick={() => choose("accepted")} className="rounded bg-slate-900 px-4 py-2 font-semibold text-white">{copy.allow}</button>
+        <button type="button" onClick={() => choose("declined")} className="rounded border border-slate-400 px-4 py-2 font-semibold">{copy.decline}</button>
+      </div>
+    </aside>
+  );
 }

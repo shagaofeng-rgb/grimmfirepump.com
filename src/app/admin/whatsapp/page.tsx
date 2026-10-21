@@ -42,7 +42,7 @@ export default async function WhatsAppConversionPage({ searchParams }: PageProps
   const placement = value(params, "placement") || "all";
   const page = parsePositiveInt(value(params, "page"));
   const pageSize = paginationPageSize(value(params, "pageSize"));
-  const { whatsappClicks, inquiries } = await getAdminData();
+  const { whatsappClicks, inquiries } = await getAdminData(["whatsappClicks", "inquiries"]);
   const visibleClicks = whatsappClicks
     .filter((click) => click.trafficType === "real")
     .filter((click) => isWithinDateRange(click.createdAt, { from: range.from, to: range.to, timeZone: settings.timezone || "Asia/Shanghai" }))

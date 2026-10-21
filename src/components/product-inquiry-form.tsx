@@ -2,7 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { company } from "@/data/site";
-import { getVisitorContext } from "@/components/analytics-listener";
+import { getVisitorContext, hasAnalyticsConsent } from "@/components/analytics-listener";
 
 type ProductInquiryFormProps = {
   productTitle: string;
@@ -27,7 +27,7 @@ export function ProductInquiryForm({ productTitle }: ProductInquiryFormProps) {
       });
       if (!response.ok) throw new Error("Submission failed");
 
-      await fetch("/api/analytics", {
+      if (hasAnalyticsConsent()) void fetch("/api/analytics", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ event: "inquiry_submit", path: window.location.pathname, label: productTitle, ...visitor }),
@@ -95,6 +95,7 @@ export function ProductInquiryForm({ productTitle }: ProductInquiryFormProps) {
       <button className="button button-primary md:col-span-2" type="submit" disabled={submitting}>
         {submitting ? "Submitting..." : "Get Quote for This Product"}
       </button>
+      <p className="text-xs text-slate-500 md:col-span-2">We use your details to reply to this request. <a href="/privacy" className="underline">Privacy Policy</a></p>
       <p className="text-sm leading-6 text-slate-500 md:col-span-2">{message}</p>
     </form>
   );

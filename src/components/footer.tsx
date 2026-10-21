@@ -65,6 +65,11 @@ export function Footer() {
           </div>
         ))}
       </div>
+      <div className="mx-auto mt-10 flex max-w-[1240px] flex-wrap gap-5 border-t border-white/15 pt-6 text-xs">
+        <Link href="/privacy" className="hover:text-white">Privacy Policy</Link>
+        <Link href="/terms" className="hover:text-white">Terms of Use</Link>
+        <Link href="/sitemap.xml" className="hover:text-white">Site Map</Link>
+      </div>
     </footer>
   );
 }

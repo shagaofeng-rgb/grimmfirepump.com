@@ -21,7 +21,7 @@ function channelFor(value: string) {
 }
 
 export default async function FormsPage() {
-  const { inquiries, downloadLeads } = await getAdminData();
+  const { inquiries, downloadLeads } = await getAdminData(["inquiries", "downloadLeads"]);
   const counts = new Map(channels.map((item) => [item.key, 0]));
   inquiries.forEach((item) => counts.set(channelFor(`${item.sourceType} ${item.sourcePage} ${item.product}`), (counts.get(channelFor(`${item.sourceType} ${item.sourcePage} ${item.product}`)) || 0) + 1));
   counts.set("download", (counts.get("download") || 0) + downloadLeads.length);

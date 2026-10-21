@@ -22,7 +22,7 @@ function Value({ label, value }: { label: string; value?: string | number | bool
 
 export default async function LeadDetailPage({ params }: Props) {
   const { id } = await params;
-  const { inquiries, events, downloadLeads } = await getAdminData();
+  const { inquiries, events, downloadLeads } = await getAdminData(["inquiries", "events", "downloadLeads"]);
   const lead = inquiries.find((item) => item.id === id);
   if (!lead) notFound();
   const sessions = lead.visitorId ? getVisitorSessions(events, lead.visitorId, { traffic: "real" }) : [];
