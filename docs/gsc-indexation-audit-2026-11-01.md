@@ -7,7 +7,7 @@ Scope: `grimmfirepump.com` repository and production deployment only. Code basel
 - GSC Page indexing overview (last updated 2026-10-23): 133 indexed, 150 not indexed. Categories: proper canonical alternative 57, noindex 22, redirect 17, 404 11, discovered not indexed 24, crawled not indexed 13, Google-selected different canonical 5, duplicate without user canonical 1. These are not 150 confirmed defects.
 - GSC sitemap overview: Success, 119 URLs, last read 2026-11-01. The live XML inventory before this fix contained 123 final canonical URLs; GSC reporting and live XML are snapshots with different update times and must not be equated.
 - GSC category drilldowns could not be operated through the available browser connection. No affected-URL export, last-crawl dates or validation details were obtained. The user chose to proceed with public evidence. `gsc_last_crawl` and `gsc_validation` in the CSV are explicitly `not-exported`, not fabricated.
-- [Public URL inventory](./gsc-indexation-2026-11-01-url-inventory.csv) contains 153 checked URLs from the local production build against the current CMS: 125 sitemap entries, 21 internally linked noindex HTML pages and 7 linked image/XML resources. It is **not** a GSC export.
+- [Public URL inventory](./gsc-indexation-2026-11-01-url-inventory.csv) contains 153 checked URLs from the deployed production domain: 125 sitemap entries, 21 internally linked noindex HTML pages and 7 linked image/XML resources. It is **not** a GSC export.
 
 ## Findings and disposition
 
@@ -31,7 +31,8 @@ Scope: `grimmfirepump.com` repository and production deployment only. Code basel
 - Local updated build: `tsc --noEmit` passed; `next build` passed; 34/34 tests passed.
 - Local updated URL audit: 5 shards, 125 sitemap URLs, 121 internal link targets, 28 additional linked resources/noindex pages, zero failures; median 409 ms, p95 1746 ms, max 1881 ms for concurrent HTTP requests. Local and production latency are different environments, not a before/after speed claim.
 - Every sitemap entry was checked for final 200, self canonical, no noindex, one H1 and language. Internal indexable HTML pages absent from the sitemap now fail the regression audit.
-- Production post-deployment verification and GSC recrawl/validation status: pending at the time of this report. The latter cannot be marked complete without affected-URL details and a later GSC crawl.
+- Production deployment `dpl_3GVfyGWZPgLGtaWFgo8pCt3ftnUz` reached READY with code commit `c3686ca46b0764e639d3c32fb3415d767fffead6` and both `grimmfirepump.com` and `www.grimmfirepump.com` aliases. At 2026-11-01 10:34 UTC, the same deep audit against `https://www.grimmfirepump.com` passed: 5 shards, 125 sitemap URLs, 121 internal link targets, 28 additional linked noindex/resource URLs, zero failures; median 421 ms, p95 955 ms, max 1186 ms (concurrent HTTP requests).
+- GSC recrawl/validation status remains pending. The site cannot force Google to index a page, and the six disputed-canonical URLs plus GSC 404 list remain unavailable without affected-URL exports.
 
 ## Changes and rollback
 
