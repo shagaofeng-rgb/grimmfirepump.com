@@ -81,7 +81,7 @@ function productMetaDescription(product: Product) {
     .filter((line) => line.length > 45 && !/^Q\d+:|^A\d+:/i.test(line))
     .slice(0, 2)
     .join(" ");
-  const combined = [product.description, detailSummary, product.specs.join(", ")].filter(Boolean).join(" ");
+  const combined = [product.title, product.description, detailSummary, product.specs.join(", ")].filter(Boolean).join(". ");
 
   return trimMeta(combined || product.summary);
 }

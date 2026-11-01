@@ -79,17 +79,6 @@ function absoluteUrl(pathname: string) {
   return url.toString();
 }
 
-function canonicalIsSelf(canonical: string, expectedPath: string) {
-  if (!canonical) return true;
-  try {
-    const canonicalUrl = new URL(canonical, `${getSiteOrigin()}/`);
-    const expectedUrl = new URL(expectedPath, `${getSiteOrigin()}/`);
-    return !canonicalUrl.search && canonicalUrl.origin === expectedUrl.origin && canonicalUrl.pathname === expectedUrl.pathname;
-  } catch {
-    return false;
-  }
-}
-
 function safeSlug(slug: string) {
   return /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug);
 }
@@ -150,8 +139,8 @@ async function buildSitemapBundleUncached(): Promise<SitemapBundle> {
       skipped.push(`${pathname}: unpublished or noindex`);
       continue;
     }
-    if (!safeSlug(normalizedSlug) || !canonicalIsSelf((product.canonicalUrl || "").toLowerCase(), pathname)) {
-      skipped.push(`${pathname}: invalid slug or non-self canonical`);
+    if (!safeSlug(normalizedSlug)) {
+      skipped.push(`${pathname}: invalid slug`);
       continue;
     }
     add("products", pathname, product.updatedAt || product.createdAt);

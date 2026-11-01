@@ -12,17 +12,31 @@ type NewsDetailProps = { params: Promise<{ slug: string }> };
 
 export const dynamic = "force-dynamic";
 
+function newsMetaDescription(article: NonNullable<Awaited<ReturnType<typeof getNewsArticle>>>) {
+  const current = article.seoDescription || article.summary;
+  if (!/^(An independently edited summary of|A buyer-focused engineering note on)\b/i.test(current)) return current;
+
+  const sourceFact = article.sourceFacts.find((fact) =>
+    !/published the original update|uses this public update|original reporting/i.test(fact),
+  );
+  const description = [article.title.replace(/[.!?]+$/, ""), sourceFact || `${article.sourceName} industry update`]
+    .filter(Boolean)
+    .join(". ");
+  return description.length > 160 ? `${description.slice(0, 157).trimEnd()}...` : description;
+}
+
 export async function generateMetadata({ params }: NewsDetailProps): Promise<Metadata> {
   const { slug } = await params;
   const article = await getNewsArticle(slug);
   if (!article) return {};
+  const description = newsMetaDescription(article);
   return {
     title: article.seoTitle || article.title,
-    description: article.seoDescription || article.summary,
+    description,
     alternates: { canonical: `/news/${article.slug}` },
     openGraph: {
       title: article.title,
-      description: article.summary,
+      description,
       url: `${company.website}/news/${article.slug}`,
       images: [{ url: article.coverImageUrl, width: article.coverImageWidth || 1200, height: article.coverImageHeight || 630, alt: article.coverImageAlt }],
       type: "article",
@@ -32,7 +46,7 @@ export async function generateMetadata({ params }: NewsDetailProps): Promise<Met
     twitter: {
       card: "summary_large_image",
       title: article.title,
-      description: article.summary,
+      description,
       images: [article.coverImageUrl],
     },
     robots: article.indexable === true && article.generatedModel === "grimm-news-v2" ? { index: true, follow: true } : { index: false, follow: true },

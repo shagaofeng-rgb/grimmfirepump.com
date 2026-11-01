@@ -1,3 +1,5 @@
+import { writeFile } from "node:fs/promises";
+
 const baseUrl = (process.env.AUDIT_BASE_URL || "http://localhost:4174").replace(/\/$/, "");
 const productionOrigin = "https://www.grimmfirepump.com";
 
@@ -17,6 +19,18 @@ function attribute(tag, name) {
   return tag.match(new RegExp(`${name}=["']([^"']+)["']`, "i"))?.[1] || "";
 }
 
+function pageTemplate(pathname) {
+  if (pathname === "/") return "home";
+  const parts = pathname.split("/").filter(Boolean);
+  if (["es", "ru", "ar", "fr", "pt"].includes(parts[0])) return `localized-${parts[1] || "home"}`;
+  if (["products", "blog", "news", "applications", "knowledge"].includes(parts[0]) && parts.length > 1) return `${parts[0]}-detail`;
+  return parts[0] || "home";
+}
+
+function csvCell(value) {
+  return `"${String(value ?? "").replaceAll('"', '""')}"`;
+}
+
 async function fetchText(pathname, options = {}) {
   const started = Date.now();
   const response = await fetch(`${baseUrl}${pathname}`, { redirect: "manual", ...options });
@@ -34,7 +48,11 @@ async function auditSitemapPage(url) {
   const canonicalTag = text.match(/<link\b[^>]*rel=["']canonical["'][^>]*>/i)?.[0] || text.match(/<link\b[^>]*href=["'][^"']+["'][^>]*rel=["']canonical["'][^>]*>/i)?.[0] || "";
   const canonical = attribute(canonicalTag, "href");
   if (canonical !== expectedCanonical) issues.push(`canonical ${canonical || "missing"}`);
-  if (/<meta\b[^>]*name=["']robots["'][^>]*content=["'][^"']*noindex/i.test(text)) issues.push("noindex");
+  const descriptionTag = text.match(/<meta\b[^>]*name=["']description["'][^>]*>/i)?.[0] || "";
+  const description = attribute(descriptionTag, "content");
+  if (!description) issues.push("missing meta description");
+  const noindex = /<meta\b[^>]*name=["']robots["'][^>]*content=["'][^"']*noindex/i.test(text);
+  if (noindex) issues.push("noindex");
   const h1Count = (text.match(/<h1\b/gi) || []).length;
   if (h1Count !== 1) issues.push(`${h1Count} H1 elements`);
   const htmlTag = text.match(/<html\b[^>]*>/i)?.[0] || "";
@@ -42,7 +60,10 @@ async function auditSitemapPage(url) {
   const locale = source.pathname.match(/^\/(es|ru|ar|fr|pt)(?:\/|$)/)?.[1] || "en";
   if (!lang.toLowerCase().startsWith(locale)) issues.push(`lang ${lang || "missing"}`);
   if (locale === "ar" && attribute(htmlTag, "dir") !== "rtl") issues.push("Arabic page missing html dir=rtl");
-  return { path: source.pathname, status: response.status, elapsed, issues };
+  const internalTargets = Array.from(text.matchAll(/<a\b[^>]*>/gi), ([tag]) => attribute(tag, "href"))
+    .filter((href) => href.startsWith("/") && !href.startsWith("//"))
+    .map((href) => new URL(href, productionOrigin).pathname);
+  return { path: source.pathname, status: response.status, elapsed, canonical, noindex, description, internalTargets, issues };
 }
 
 async function mapConcurrent(items, limit, worker) {
@@ -65,6 +86,7 @@ async function main() {
   assert((index.response.headers.get("content-type") || "").includes("application/xml"), "Sitemap Index content-type is not application/xml");
   const shardUrls = xmlLocations(index.text);
   assert(shardUrls.length >= 4, "Sitemap Index is missing expected shards");
+  assert(shardUrls.every((url) => new URL(url).origin === productionOrigin), "Sitemap Index has an off-site shard");
 
   const pageUrls = [];
   for (const shardUrl of shardUrls) {
@@ -75,9 +97,56 @@ async function main() {
     pageUrls.push(...xmlLocations(shard.text));
   }
   assert(new Set(pageUrls).size === pageUrls.length, "Sitemap contains duplicate URLs");
+  assert(pageUrls.every((url) => new URL(url).origin === productionOrigin), "Sitemap contains an off-site URL");
   assert(!pageUrls.some((url) => new URL(url).search || new URL(url).pathname.includes("/search")), "Sitemap contains search or parameter URLs");
   const pages = await mapConcurrent(pageUrls, 8, auditSitemapPage);
   for (const page of pages) if (page.issues.length) failures.push(`${page.path}: ${page.issues.join(", ")}`);
+
+  const descriptions = new Map();
+  for (const page of pages) {
+    if (!page.description) continue;
+    const prior = descriptions.get(page.description);
+    if (prior) failures.push(`${page.path}: duplicate meta description also used by ${prior}`);
+    else descriptions.set(page.description, page.path);
+  }
+  const sitemapPaths = new Set(pageUrls.map((url) => new URL(url).pathname));
+  const linkedPaths = new Set(pages.flatMap((page) => page.internalTargets));
+  const additionalPaths = [...linkedPaths].filter((pathname) => !sitemapPaths.has(pathname));
+  const additionalResults = await mapConcurrent(additionalPaths, 8, async (pathname) => {
+    const { response, text } = await fetchText(pathname);
+    const canonicalTag = text.match(/<link\b[^>]*rel=["']canonical["'][^>]*>/i)?.[0] || "";
+    return {
+      pathname,
+      status: response.status,
+      contentType: response.headers.get("content-type") || "",
+      canonical: attribute(canonicalTag, "href"),
+      noindex: /<meta\b[^>]*name=["']robots["'][^>]*content=["'][^"']*noindex/i.test(text),
+    };
+  });
+  for (const result of additionalResults) {
+    if (result.status !== 200) failures.push(`${result.pathname}: internal link returned HTTP ${result.status}`);
+    if (result.status === 200 && result.contentType.includes("text/html") && !result.noindex
+      && result.canonical === `${productionOrigin}${result.pathname}`) {
+      failures.push(`${result.pathname}: indexable internal page is absent from Sitemap`);
+    }
+  }
+
+  if (process.env.AUDIT_CSV_PATH) {
+    const observedAt = new Date().toISOString();
+    const rows = [
+      ["url", "template", "discovered_via", "http_status", "canonical", "noindex", "disposition", "gsc_last_crawl", "gsc_validation", "observed_at"],
+      ...pages.map((page) => [
+        `${productionOrigin}${page.path === "/" ? "" : page.path}`, pageTemplate(page.path), "sitemap", page.status,
+        page.canonical, page.noindex, page.issues.length ? "needs-review" : "public-checks-pass-awaiting-gsc-recrawl", "not-exported", "not-exported", observedAt,
+      ]),
+      ...additionalResults.map((page) => [
+        `${productionOrigin}${page.pathname}`, pageTemplate(page.pathname), "internal-link", page.status,
+        page.canonical, page.noindex, !page.contentType.includes("text/html") ? "non-html-resource"
+          : page.noindex ? "intentional-exclusion-review" : "not-in-sitemap-review", "not-exported", "not-exported", observedAt,
+      ]),
+    ];
+    await writeFile(process.env.AUDIT_CSV_PATH, `${rows.map((row) => row.map(csvCell).join(",")).join("\n")}\n`);
+  }
 
   const robots = await fetchText("/robots.txt");
   assert(robots.response.status === 200, "robots.txt is unavailable");
@@ -104,6 +173,8 @@ async function main() {
     baseUrl,
     sitemapShards: shardUrls.length,
     publicUrls: pageUrls.length,
+    linkedPaths: linkedPaths.size,
+    additionalLinkedPaths: additionalPaths.length,
     failures,
     latencyMs: { median: elapsed[Math.floor(elapsed.length / 2)] || 0, p95, max: elapsed.at(-1) || 0 },
     slowest: [...pages].sort((a, b) => b.elapsed - a.elapsed).slice(0, 10).map(({ path, elapsed }) => ({ path, elapsed })),

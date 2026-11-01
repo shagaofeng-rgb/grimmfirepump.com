@@ -27,6 +27,7 @@ import {
 import { createId, deleteStoreItem, readStore, upsertStore, writeStore } from "@/lib/local-store";
 import type { InquiryRecord } from "@/lib/admin-data";
 import { markSitemapDirty } from "@/lib/sitemap-dirty";
+import { company } from "@/data/site";
 
 const statusSchema = z.enum(["draft", "review", "published", "offline", "archived"]);
 
@@ -170,6 +171,15 @@ export async function saveProduct(formData: FormData) {
     throw new Error("The selected category has no enabled parent.");
   }
   const status = statusSchema.parse(text(formData, "status", "draft")) as PublishStatus;
+  const slug = text(formData, "slug");
+  const canonicalPath = `/products/${slug.toLowerCase()}`;
+  const canonicalInput = text(formData, "canonicalUrl");
+  if (canonicalInput) {
+    const canonical = new URL(canonicalInput, `${company.website}/`);
+    if (canonical.origin !== company.website || canonical.pathname.toLowerCase() !== canonicalPath || canonical.search || canonical.hash) {
+      throw new Error("Product canonical URL must point to this product's public URL.");
+    }
+  }
   const item: CmsProduct = {
     id,
     createdAt: existing?.createdAt || now,
@@ -179,7 +189,7 @@ export async function saveProduct(formData: FormData) {
     subtitle: text(formData, "subtitle"),
     model: text(formData, "model"),
     sku: text(formData, "sku"),
-    slug: text(formData, "slug"),
+    slug,
     categoryId,
     categoryName: category?.name || "",
     tags: tags(text(formData, "tags")),
@@ -210,7 +220,7 @@ export async function saveProduct(formData: FormData) {
     seoTitle: text(formData, "seoTitle"),
     seoDescription: text(formData, "seoDescription"),
     seoKeywords: text(formData, "seoKeywords"),
-    canonicalUrl: text(formData, "canonicalUrl"),
+    canonicalUrl: canonicalPath,
     ogImage: text(formData, "ogImage"),
     indexable: checkbox(formData, "indexable"),
   };
