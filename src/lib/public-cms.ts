@@ -3,9 +3,10 @@ import { unstable_cache } from "next/cache";
 import { getProductDisplayName, getProductFamily } from "@/lib/product-taxonomy";
 import { buildProductNavigation, publicCategorySlug, publicProductCategory } from "@/lib/product-navigation";
 
-const cachedCmsProducts = unstable_cache(listCmsProducts, ["public-cms-products-v2"], { revalidate: 300, tags: ["cms-products"] });
-const cachedProductCategories = unstable_cache(listProductCategories, ["public-cms-product-categories-v1"], { revalidate: 300, tags: ["cms-product-categories"] });
-const cachedCmsNews = unstable_cache(listCmsNews, ["public-cms-blog-v3"], { revalidate: 300, tags: ["cms-blog"] });
+const publicContentRevalidateSeconds = 3600;
+const cachedCmsProducts = unstable_cache(listCmsProducts, ["public-cms-products-v2"], { revalidate: publicContentRevalidateSeconds, tags: ["cms-products"] });
+const cachedProductCategories = unstable_cache(listProductCategories, ["public-cms-product-categories-v1"], { revalidate: publicContentRevalidateSeconds, tags: ["cms-product-categories"] });
+const cachedCmsNews = unstable_cache(listCmsNews, ["public-cms-blog-v3"], { revalidate: publicContentRevalidateSeconds, tags: ["cms-blog"] });
 
 export type PublicProduct = {
   slug: string;

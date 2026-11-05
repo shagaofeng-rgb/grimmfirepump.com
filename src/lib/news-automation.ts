@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import { revalidateTag, unstable_cache } from "next/cache";
 import { NEWS_AUTOMATION_ENABLED } from "@/lib/news-automation-policy";
 import { company } from "@/data/site";
 import { getPublicProducts, type PublicProduct } from "@/lib/public-cms";
@@ -280,8 +281,6 @@ export function getNewsConfig(siteId = SITE_ID) {
 }
 
 export async function listNewsArticles(siteId = SITE_ID) {
-  // A publish run writes an article and immediately validates it through the
-  // public routes. The former 5-minute data cache made those routes stale.
   const articles = await readStore<NewsArticle[]>(ARTICLES_STORE, []);
   return articles
     .map((article) => normalizeStoredArticle(article))
@@ -289,9 +288,14 @@ export async function listNewsArticles(siteId = SITE_ID) {
     .sort((a, b) => Date.parse(b.publishAt || b.createdAt) - Date.parse(a.publishAt || a.createdAt));
 }
 
+const cachedPublicNewsArticles = unstable_cache(listNewsArticles, ["public-news-articles-v1"], {
+  revalidate: 3600,
+  tags: ["news-articles"],
+});
+
 export async function listPublishedNews(siteId = SITE_ID) {
   const seenSlugs = new Set<string>();
-  return (await listNewsArticles(siteId)).filter((item) => {
+  return (await cachedPublicNewsArticles(siteId)).filter((item) => {
     if (!(["published", "frontend_verifying", "published_success"] as NewsStatus[]).includes(item.status) || item.indexable !== true || item.generatedModel !== "grimm-news-v2" || seenSlugs.has(item.slug)) return false;
     seenSlugs.add(item.slug);
     return true;
@@ -299,7 +303,7 @@ export async function listPublishedNews(siteId = SITE_ID) {
 }
 
 export async function getNewsArticle(slug: string, siteId = SITE_ID) {
-  return (await listNewsArticles(siteId)).find(
+  return (await cachedPublicNewsArticles(siteId)).find(
     (item) => item.slug === slug && (["published", "frontend_verifying", "published_success"] as NewsStatus[]).includes(item.status),
   );
 }
@@ -556,15 +560,18 @@ export async function runNewsPublish(reason = "scheduled", options: { siteId?: s
     const article = await buildArticle(candidateToFeedItem(candidate), product, siteId);
     const pending = { ...article, status: "frontend_verifying" as NewsStatus, publishAt: new Date().toISOString() };
     await upsertStore(ARTICLES_STORE, pending);
+    revalidateTag("news-articles");
     const delivery = await verifyFrontendDelivery(config, pending);
     const check: NewsDeliveryCheck = { id: createId("newsdelivery"), siteId, articleId: pending.id, slug: pending.slug, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), ...delivery, message: delivery.status === "passed" ? "Public News list, detail, RSS and News sitemap verified." : "Public frontend verification failed; publication requires retry." };
     await upsertStore(DELIVERY_CHECKS_STORE, check);
     if (delivery.status !== "passed") {
       await upsertStore(ARTICLES_STORE, { ...pending, status: "retry_pending", failureReason: check.message, retries: pending.retries + 1 });
+      revalidateTag("news-articles");
       await finishJob(job, "failed", check.message, { published: 0, retries: pending.retries + 1 });
       return { ok: false, message: check.message, stats: { published: 0 } };
     }
     await upsertStore(ARTICLES_STORE, { ...pending, status: "published_success" });
+    revalidateTag("news-articles");
     await upsertStore(CANDIDATES_STORE, { ...candidate, state: "used", updatedAt: new Date().toISOString(), usedByArticleId: pending.id });
     await markSitemapDirty("frontend_verified_news_published");
     const message = `Published and frontend-verified /news/${pending.slug}.${supersededRetries ? ` Archived ${supersededRetries} superseded retry attempt(s).` : ""}`;
