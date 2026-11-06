@@ -1,4 +1,5 @@
-import { isLegacyImportedBlogSlug, listCmsNews, listCmsProducts, listProductCategories, type CmsNews, type CmsProduct, type CmsProductCategory } from "@/lib/admin-cms";
+import { isLegacyImportedBlogSlug, listCmsNews, listCmsProducts, listProductCategories, type CmsNews, type CmsProduct, type CmsProductCategory, type CmsProductParameter } from "@/lib/admin-cms";
+import { cache } from "react";
 import { unstable_cache } from "next/cache";
 import { getProductDisplayName, getProductFamily } from "@/lib/product-taxonomy";
 import { buildProductNavigation, publicCategorySlug, publicProductCategory } from "@/lib/product-navigation";
@@ -21,6 +22,8 @@ export type PublicProduct = {
   image: string;
   summary: string;
   description: string;
+  model: string;
+  parameters: CmsProductParameter[];
   specs: string[];
   keywords: string;
   detailLines: string[];
@@ -102,6 +105,8 @@ function mapProduct(item: CmsProduct, categories: Map<string, CmsProductCategory
     image,
     summary: item.summary || item.description,
     description: item.description || item.summary,
+    model: item.model,
+    parameters: item.parameters,
     specs: productSpecs(item),
     keywords: item.seoKeywords || item.title,
     detailLines: productDetailLines(item),
@@ -129,7 +134,7 @@ function mapPost(item: CmsNews): PublicPost {
   };
 }
 
-export async function getPublicProducts() {
+export const getPublicProducts = cache(async function getPublicProducts() {
   const [cmsProducts, categories] = await Promise.all([cachedCmsProducts(), cachedProductCategories()]);
   const byId = new Map(categories.map((category) => [category.id, category]));
   const cmsMapped = cmsProducts
@@ -137,12 +142,12 @@ export async function getPublicProducts() {
     .sort((a, b) => a.sortOrder - b.sortOrder)
     .map((item) => mapProduct(item, byId));
   return cmsMapped;
-}
+});
 
-export async function getPublicProductNavigation() {
+export const getPublicProductNavigation = cache(async function getPublicProductNavigation() {
   const [categories, products] = await Promise.all([cachedProductCategories(), getPublicProducts()]);
   return buildProductNavigation(categories, products);
-}
+});
 
 export async function getPublicProduct(slug: string) {
   return (await getPublicProducts()).find((item) => item.slug === slug.trim().toLowerCase());

@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import { notFound } from "next/navigation";
-import { Header } from "@/components/header";
-import { Footer } from "@/components/footer";
+import { ExternalLink } from "lucide-react";
+import { ArticleReader } from "@/components/interior/editorial";
+import { InteriorFrame } from "@/components/interior/frame";
 import { company } from "@/data/site";
 import { getNewsArticle } from "@/lib/news-automation";
-import { ArticleContent } from "@/components/article-content";
 import { safeArticleImageUrl } from "@/lib/article-content";
 
 type NewsDetailProps = { params: Promise<{ slug: string }> };
@@ -62,6 +61,8 @@ export default async function NewsDetailPage({ params }: NewsDetailProps) {
   const sourcePageHost = (() => {
     try { return new URL(article.coverImagePageUrl).hostname; } catch { return "Source page"; }
   })();
+  const imageSource = safeArticleImageUrl(article.coverImagePageUrl);
+  const sourceUrl = safeArticleImageUrl(article.sourceUrl);
   const newsSchema = {
     "@context": "https://schema.org",
     "@type": "Article",
@@ -90,53 +91,27 @@ export default async function NewsDetailPage({ params }: NewsDetailProps) {
   };
 
   return (
-    <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(newsSchema) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
-      <Header />
-      <main>
-        <article className="container-shell max-w-4xl py-14 lg:py-20">
-          <p className="eyebrow mb-4">{article.category}</p>
-          <h1 className="article-title break-words text-3xl font-black leading-tight text-[var(--navy-950)] md:text-5xl">{article.title}</h1>
-          <div className="mt-5 flex flex-wrap gap-x-4 gap-y-2 text-sm font-bold text-slate-500"><span>Editorial publication: {(article.publishAt || article.createdAt).slice(0, 10)}</span><span>Original publication: {article.sourcePublishedAt.slice(0, 10)}</span></div>
-          <p className="article-content-copy mt-6 text-xl leading-9 text-slate-600">{article.summary}</p>
-          <figure className="mt-10 overflow-hidden rounded-lg border border-slate-200 bg-slate-50">
-            {safeArticleImageUrl(article.coverImageUrl).startsWith("/") ? (
-              <Image src={safeArticleImageUrl(article.coverImageUrl)} alt={article.coverImageAlt} width={article.coverImageWidth || 1200} height={article.coverImageHeight || 630} sizes="(min-width: 1024px) 896px, 100vw" className="aspect-[16/9] h-auto w-full object-cover" priority />
-            ) : (
-              <img src={safeArticleImageUrl(article.coverImageUrl)} alt={article.coverImageAlt} className="aspect-[16/9] h-auto w-full object-cover" loading="eager" decoding="async" />
-            )}
-            <figcaption className="article-content-copy border-t border-slate-200 bg-white px-4 py-3 text-xs font-bold text-slate-500">
-              Image source: <a href={article.coverImagePageUrl} target="_blank" rel="noreferrer" className="underline">{sourcePageHost}</a>
-            </figcaption>
-          </figure>
-
-          <section className="mt-10 rounded-lg border border-slate-200 bg-slate-50 p-6">
-            <h2 className="text-xl font-black text-[var(--navy-950)]">Original source and editorial note</h2>
-            <dl className="mt-4 grid gap-2 text-sm leading-6 text-slate-700">
-              <div><dt className="inline font-black">Source: </dt><dd className="inline">{article.sourceName}</dd></div>
-              <div><dt className="inline font-black">Original date: </dt><dd className="inline">{article.sourcePublishedAt.slice(0, 10)}</dd></div>
-              {article.sourceAuthor ? <div><dt className="inline font-black">Author: </dt><dd className="inline">{article.sourceAuthor}</dd></div> : null}
-              <div><dt className="inline font-black">Image use: </dt><dd className="inline">{article.imageLicenseStatus || "owned-neutral"}</dd></div>
-              <div><a className="font-black text-[var(--navy-800)] underline decoration-[var(--orange)] underline-offset-4" href={article.sourceUrl} target="_blank" rel="noreferrer">Read the original source</a></div>
+    <InteriorFrame path={`/news/${article.slug}`} breadcrumbs={[{ label: "News", href: "/news" }, { label: article.title }]}>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(newsSchema).replace(/</g, "\\u003c") }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema).replace(/</g, "\\u003c") }} />
+      <ArticleReader title={article.title} label={article.category} date={(article.publishAt || article.createdAt).slice(0, 10)} text={article.summary}
+        image={article.coverImageUrl} imageAlt={article.coverImageAlt} content={article.body} back={{ label: "Back to industry news", href: "/news" }}
+        imageCredit={imageSource && <>Image source: <a className="underline" href={imageSource} target="_blank" rel="noreferrer">{sourcePageHost}</a></>}
+        source={
+          <section className="interior-source">
+            <h2 className="interior-subtitle">Original source and editorial note</h2>
+            <dl className="interior-copy mt-3 grid gap-1 text-sm">
+              <div><dt className="inline font-bold">Source: </dt><dd className="inline">{article.sourceName}</dd></div>
+              <div><dt className="inline font-bold">Original date: </dt><dd className="inline">{article.sourcePublishedAt.slice(0, 10)}</dd></div>
+              {article.sourceAuthor && <div><dt className="inline font-bold">Author: </dt><dd className="inline">{article.sourceAuthor}</dd></div>}
+              <div><dt className="inline font-bold">Image use: </dt><dd className="inline">{article.imageLicenseStatus || "owned-neutral"}</dd></div>
             </dl>
-            <p className="article-content-copy mt-5 border-t border-slate-200 pt-5 text-sm leading-7 text-slate-600">{article.editorialDisclaimer || "This page is an independent editorial summary and analysis. Original reporting and factual claims remain attributable to the linked source."}</p>
-            <h3 className="mt-6 text-base font-black text-[var(--navy-950)]">Source facts used</h3>
-            <ul className="mt-4 grid gap-3 text-sm leading-6 text-slate-700">
-              {article.sourceFacts.map((fact) => (
-                <li key={fact} className="flex min-w-0 gap-3">
-                  <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--orange)]" />
-                  <span className="article-content-copy">{fact}</span>
-                </li>
-              ))}
-            </ul>
+            {sourceUrl && <a className="interior-text-link mt-3" href={sourceUrl} target="_blank" rel="noreferrer">Read the original source <ExternalLink size={15} /></a>}
+            <p className="interior-copy mt-3 text-sm">{article.editorialDisclaimer || "This page is an independent editorial summary and analysis. Original reporting and factual claims remain attributable to the linked source."}</p>
+            {article.sourceFacts.length > 0 && <details className="interior-form-more mt-3"><summary>Source facts used <span aria-hidden="true">+</span></summary><ul className="interior-copy list-disc space-y-2 ps-5 text-sm">{article.sourceFacts.map((fact, index) => <li key={index}>{fact}</li>)}</ul></details>}
           </section>
-
-          <ArticleContent content={article.body} />
-
-        </article>
-      </main>
-      <Footer />
-    </>
+        }
+      />
+    </InteriorFrame>
   );
 }

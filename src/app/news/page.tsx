@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
-import Image from "next/image";
-import Link from "next/link";
-import { Header } from "@/components/header";
-import { Footer } from "@/components/footer";
+import { EditorialFeature, EditorialRows } from "@/components/interior/editorial";
+import { InteriorFrame, PageMast, SectionHeading } from "@/components/interior/frame";
 import { company } from "@/data/site";
 import { localizedAlternates } from "@/lib/i18n";
 import { listPublishedNews } from "@/lib/news-automation";
@@ -26,58 +24,25 @@ type NewsPageProps = { searchParams: Promise<{ page?: string }> };
 export default async function NewsPage({ searchParams }: NewsPageProps) {
   const news = await listPublishedNews();
   const { page } = await searchParams;
-  const pagedNews = getPageSlice(news, getPageNumber(page), 6);
+  const pageSize = 4;
+  const pagedNews = getPageSlice(news, getPageNumber(page), pageSize);
+  const [featured, ...rest] = pagedNews.items.map((item) => ({
+    href: `/news/${item.slug}`, title: item.title, image: item.coverImageUrl, text: item.summary,
+    label: item.sourceName, date: (item.publishAt || item.sourcePublishedAt).slice(0, 10),
+  }));
 
   return (
-    <>
-      <Header />
-      <main className="bg-[var(--grey-50)]">
-        <section className="bg-[var(--navy-950)] text-white">
-          <div className="container-shell py-14 md:py-18">
-            <p className="text-sm font-bold text-orange-200">Industry news</p>
-            <h1 className="mt-3 max-w-4xl text-[38px] font-black leading-[1.08] md:text-[56px]">Verified fire protection and industrial water news.</h1>
-            <p className="mt-6 max-w-3xl text-lg leading-8 text-slate-300">
-              Each update identifies its original source and date, then separates source facts from independent editorial analysis. News is not a product offer, project reference or company announcement.
-            </p>
+    <InteriorFrame path="/news" breadcrumbs={[{ label: "News" }]}>
+      <PageMast eyebrow="Resources" title="Industry news" text="External industry updates with original sources and publication dates." />
+      <section className="interior-shell interior-band">
+        {featured ? (
+          <div className="interior-split">
+            <div><h2 className="sr-only">Featured update</h2><div className="interior-news-feature"><EditorialFeature item={featured} linkText="Read update" /></div></div>
+            {rest.length > 0 && <div><SectionHeading title="Industry updates" /><EditorialRows items={rest} linkText="Read update" /></div>}
           </div>
-        </section>
-
-        <section className="container-shell py-12">
-          {news.length ? (
-            <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-              {pagedNews.items.map((item) => (
-                <article key={item.id} className="card overflow-hidden">
-                  <Link href={`/news/${item.slug}`} className="block">
-                    <span className="relative block aspect-[16/10] overflow-hidden bg-slate-100">
-                      {item.coverImageUrl.startsWith("/") ? (
-                        <Image src={item.coverImageUrl} alt={item.coverImageAlt} fill sizes="(min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw" className="object-cover" />
-                      ) : (
-                        <img src={item.coverImageUrl} alt={item.coverImageAlt} className="h-full w-full object-cover" loading="lazy" />
-                      )}
-                    </span>
-                    <span className="block p-6">
-                  <span className="text-xs font-black text-[var(--orange-dark)]">{item.category}</span>
-                      <h2 className="mt-3 text-xl font-black leading-snug text-[var(--navy-950)]">{item.title}</h2>
-                      <p className="mt-3 text-sm leading-6 text-slate-600">{item.summary}</p>
-                      <span className="mt-5 flex flex-wrap gap-2 text-xs font-bold text-slate-500">
-                        <span>{item.sourceName}</span>
-                        <span>{(item.publishAt || item.sourcePublishedAt).slice(0, 10)}</span>
-                      </span>
-                    </span>
-                  </Link>
-                </article>
-              ))}
-            </div>
-          ) : (
-            <div className="rounded-lg border border-dashed border-slate-300 bg-white p-8">
-              <h2 className="text-2xl font-black text-[var(--navy-950)]">New industry updates are being prepared.</h2>
-              <p className="mt-3 max-w-3xl leading-7 text-slate-600">The next verified industry update will appear here after source and editorial checks are complete.</p>
-            </div>
-          )}
-          {news.length ? <ContentPagination currentPage={pagedNews.currentPage} totalItems={news.length} pageSize={6} pathname="/news" /> : null}
-        </section>
-      </main>
-      <Footer />
-    </>
+        ) : <div className="interior-empty"><h2>No industry updates are published</h2></div>}
+        <ContentPagination currentPage={pagedNews.currentPage} totalItems={news.length} pageSize={pageSize} pathname="/news" />
+      </section>
+    </InteriorFrame>
   );
 }

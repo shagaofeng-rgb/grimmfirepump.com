@@ -1,19 +1,23 @@
-import { toArticleContentBlocks } from "@/lib/article-content";
+import { toArticleContentBlocks, type ArticleContentBlock } from "@/lib/article-content";
 
 type ArticleContentProps = {
-  content: string | string[];
+  content?: string | string[];
   maxBlocks?: number;
+  blocks?: ArticleContentBlock[];
+  headingIds?: boolean;
 };
 
-export function ArticleContent({ content, maxBlocks }: ArticleContentProps) {
-  const blocks = toArticleContentBlocks(content, maxBlocks);
+export function ArticleContent({ content = "", maxBlocks, blocks: parsed, headingIds = false }: ArticleContentProps) {
+  const blocks = parsed || toArticleContentBlocks(content, maxBlocks);
+  let hasH2 = false;
 
   return (
     <div className="article-content mt-10 grid min-w-0 gap-5 text-base leading-8 text-slate-700">
       {blocks.map((block, index) => {
         if (block.type === "heading") {
-          const Heading = block.level === 2 ? "h2" : "h3";
-          return <Heading key={`${block.type}-${index}`} className={block.level === 2 ? "article-content-heading mt-5 text-2xl font-black leading-tight text-[var(--navy-950)]" : "article-content-heading mt-3 text-xl font-black leading-tight text-[var(--navy-950)]"}>{block.value}</Heading>;
+          const Heading = block.level === 2 || !hasH2 ? "h2" : "h3";
+          if (Heading === "h2") hasH2 = true;
+          return <Heading key={`${block.type}-${index}`} id={headingIds ? `article-heading-${index}` : undefined} className={Heading === "h2" ? "article-content-heading interior-anchor mt-5 text-2xl font-black leading-tight text-[var(--navy-950)]" : "article-content-heading interior-anchor mt-3 text-xl font-black leading-tight text-[var(--navy-950)]"}>{block.value}</Heading>;
         }
         if (block.type === "image") {
           return (

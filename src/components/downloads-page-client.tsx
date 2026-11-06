@@ -1,88 +1,80 @@
 "use client";
 
-import { FormEvent, useState } from "react";
-import type { DownloadAsset } from "@/lib/admin-cms";
+import { useId, useRef, useState, type FormEvent } from "react";
+import { Download, X } from "lucide-react";
+import Link from "next/link";
 import { hasAnalyticsConsent } from "@/components/analytics-listener";
 
-export function DownloadsPageClient({ assets }: { assets: DownloadAsset[] }) {
-  const [active, setActive] = useState<DownloadAsset | null>(null);
-  const [message, setMessage] = useState("Submit buyer details to unlock the download.");
+export function DownloadRequest({ id, title }: { id: string; title: string }) {
+  const dialog = useRef<HTMLDialogElement>(null);
+  const headingId = useId();
+  const [file, setFile] = useState("");
+  const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const revision = useRef(0);
 
-  async function submitDownload(event: FormEvent<HTMLFormElement>) {
+  async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!active) return;
     setSubmitting(true);
-    const form = event.currentTarget;
-    const data = Object.fromEntries(new FormData(form).entries());
+    setError("");
+    const run = revision.current;
+    const data = Object.fromEntries(new FormData(event.currentTarget).entries());
     try {
       const response = await fetch("/api/download-leads", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...data, assetId: active.id, sourcePage: window.location.pathname }),
+        body: JSON.stringify({ ...data, assetId: id, sourcePage: window.location.pathname }),
       });
       if (!response.ok) throw new Error("Download request failed");
       const result = await response.json();
+      if (typeof result.file !== "string" || !(/^\/(?!\/)/.test(result.file) || result.file.startsWith("https://"))) throw new Error("Missing file");
+      if (run !== revision.current) return;
+      setFile(result.file);
       if (hasAnalyticsConsent()) void fetch("/api/analytics", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ event: "download_click", path: window.location.pathname, label: active.title }),
+        body: JSON.stringify({ event: "download_click", path: window.location.pathname, label: title }),
       }).catch(() => undefined);
-      setMessage("Download unlocked. Opening catalog...");
-      form.reset();
-      const link = document.createElement("a");
-      link.href = result.file;
-      link.target = "_blank";
-      link.rel = "noopener noreferrer";
-      link.click();
-      setActive(null);
     } catch {
-      setMessage("Download request failed. Please contact us for the file.");
+      if (run === revision.current) setError("Unable to prepare the download. Try again or contact our team.");
     } finally {
-      setSubmitting(false);
+      if (run === revision.current) setSubmitting(false);
     }
   }
 
   return (
     <>
-      <main>
-        <section className="dark-gradient px-6 py-16 md:py-20">
-          <div className="mx-auto max-w-[1240px]">
-            <p className="text-sm font-bold text-orange-200">Download center</p>
-            <h1 className="mt-3 max-w-4xl text-[38px] font-black leading-[1.08] text-white md:text-[56px]">Available fire pump documents for buyer review.</h1>
-            <p className="mt-6 max-w-3xl text-lg leading-8 text-slate-300">Review the available documents before discussing your project with our team.</p>
-          </div>
-        </section>
-        <section className="section">
-          <div className="container-shell grid gap-6 lg:grid-cols-3">
-            {assets.map((item) => (
-              <article key={item.id} className="card p-6 md:p-7">
-                <h2 className="text-2xl font-black text-[var(--navy-950)]">{item.title}</h2>
-                <p className="mt-4 leading-7 text-slate-600">{item.category} · {item.language} · {item.version}</p>
-                {item.gated ? <button className="button button-primary mt-6" type="button" onClick={() => { setActive(item); setMessage("Submit buyer details to unlock the download."); }}>Request Download</button> : <a className="button button-primary mt-6" href={item.fileUrl} target="_blank" rel="noopener noreferrer">Download</a>}
-              </article>
-            ))}
-          </div>
-        </section>
-      </main>
-      {active ? (
-        <div className="fixed inset-0 z-[80] grid place-items-center bg-[rgba(7,20,38,0.64)] p-4">
-          <form onSubmit={submitDownload} className="grid w-full max-w-xl gap-4 rounded-lg bg-white p-6 shadow-[0_24px_60px_rgba(7,20,38,0.28)] md:p-8">
-            <button type="button" className="justify-self-end text-2xl" aria-label="Close download form" onClick={() => setActive(null)}>×</button>
-            <h2 className="text-3xl font-black text-[var(--navy-950)]">{active.title}</h2>
-            <input name="website" className="hidden" tabIndex={-1} autoComplete="off" />
-            <input name="name" required className="min-h-12 rounded-md border border-slate-300 px-3" placeholder="Name" />
-            <input name="email" required className="min-h-12 rounded-md border border-slate-300 px-3" placeholder="Email" type="email" />
-            <input name="company" className="min-h-12 rounded-md border border-slate-300 px-3" placeholder="Company" />
-            <input name="country" className="min-h-12 rounded-md border border-slate-300 px-3" placeholder="Country" />
-            <button className="button button-primary" type="submit" disabled={submitting}>
-              {submitting ? "Submitting..." : "Submit & Download"}
-            </button>
-            <p className="text-xs text-slate-500">We use your details to provide the requested document. <a href="/privacy" className="underline">Privacy Policy</a></p>
-            <p className="text-sm text-slate-500">{message}</p>
-          </form>
+      <button className="interior-button interior-primary" type="button" onClick={() => dialog.current?.showModal()}><Download size={16} /> Get document</button>
+      <dialog className="interior-dialog interior-download-dialog" ref={dialog} aria-labelledby={headingId} onClose={() => {
+        revision.current++;
+        setError("");
+        setFile("");
+        setSubmitting(false);
+      }}>
+        <div className="interior-dialog-head">
+          <h2 id={headingId}>{title}</h2>
+          <form method="dialog"><button className="interior-icon-button" aria-label="Close download form" title="Close"><X size={20} /></button></form>
         </div>
-      ) : null}
+        {file ? (
+          <div role="status">
+            <p className="interior-copy mb-3">Your download is ready.</p>
+            <a className="interior-button interior-primary" href={file} target="_blank" rel="noopener noreferrer" autoFocus><Download size={16} /> Open document</a>
+          </div>
+        ) : (
+          <form className="interior-form" method="post" onSubmit={submit}>
+            <input name="website" className="hidden" tabIndex={-1} autoComplete="off" />
+            <label className="interior-field">Full name * <input name="name" required minLength={2} maxLength={120} autoComplete="name" /></label>
+            <label className="interior-field">Work email * <input name="email" type="email" required maxLength={254} autoComplete="email" /></label>
+            <label className="interior-field">Company <input name="company" maxLength={180} autoComplete="organization" /></label>
+            <label className="interior-field">Country or region <input name="country" maxLength={120} autoComplete="country-name" /></label>
+            <div className="interior-actions interior-form-wide">
+              <button className="interior-button interior-primary" type="submit" disabled={submitting}>{submitting ? "Preparing..." : "Request download"} <Download size={16} /></button>
+              <Link href="/privacy" prefetch={false} className="interior-text-link">Privacy policy</Link>
+            </div>
+            {error && <p role="alert" className="interior-form-wide text-sm text-red-800">{error}</p>}
+          </form>
+        )}
+      </dialog>
     </>
   );
 }

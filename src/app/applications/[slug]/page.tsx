@@ -1,10 +1,8 @@
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { Header } from "@/components/header";
-import { Footer } from "@/components/footer";
-import { StickyCta } from "@/components/sticky-cta";
+import { ArrowRight, Check, ClipboardList, Gauge, PanelsTopLeft } from "lucide-react";
+import { InteriorFrame, InteriorTabs, PageMast, SectionHeading } from "@/components/interior/frame";
 import { ProductInquiryForm } from "@/components/product-inquiry-form";
 import { applications } from "@/data/site";
 
@@ -48,9 +46,9 @@ const applicationGuidance: Record<string, { background: string; challenges: stri
 };
 
 const applicationViews = [
-  { id: "overview", label: "Project Context" },
-  { id: "selection", label: "Selection" },
-  { id: "enquiry", label: "Enquiry" },
+  { id: "overview", label: "Project overview", icon: PanelsTopLeft },
+  { id: "selection", label: "Pump selection", icon: Gauge },
+  { id: "enquiry", label: "Project inquiry", icon: ClipboardList },
 ] as const;
 
 type ApplicationView = (typeof applicationViews)[number]["id"];
@@ -88,52 +86,36 @@ export default async function ApplicationDetailPage({ params, searchParams }: Ap
   if (!application) notFound();
   const guidance = applicationGuidance[application.slug] || applicationGuidance["industrial-plant-fire-protection"];
   const activeView = getApplicationView(view);
+  const path = `/applications/${application.slug}`;
 
   return (
-    <>
-      <Header />
-      <main>
-        <section className="container-shell grid gap-12 py-20 lg:grid-cols-[0.9fr_1.1fr]">
+    <InteriorFrame path={path} breadcrumbs={[{ label: "Applications", href: "/applications" }, { label: application.title }]}>
+      <PageMast eyebrow="Industry application" title={`${application.title} Fire Protection`} text={application.text} image={{ src: application.image, alt: application.title }} />
+      <div className="interior-shell">
+        <InteriorTabs label="Application information" links={applicationViews.map(({ id, label, icon: Icon }) => ({ label, href: id === "overview" ? path : `${path}?view=${id}`, current: activeView === id, icon: <Icon size={16} /> }))} />
+        {activeView === "overview" && <section className="interior-detail-panel interior-split">
           <div>
-            <p className="eyebrow mb-4">{application.keyword}</p>
-            <h1 className="text-5xl font-black leading-tight text-[var(--navy-950)]">{application.title} Fire Protection</h1>
-            <p className="mt-6 text-lg leading-8 text-slate-600">{application.text}</p>
-            <p className="mt-6 rounded-lg bg-blue-50 p-5 font-bold text-[var(--navy-800)]">Recommended: {application.recommended}</p>
-            <Link className="button button-primary mt-8" href={`/applications/${application.slug}?view=enquiry`}>Get Engineering Advice</Link>
+            <SectionHeading eyebrow="Project overview" title="What to review" />
+            <p className="interior-copy">{guidance.background}</p>
+            <ul className="interior-check-list mt-4">{guidance.challenges.map((item) => <li key={item}><Check size={16} />{item}</li>)}</ul>
           </div>
-          <div className="relative min-h-[420px] overflow-hidden rounded-lg">
-            <Image src={application.image} alt={`${application.title} fire protection`} fill priority className="object-cover" />
+          <aside className="interior-detail-aside"><Gauge size={24} /><h3 className="my-2">{application.title} selection</h3><p className="interior-copy">Configuration to review: {application.recommended}</p><Link href={`${path}?view=selection`} scroll={false} className="interior-text-link mt-3" prefetch={false}>Pump selection <ArrowRight size={15} /></Link></aside>
+        </section>}
+        {activeView === "selection" && <section className="interior-detail-panel interior-split">
+          <div>
+            <SectionHeading eyebrow="Equipment selection" title="Selection criteria" />
+            <ol className="interior-copy list-decimal space-y-2 ps-5">{guidance.selection.map((item) => <li key={item}>{item}</li>)}</ol>
+            <h3 className="mt-6 font-extrabold">Installation and project files</h3><p className="interior-copy mt-2">{guidance.installation}</p>
           </div>
-        </section>
-        <section className="bg-[var(--grey-50)] py-10">
-          <div className="container-shell">
-            <nav className="flex gap-2 overflow-x-auto border-b border-slate-200 pb-3" aria-label="Application information sections">
-              {applicationViews.map((item) => (
-                <Link key={item.id} href={item.id === "overview" ? `/applications/${application.slug}` : `/applications/${application.slug}?view=${item.id}`} aria-current={activeView === item.id ? "page" : undefined} className={`shrink-0 rounded-md px-4 py-2.5 text-sm font-black ${activeView === item.id ? "bg-[var(--navy-950)] text-white" : "bg-white text-[var(--navy-900)] hover:bg-orange-50"}`}>
-                  {item.label}
-                </Link>
-              ))}
-            </nav>
+          <aside className="interior-detail-aside"><h3 className="mb-2">Product configurations</h3><ul className="interior-check-list">{guidance.products.map((item) => <li key={item}><Check size={16} />{item}</li>)}</ul><Link href="/products" className="interior-text-link mt-3" prefetch={false}>Browse products <ArrowRight size={15} /></Link></aside>
+        </section>}
+        {activeView === "enquiry" && <section className="interior-detail-panel interior-split interior-quote-split">
+          <div><SectionHeading eyebrow="Project inquiry" title="Information to prepare" /><ul className="interior-check-list">{guidance.enquiry.map((item) => <li key={item}><Check size={16} />{item}</li>)}</ul>
+            <h3 className="mt-6 text-lg font-extrabold">Common questions</h3>{guidance.faq.map(([question, answer]) => <details key={question} className="interior-form-more"><summary>{question} <span aria-hidden="true">+</span></summary><p className="interior-copy mt-2">{answer}</p></details>)}
           </div>
-        </section>
-        {activeView === "overview" ? <section className="bg-[var(--grey-50)] pb-14">
-          <div className="container-shell grid gap-6 lg:grid-cols-2">
-            <article className="rounded-lg border border-slate-200 bg-white p-7"><h2 className="text-2xl font-black text-[var(--navy-950)]">Industry context</h2><p className="mt-4 leading-8 text-slate-600">{guidance.background}</p></article>
-            <article className="rounded-lg border border-slate-200 bg-white p-7"><h2 className="text-2xl font-black text-[var(--navy-950)]">Project issues to review</h2><ul className="mt-4 grid gap-3 text-slate-700">{guidance.challenges.map((item) => <li key={item}>• {item}</li>)}</ul></article>
-          </div>
-        </section> : null}
-        {activeView === "selection" ? <section className="container-shell grid gap-6 py-14 lg:grid-cols-2">
-          <article className="rounded-lg border border-slate-200 bg-white p-7"><h2 className="text-2xl font-black text-[var(--navy-950)]">Selection logic</h2><ol className="mt-4 grid gap-3 text-slate-700">{guidance.selection.map((item, index) => <li key={item}>{index + 1}. {item}</li>)}</ol></article>
-          <article className="rounded-lg border border-slate-200 bg-white p-7"><h2 className="text-2xl font-black text-[var(--navy-950)]">Typical product paths</h2><ul className="mt-4 grid gap-3 text-slate-700">{guidance.products.map((item) => <li key={item}>• {item}</li>)}</ul></article>
-          <article className="rounded-lg border border-slate-200 bg-white p-7 lg:col-span-2"><h2 className="text-2xl font-black text-[var(--navy-950)]">Installation and project files</h2><p className="mt-4 leading-8 text-slate-600">{guidance.installation}</p></article>
-        </section> : null}
-        {activeView === "enquiry" ? <section className="container-shell grid gap-8 py-14 lg:grid-cols-[0.8fr_1.2fr]">
-          <div><p className="eyebrow">Project enquiry</p><h2 className="mt-3 text-3xl font-black text-[var(--navy-950)]">Information to prepare</h2><ul className="mt-6 grid gap-3 leading-7 text-slate-700">{guidance.enquiry.map((item) => <li key={item}>• {item}</li>)}</ul><h2 className="mt-10 text-2xl font-black text-[var(--navy-950)]">FAQ</h2>{guidance.faq.map(([question, answer]) => <div key={question} className="mt-5"><h3 className="font-black text-[var(--navy-950)]">{question}</h3><p className="mt-2 leading-7 text-slate-600">{answer}</p></div>)}</div>
-          <div className="rounded-lg bg-[var(--navy-950)] p-6 md:p-8"><ProductInquiryForm productTitle={`${application.title} project fire protection`} /></div>
-        </section> : null}
-      </main>
-      <Footer />
-      <StickyCta />
-    </>
+          <div className="interior-form-surface"><ProductInquiryForm productTitle={`${application.title} project fire protection`} initial={{ application: application.title }} /></div>
+        </section>}
+      </div>
+    </InteriorFrame>
   );
 }

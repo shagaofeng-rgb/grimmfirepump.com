@@ -2,9 +2,16 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { Menu } from "lucide-react";
+import { ArrowRight, Menu, Search } from "lucide-react";
 import { StickyCta } from "@/components/sticky-cta";
-import { applications, certificates, company, knowledgePosts, projects } from "@/data/site";
+import { FooterSocialLinks } from "@/components/footer";
+import { applications, company, factoryImages, knowledgePosts, projects } from "@/data/site";
+import { certificatePreviews } from "@/data/certificate-previews";
+import { InteriorFrame, PageMast, SectionHeading } from "@/components/interior/frame";
+import { MediaCard } from "@/components/interior/content";
+import { ProductCard } from "@/components/interior/catalog";
+import { EditorialRows } from "@/components/interior/editorial";
+import { ContentPagination, getPageNumber, getPageSlice } from "@/components/content-pagination";
 import { localizedSite } from "@/data/localized-site";
 import {
   isLocalizedLocale,
@@ -20,10 +27,14 @@ import {
 } from "@/lib/i18n";
 import { getPublicPosts, getPublicProducts } from "@/lib/public-cms";
 import { listDownloadAssets } from "@/lib/admin-cms";
+import { listPublishedNews } from "@/lib/news-automation";
 
 export const dynamic = "force-dynamic";
 
-type LocalizedPageProps = { params: Promise<{ locale: string; path?: string[] }> };
+type LocalizedPageProps = {
+  params: Promise<{ locale: string; path?: string[] }>;
+  searchParams: Promise<{ page?: string }>;
+};
 
 function currentPath(path?: string[]) {
   return normalizeLocalizedPath(path?.length ? path.join("/") : "/");
@@ -38,7 +49,7 @@ export function generateStaticParams() {
   );
 }
 
-export async function generateMetadata({ params }: LocalizedPageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: Pick<LocalizedPageProps, "params">): Promise<Metadata> {
   const { locale, path } = await params;
   if (!isLocalizedLocale(locale)) return {};
 
@@ -163,34 +174,16 @@ function ProofSection({ locale }: { locale: LocalizedLocale }) {
   );
 }
 
-async function ProductCards({ locale }: { locale: LocalizedLocale }) {
+async function ProductCards({ locale, page }: { locale: LocalizedLocale; page: number }) {
   const content = localizedSite[locale];
   const products = await getPublicProducts();
+  const { items, currentPage } = getPageSlice(products, page, 6);
   return (
-    <section className="section bg-[var(--grey-50)]" lang={content.htmlLang} dir={content.dir}>
-      <div className="container-shell mb-8 flex flex-wrap items-end justify-between gap-4">
-        <h2 className="text-3xl font-black text-[var(--navy-950)]">{content.home.productsTitle}</h2>
-        <Link className="font-black text-[var(--navy-800)] underline decoration-[var(--orange)] decoration-2 underline-offset-4" href="/products">
-          {content.labels.browseEnglishDetails}
-        </Link>
-      </div>
-      <div className="container-shell grid gap-5 md:grid-cols-3">
-        {products.slice(0, 6).map((product) => (
-          <article key={product.slug} className="card overflow-hidden">
-            <div className="relative h-52 bg-slate-50">
-              <Image src={product.image} alt={product.title} fill className="object-contain p-5" sizes="(min-width: 768px) 33vw, 100vw" />
-            </div>
-            <div className="p-5">
-              <p className="text-xs font-black uppercase tracking-[0.12em] text-[var(--orange)]">{product.category}</p>
-              <h3 className="mt-2 text-xl font-black text-[var(--navy-950)]">{product.title}</h3>
-              <p className="mt-3 text-sm leading-6 text-slate-600">{product.summary}</p>
-              <Link className="button button-secondary mt-5" href={`/products/${product.slug}`}>
-                {content.labels.browseEnglishDetails}
-              </Link>
-            </div>
-          </article>
-        ))}
-      </div>
+    <section className="interior-shell interior-band" lang={content.htmlLang} dir={content.dir}>
+      <SectionHeading title={content.home.productsTitle}
+        action={<Link className="interior-button" href="/products" prefetch={false}>{content.labels.browseEnglishDetails} <ArrowRight size={16} /></Link>} />
+      <div className="interior-grid" lang="en" dir="ltr">{items.map((product) => <ProductCard key={product.slug} product={product} />)}</div>
+      <ContentPagination locale={locale} currentPage={currentPage} totalItems={products.length} pageSize={6} pathname={localizedPath("/products", locale)} />
     </section>
   );
 }
@@ -198,22 +191,10 @@ async function ProductCards({ locale }: { locale: LocalizedLocale }) {
 function ApplicationCards({ locale }: { locale: LocalizedLocale }) {
   const content = localizedSite[locale];
   return (
-    <section className="section" lang={content.htmlLang} dir={content.dir}>
-      <div className="container-shell mb-8">
-        <h2 className="text-3xl font-black text-[var(--navy-950)]">{content.home.applicationsTitle}</h2>
-      </div>
-      <div className="container-shell grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-        {applications.slice(0, 4).map((application) => (
-          <Link key={application.slug} className="card overflow-hidden" href={`/applications/${application.slug}`}>
-            <div className="relative h-44 bg-slate-100">
-              <Image src={application.image} alt={application.title} fill className="object-cover" sizes="(min-width: 1280px) 25vw, 50vw" />
-            </div>
-            <div className="p-5">
-              <h3 className="text-xl font-black text-[var(--navy-950)]">{application.title}</h3>
-              <p className="mt-3 text-sm leading-6 text-slate-600">{application.text}</p>
-            </div>
-          </Link>
-        ))}
+    <section className="interior-shell interior-band" lang={content.htmlLang} dir={content.dir}>
+      <SectionHeading title={content.home.applicationsTitle} />
+      <div className="interior-grid" lang="en" dir="ltr">
+        {applications.map(({ slug, image, title, text, icon: Icon }) => <MediaCard key={slug} image={image} title={title} text={text} href={`/applications/${slug}`} icon={<Icon size={17} />} />)}
       </div>
     </section>
   );
@@ -245,11 +226,11 @@ function LocalizedHomeLinks({ locale }: { locale: LocalizedLocale }) {
   );
 }
 
-function LocalizedFooter({ locale }: { locale: LocalizedLocale }) {
+function LocalizedFooter({ locale, interior = false }: { locale: LocalizedLocale; interior?: boolean }) {
   const content = localizedSite[locale];
   const navPaths: LocalizedPath[] = ["/products", "/applications", "/projects", "/factory", "/downloads", "/contact"];
   return (
-    <footer className="bg-[var(--navy-950)] px-6 pb-20 pt-14 text-slate-300" lang={content.htmlLang} dir={content.dir}>
+    <footer className={`bg-[var(--navy-950)] px-6 pb-20 pt-14 text-slate-300${interior ? " interior-footer" : ""}`} lang={content.htmlLang} dir={content.dir}>
       <div className="mx-auto grid max-w-[1240px] gap-10 md:grid-cols-[1.2fr_0.8fr]">
         <div>
           <Link href={localizedPath("/", locale)} className="flex items-center gap-3">
@@ -259,6 +240,7 @@ function LocalizedFooter({ locale }: { locale: LocalizedLocale }) {
           <p className="mt-5 max-w-xl text-sm leading-7">{content.home.text}</p>
           <p className="mt-4 text-sm leading-7">{company.legalName}</p>
           <a className="mt-2 block text-sm hover:text-white" href={`mailto:${company.email}`}>{company.email}</a>
+          {interior && <FooterSocialLinks />}
         </div>
         <nav className="grid grid-cols-2 gap-3 text-sm font-bold" aria-label={`${content.localeName} footer navigation`}>
           {navPaths.map((path) => <Link key={path} href={localizedPath(path, locale)} className="hover:text-white">{content.nav[path]}</Link>)}
@@ -268,9 +250,10 @@ function LocalizedFooter({ locale }: { locale: LocalizedLocale }) {
   );
 }
 
-async function ResourceCards({ locale, path }: { locale: LocalizedLocale; path: LocalizedPath }) {
+async function ResourceCards({ locale, path, page }: { locale: LocalizedLocale; path: LocalizedPath; page: number }) {
   const content = localizedSite[locale];
   const blogPosts = path === "/blog" ? await getPublicPosts() : [];
+  const news = path === "/news" ? await listPublishedNews() : [];
   const downloadRecords = path === "/downloads" ? (await listDownloadAssets()).filter((item) => item.status === "published" && (item.fileUrl.startsWith("/") && !item.fileUrl.startsWith("//") || item.fileUrl.startsWith("https://"))) : [];
   const downloadUrls = new Set<string>();
   const availableDownloads = downloadRecords.filter((item) => {
@@ -280,46 +263,46 @@ async function ResourceCards({ locale, path }: { locale: LocalizedLocale; path: 
   });
   const cards =
     path === "/projects"
-      ? projects.map((item) => ({ title: item.title, text: `${item.region} · ${item.meta}`, image: item.image, href: "/projects" }))
+      ? projects.map((item) => ({ title: item.title, text: `${item.region} · Equipment reference`, image: item.region === "South America" ? "/assets/synced/products/interior/edj-fire-pump-set.webp" : item.image, href: "/projects" }))
       : path === "/downloads"
         ? availableDownloads.map((item) => ({ title: item.title, text: `${item.category} · ${item.language}`, image: "/assets/applications/hero-edj.webp", href: "/downloads" }))
         : path === "/certificates"
-          ? certificates.map((item) => ({ title: item.title, text: item.note, image: item.src, href: "/certificates" }))
+          ? certificatePreviews.map((item) => ({ title: item.label, text: "", image: item.src, href: "/certificates" }))
           : path === "/blog"
-            ? blogPosts.slice(0, 6).map((item) => ({ title: item.title, text: item.text, image: item.image, href: `/${locale}/blog/${item.slug}` }))
+            ? blogPosts.map((item) => ({ title: item.title, text: item.text, image: item.image, href: `/${locale}/blog/${item.slug}` }))
             : path === "/knowledge"
-              ? knowledgePosts.slice(0, 6).map((item) => ({ title: item.title, text: item.text, image: item.image, href: `/knowledge/${item.slug}` }))
-              : [];
-
-  if (!cards.length) return null;
+              ? knowledgePosts.map((item) => ({ title: item.title, text: item.text, image: item.image, href: `/knowledge/${item.slug}` }))
+              : path === "/news" ? news.map((item) => ({ title: item.title, text: item.summary, image: item.coverImageUrl, href: `/news/${item.slug}`, label: item.sourceName, date: (item.publishAt || item.sourcePublishedAt).slice(0, 10) }))
+                : [];
+  const { items, currentPage } = getPageSlice(cards, page, 6);
 
   return (
-    <section className="section bg-[var(--grey-50)]" lang={content.htmlLang} dir={content.dir}>
-      <div className="container-shell grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-        {cards.map((card) => (
-          <Link key={`${card.title}-${card.href}`} className="card overflow-hidden" href={card.href}>
-            <div className="relative h-44 bg-slate-50">
-              <Image
-                src={card.image}
-                alt={card.title}
-                fill
-                className={path === "/certificates" ? "object-contain p-4" : "object-cover p-0"}
-                sizes="(min-width: 1280px) 30vw, 50vw"
-              />
-            </div>
-            <div className="p-5">
-              <h2 className="text-xl font-black text-[var(--navy-950)]">{card.title}</h2>
-              <p className="mt-3 text-sm leading-6 text-slate-600">{card.text}</p>
-            </div>
-          </Link>
-        ))}
+    <section className="interior-shell interior-band" lang={content.htmlLang} dir={content.dir}>
+      <SectionHeading title={content.nav[path]} />
+      <div lang="en" dir="ltr">
+        {path === "/news" || path === "/blog" || path === "/knowledge"
+          ? <EditorialRows items={items.map((item) => ({ label: "", ...item }))} images linkText="Read article" />
+          : <div className={`interior-grid${path === "/certificates" ? " interior-grid-4" : ""}`}>
+              {items.map((card) => <MediaCard key={`${card.title}-${card.href}`} {...card} contain={path === "/certificates" || card.image.includes("/synced/products/")} />)}
+            </div>}
       </div>
+      <ContentPagination locale={locale} currentPage={currentPage} totalItems={cards.length} pageSize={6} pathname={localizedPath(path, locale)} />
+      {items.length === 0 && <Link className="interior-text-link" href={path === "/blog" ? localizedPath("/knowledge", locale) : "/contact"} prefetch={false}>{path === "/blog" ? content.nav["/knowledge"] : content.labels.contactSales} <ArrowRight size={16} /></Link>}
     </section>
   );
 }
 
-function ContactPanel({ locale }: { locale: LocalizedLocale }) {
+function ContactPanel({ locale, interior = false }: { locale: LocalizedLocale; interior?: boolean }) {
   const content = localizedSite[locale];
+  if (interior) return (
+    <section className="interior-shell interior-band interior-split" lang={content.htmlLang} dir={content.dir}>
+      <div><SectionHeading title={content.home.contactTitle} /><div className="interior-actions">
+        <a className="interior-button" href={company.whatsappUrl} target="_blank" rel="noreferrer" data-event="whatsapp_click" data-whatsapp-account="grimm-main" data-whatsapp-placement="localized_contact">{content.labels.whatsapp}</a>
+        <Link className="interior-button interior-primary" href="/contact" prefetch={false}>{content.labels.contactSales} <ArrowRight size={16} /></Link>
+      </div></div>
+      <dl className="interior-contact-list"><div><dt>{content.labels.email}</dt><dd><a href={`mailto:${company.email}`} dir="ltr">{company.email}</a></dd></div><div><dt>{company.legalName}</dt><dd lang="en" dir="ltr">{company.address}</dd></div></dl>
+    </section>
+  );
   return (
     <section className="section" lang={content.htmlLang} dir={content.dir}>
       <div className="container-shell rounded-lg bg-[var(--navy-950)] p-8 text-white md:p-10">
@@ -347,40 +330,53 @@ function ContactPanel({ locale }: { locale: LocalizedLocale }) {
   );
 }
 
-export default async function LocalizedPage({ params }: LocalizedPageProps) {
+export default async function LocalizedPage({ params, searchParams }: LocalizedPageProps) {
   const { locale, path } = await params;
   if (!isLocalizedLocale(locale)) notFound();
 
   const pagePath = currentPath(path);
   if (!isSupportedLocalizedPath(pagePath)) notFound();
 
-  const isHome = pagePath === "/";
+  if (pagePath !== "/") {
+    const content = localizedSite[locale];
+    const copy = content.pages[pagePath];
+    const page = getPageNumber((await searchParams).page);
+    const companyPage = pagePath === "/about" || pagePath === "/factory" || pagePath === "/testing";
+    return (
+      <InteriorFrame locale={locale} path={pagePath} breadcrumbs={[{ label: content.nav[pagePath] }]} footer={<LocalizedFooter locale={locale} interior />}>
+        <PageMast eyebrow={copy.eyebrow} title={copy.title} text={copy.text}
+          image={companyPage ? { src: pagePath === "/testing" ? "/assets/factory/factory-testing.webp" : factoryImages[0].src, alt: "" } : undefined}
+          action={pagePath === "/tools/fire-pump-selector" ? <Link className="interior-button" href="/tools/fire-pump-selector" prefetch={false}>{content.labels.browseEnglishDetails} <ArrowRight size={16} /></Link> : undefined} />
+        {pagePath === "/products" ? <ProductCards locale={locale} page={page} />
+          : pagePath === "/applications" ? <ApplicationCards locale={locale} />
+          : pagePath === "/contact" ? <ContactPanel locale={locale} interior />
+          : companyPage ? <>
+            <section className="interior-shell interior-band">
+              <SectionHeading title={content.home.evidenceTitle} />
+              <ul className="interior-check-list">{content.home.proof.map((item) => <li key={item}>{item}</li>)}</ul>
+              <Link className="interior-text-link mt-4" href={pagePath} prefetch={false}>{content.labels.browseEnglishDetails} <ArrowRight size={16} /></Link>
+            </section>
+            <ContactPanel locale={locale} interior />
+          </> : pagePath === "/search" ? (
+            <section className="interior-shell interior-band interior-search">
+              <form className="interior-toolbar" action="/search" method="get" role="search">
+                <label className="interior-field"><span className="sr-only">{content.nav["/search"]}</span><input name="q" type="search" maxLength={120} placeholder={content.nav["/search"]} /></label>
+                <button type="submit" className="interior-button interior-primary"><Search size={17} />{content.nav["/search"]}</button>
+              </form>
+            </section>
+          ) : pagePath !== "/tools/fire-pump-selector" && <ResourceCards locale={locale} path={pagePath} page={page} />}
+      </InteriorFrame>
+    );
+  }
 
   return (
     <>
       <LocalizedHeader locale={locale} />
       <main>
         <LocalizedHero locale={locale} path={pagePath} />
-        {isHome ? (
-          <>
-            <ProofSection locale={locale} />
-            <LocalizedHomeLinks locale={locale} />
-            <ContactPanel locale={locale} />
-          </>
-        ) : pagePath === "/products" ? (
-          <ProductCards locale={locale} />
-        ) : pagePath === "/applications" ? (
-          <ApplicationCards locale={locale} />
-        ) : pagePath === "/contact" ? (
-          <ContactPanel locale={locale} />
-        ) : pagePath === "/about" || pagePath === "/factory" || pagePath === "/testing" || pagePath === "/tools/fire-pump-selector" ? (
-          <>
-            <ProofSection locale={locale} />
-            <ContactPanel locale={locale} />
-          </>
-        ) : (
-          <ResourceCards locale={locale} path={pagePath} />
-        )}
+        <ProofSection locale={locale} />
+        <LocalizedHomeLinks locale={locale} />
+        <ContactPanel locale={locale} />
       </main>
       <LocalizedFooter locale={locale} />
       <StickyCta />

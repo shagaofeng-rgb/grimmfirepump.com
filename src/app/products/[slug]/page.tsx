@@ -1,485 +1,231 @@
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import type { ReactNode } from "react";
-import { ArrowRight, CheckCircle2 } from "lucide-react";
-import { Header } from "@/components/header";
-import { Footer } from "@/components/footer";
-import { StickyCta } from "@/components/sticky-cta";
+import { ArrowRight, Building2, Check, Download, FileText, Gauge, Layers, Mail, PanelsTopLeft, Ruler, Waves } from "lucide-react";
+import { ProductCard } from "@/components/interior/catalog";
+import { InteriorFrame, InteriorTabs, SectionHeading } from "@/components/interior/frame";
+import { ProductGallery } from "@/components/interior/media";
 import { ProductInquiryForm } from "@/components/product-inquiry-form";
-import { company } from "@/data/site";
+import { applications, company } from "@/data/site";
+import { catalogHref, displayParameter, keyParameters } from "@/lib/catalog-presentation";
 import { getRelatedNewsForProduct } from "@/lib/news-automation";
-import { getPublicProduct, getPublicProductNavigation, getPublicProducts, type PublicProduct } from "@/lib/public-cms";
-import type { ProductNavigationGroup } from "@/lib/product-navigation";
+import { getPublicProduct, getPublicProducts, type PublicProduct } from "@/lib/public-cms";
 import { getProductKnowledge } from "@/lib/product-knowledge";
 
 type ProductPageProps = {
   params: Promise<{ slug: string }>;
   searchParams: Promise<{ view?: string }>;
 };
-type ProductMetadataProps = { params: Promise<{ slug: string }> };
-type Product = PublicProduct;
-type DetailImage = { src: string; alt: string };
 
-const productViews = [
-  { id: "overview", label: "Overview" },
-  { id: "configuration", label: "Configuration" },
-  { id: "technical", label: "Technical Data" },
-  { id: "applications", label: "Applications" },
-  { id: "resources", label: "Resources" },
-  { id: "quote", label: "Get Quote" },
+const views = [
+  { id: "overview", label: "Overview", icon: PanelsTopLeft },
+  { id: "configuration", label: "Configuration", icon: Layers },
+  { id: "technical", label: "Technical data", icon: Gauge },
+  { id: "applications", label: "Applications", icon: Building2 },
+  { id: "resources", label: "Documents", icon: FileText },
+  { id: "quote", label: "Request a quote", icon: Mail },
 ] as const;
+type ProductView = (typeof views)[number]["id"];
 
-type ProductView = (typeof productViews)[number]["id"];
+function productDeck(product: PublicProduct) {
+  if (product.slug === "edj-fire-pump-set" || product.slug === "vertical-stainless-steel-multistage-pump-jockey-pump") {
+    return getProductKnowledge(product.slug, product.title, product.category).solutionSummary;
+  }
+  return product.description || product.summary;
+}
 
-const ignoredTableLabels = new Set(["Pump", "Model", "Capacity(GPM)", "Head(BAR)", "Power(KW)", "Material", "FQA:"]);
+function productMetaDescription(product: PublicProduct) {
+  const text = `${product.title}. ${productDeck(product)}`.replace(/\s+/g, " ").trim();
+  return text.length > 170 ? `${text.slice(0, 169).replace(/\s+\S*$/, "").replace(/[., ]+$/, "")}.` : text;
+}
 
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata({ params }: ProductMetadataProps): Promise<Metadata> {
-  const { slug } = await params;
-  const product = await getPublicProduct(slug);
+export async function generateMetadata({ params }: Pick<ProductPageProps, "params">): Promise<Metadata> {
+  const product = await getPublicProduct((await params).slug);
   if (!product) return {};
   const description = productMetaDescription(product);
   return {
     title: product.title,
     description,
     alternates: { canonical: product.canonicalUrl || `/products/${product.slug}` },
-    robots: product.indexable ? { index: true, follow: true } : { index: false, follow: true },
+    robots: { index: product.indexable, follow: true },
     openGraph: { title: product.title, description, images: [product.image] },
   };
 }
 
-function cleanDetailLines(product: Product) {
-  return product.detailLines
-    .map((line) => line.trim())
-    .filter(Boolean)
-    .filter((line) => !ignoredTableLabels.has(line))
-    .filter((line) => !/^Q\d+:|^A\d+:/i.test(line));
-}
-
-function uniqueLines(lines: string[]) {
-  return Array.from(new Set(lines.map((line) => line.trim()).filter(Boolean)));
-}
-
-function trimMeta(value: string, maxLength = 180) {
-  const cleanValue = value.replace(/\s+/g, " ").trim();
-
-  if (cleanValue.length <= maxLength) {
-    return cleanValue;
-  }
-
-  const trimmed = cleanValue.slice(0, maxLength - 1);
-  const lastSpace = trimmed.lastIndexOf(" ");
-  return `${trimmed.slice(0, lastSpace > 120 ? lastSpace : trimmed.length).replace(/[,. ]+$/, "")}.`;
-}
-
-function productMetaDescription(product: Product) {
-  const detailSummary = product.detailLines
-    .map((line) => line.trim())
-    .filter((line) => line.length > 45 && !/^Q\d+:|^A\d+:/i.test(line))
-    .slice(0, 2)
-    .join(" ");
-  const combined = [product.title, product.description, detailSummary, product.specs.join(", ")].filter(Boolean).join(". ");
-
-  return trimMeta(combined || product.summary);
-}
-
-function splitSpec(line: string) {
-  const [label, ...value] = line.split(":");
-  if (!value.length) return { label: "Specification", value: line };
-  return { label: label.trim(), value: value.join(":").trim() };
-}
-
-function getProductView(value: string | undefined): ProductView {
-  return productViews.some((view) => view.id === value) ? (value as ProductView) : "overview";
-}
-
-function groupTechnicalLines(lines: string[]) {
-  const groups = [
-    { title: "Key selection data", lines: lines.slice(0, 6) },
-    { title: "Configuration details", lines: lines.slice(6, 12) },
-    { title: "Additional project data", lines: lines.slice(12) },
-  ];
-
-  return groups.filter((group) => group.lines.length);
-}
-
-function relatedProducts(product: Product, products: Product[]) {
-  const sameCategory = products.filter((item) => item.slug !== product.slug && item.groupSlug === product.groupSlug);
-  const fallback = products.filter((item) => item.slug !== product.slug && !sameCategory.some((same) => same.slug === item.slug));
-  return [...sameCategory, ...fallback].slice(0, 6);
-}
-
-function getDetailImages(product: Product) {
-  const importedImages = "detailImages" in product && Array.isArray(product.detailImages) ? product.detailImages : [];
-  return importedImages.length ? importedImages : [{ src: product.image, alt: product.title }];
-}
-
-function ProductImageGrid({ images, title }: { images: DetailImage[]; title: string }) {
-  if (!images.length) return null;
-
+function ProductChecklist({ title, lines }: { title: string; lines: string[] }) {
   return (
-    <div className="mt-8 grid gap-4 md:grid-cols-2">
-      {images.map((image, index) => (
-        <figure key={`${image.src}-${index}`} className="overflow-hidden rounded-lg border border-slate-200 bg-slate-50">
-          <div className="relative h-64">
-            <Image
-              src={image.src}
-              alt={image.alt || title}
-              fill
-              className="object-contain p-4"
-              sizes="(min-width: 1024px) 420px, 100vw"
-            />
-          </div>
-          <figcaption className="border-t border-slate-200 bg-white px-4 py-3 text-xs font-bold text-slate-500">
-            {title} image {index + 1}
-          </figcaption>
-        </figure>
-      ))}
-    </div>
-  );
-}
-
-function RelatedProductCarousel({ title, items }: { title: string; items: Product[] }) {
-  return (
-    <div className="mt-8 min-w-0">
-      <div className="mb-3 flex items-center justify-between gap-4">
-        <h3 className="text-sm font-black uppercase tracking-[0.12em] text-[var(--navy-900)]">{title}</h3>
-        <Link className="text-sm font-black text-[var(--orange)]" href="/products">
-          All Products
-        </Link>
-      </div>
-      <div className="flex w-full min-w-0 snap-x gap-4 overflow-x-auto pb-3">
-        {items.map((item) => (
-          <Link
-            key={item.slug}
-            href={`/products/${item.slug}`}
-            className="card grid min-w-[220px] snap-start overflow-hidden transition hover:-translate-y-0.5 hover:shadow-lg"
-          >
-            <span className="relative h-28 bg-slate-50">
-              <Image src={item.image} alt={item.title} fill className="object-contain p-3" sizes="220px" />
-            </span>
-            <span className="grid gap-2 p-4">
-              <span className="text-xs font-black uppercase tracking-[0.08em] text-[var(--orange)]">{item.category}</span>
-              <strong className="text-sm leading-5 text-[var(--navy-950)]">{item.title}</strong>
-            </span>
-          </Link>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function ProductSidebar({ activeSlug, groups }: { activeSlug: string; groups: ProductNavigationGroup[] }) {
-  return (
-    <aside className="hidden lg:block">
-      <div className="sticky top-24 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-[0_18px_50px_rgba(7,20,38,0.08)]">
-        <div className="bg-[var(--navy-950)] p-5 text-white">
-          <p className="eyebrow">Product List</p>
-          <h2 className="mt-2 text-xl font-black">Browse by category</h2>
-        </div>
-        <div className="max-h-[calc(100vh-220px)] overflow-y-auto p-4">
-          {groups.map((group) => {
-            const groupHasActiveProduct = group.items.some((item) => item.href.endsWith(`/${activeSlug}`));
-
-            return (
-            <details key={group.title} className="border-b border-slate-100 py-3 first:pt-0 last:border-b-0" open={groupHasActiveProduct}>
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-black text-[var(--navy-950)] marker:content-none">
-                <span>{group.title}</span>
-                <span aria-hidden="true" className="text-xs text-[var(--orange)]">+</span>
-              </summary>
-              <div className="mt-3 grid gap-1">
-                {group.items.map((item) => {
-                  const slug = item.href.split("/").pop();
-                  const active = slug === activeSlug;
-                  return (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      className={`rounded-md px-3 py-2 text-xs font-bold leading-5 ${
-                        active ? "bg-orange-50 text-[var(--orange-dark)]" : "text-slate-600 hover:bg-slate-50 hover:text-[var(--navy-900)]"
-                      }`}
-                    >
-                      {item.title}
-                    </Link>
-                  );
-                })}
-              </div>
-            </details>
-            );
-          })}
-        </div>
-      </div>
+    <aside className="interior-detail-aside">
+      <FileText size={24} />
+      <h3 className="my-2">{title}</h3>
+      <ul className="interior-check-list">{lines.map((line) => <li key={line}><Check size={15} />{line}</li>)}</ul>
     </aside>
   );
 }
 
-function ContentCard({
-  id,
-  eyebrow,
-  title,
-  children,
-}: {
-  id: string;
-  eyebrow: string;
-  title: string;
-  children: ReactNode;
-}) {
-  return (
-    <section id={id} className="min-w-0 scroll-mt-28 overflow-hidden rounded-lg border border-slate-200 bg-white p-6 shadow-[0_12px_40px_rgba(7,20,38,0.05)] md:p-8">
-      <p className="eyebrow mb-3">{eyebrow}</p>
-      <h2 className="text-2xl font-black text-[var(--navy-950)] md:text-3xl">{title}</h2>
-      <div className="mt-6">{children}</div>
-    </section>
-  );
-}
+const projectInputs = ["Flow and pressure at the duty point", "Power, driver and water source", "Applicable drawings and documents"];
 
-function ProductViewNavigation({ slug, activeView }: { slug: string; activeView: ProductView }) {
+function SpecificationTable({ product }: { product: PublicProduct }) {
+  const rows = product.parameters.filter((param) => param.name.trim() && param.value.trim()).map(displayParameter);
+  if (!rows.length) return <p className="interior-copy">Model-specific performance data is available on request.</p>;
   return (
-    <nav aria-label="Product information sections" className="flex min-w-0 gap-2 overflow-x-auto border-b border-slate-200 pb-3">
-      {productViews.map((view) => (
-        <Link
-          key={view.id}
-          href={view.id === "overview" ? `/products/${slug}` : `/products/${slug}?view=${view.id}`}
-          aria-current={activeView === view.id ? "page" : undefined}
-          className={`shrink-0 rounded-md px-4 py-2.5 text-sm font-black transition ${
-            activeView === view.id
-              ? "bg-[var(--navy-950)] text-white"
-              : "bg-white text-[var(--navy-900)] hover:bg-orange-50 hover:text-[var(--orange-dark)]"
-          }`}
-        >
-          {view.label}
-        </Link>
-      ))}
-    </nav>
+    <div className="interior-table-scroll">
+      <table className="interior-table">
+        <caption className="sr-only">{product.title} technical data</caption>
+        <thead><tr><th scope="col">Parameter</th><th scope="col">Value</th><th scope="col">Unit</th></tr></thead>
+        <tbody>{rows.map(({ name, value, unit }, i) => <tr key={`${name}-${i}`}><th scope="row">{name}</th><td>{value}</td><td>{unit || "—"}</td></tr>)}</tbody>
+      </table>
+    </div>
   );
 }
 
 export default async function ProductDetailPage({ params, searchParams }: ProductPageProps) {
-  const { slug } = await params;
-  const { view: viewParam } = await searchParams;
-  const [products, groups, relatedNews] = await Promise.all([getPublicProducts(), getPublicProductNavigation(), getRelatedNewsForProduct(slug, 3)]);
-  const product = products.find((item) => item.slug === slug);
+  const [{ slug }, { view }] = await Promise.all([params, searchParams]);
+  const product = await getPublicProduct(slug);
   if (!product) notFound();
 
-  const detailLines = cleanDetailLines(product);
-  const overviewLines = uniqueLines([
-    product.description,
-    ...detailLines.filter((line) => !line.includes(":") && line.length > 40).slice(0, 3),
-  ]).slice(0, 4);
-  const technicalLines = uniqueLines(product.technicalParameters).slice(0, 20);
-  const structureItems = product.structureItems;
-  const applicationItems = product.applicationItems;
-  const related = relatedProducts(product, products);
-  const detailImages = getDetailImages(product);
-  const overviewImages = detailImages.slice(0, 3);
-  const structureImages = detailImages.slice(3, 8);
-  const productUrl = `${company.website}/products/${product.slug}`;
-  const metaDescription = productMetaDescription(product);
+  const path = `/products/${product.slug}`;
+  const hrefForView = (id: ProductView) => id === "overview" ? path : catalogHref(path, { view: id });
+  const active = view === "documents" ? "resources" : views.find((entry) => entry.id === view)?.id || "overview";
+  const images = Array.from(new Map([{ src: product.image, alt: product.title }, ...product.detailImages].map((item) => [item.src, item])).values());
+  const specs = keyParameters(product.parameters);
   const knowledge = getProductKnowledge(product.slug, product.title, product.category);
-  const activeView = getProductView(viewParam);
-  const technicalGroups = groupTechnicalLines(technicalLines);
-  const productSchema = {
+  const matchedApplications = applications.filter((app) => knowledge.relatedApplicationSlugs.includes(app.slug));
+  const related = active === "overview" || active === "resources"
+    ? (await getPublicProducts()).filter((item) => item.slug !== product.slug && item.groupSlug === product.groupSlug).slice(0, 3)
+    : [];
+  const relatedNews = active === "resources" ? await getRelatedNewsForProduct(product.slug, 3) : [];
+  const title = product.title;
+  const deck = productDeck(product);
+  const familyHref = catalogHref("/products", { group: product.groupSlug });
+  const productUrl = `${company.website}${path}`;
+  const schema = {
     "@context": "https://schema.org",
-    "@type": "Product",
-    name: product.title,
-    image: Array.from(new Set([product.image, ...detailImages.map((image) => image.src)])).map((src) =>
-      src.startsWith("http") ? src : `${company.website}${src}`,
-    ),
-    description: metaDescription,
-    brand: {
-      "@type": "Brand",
-      name: company.shortName,
-    },
-    manufacturer: {
-      "@type": "Organization",
-      name: company.legalName,
-      url: company.website,
-    },
-    category: product.category,
-    url: productUrl,
-    additionalProperty: technicalLines.slice(0, 12).map((line) => {
-      const spec = splitSpec(line);
-      return {
-        "@type": "PropertyValue",
-        name: spec.label,
-        value: spec.value,
-      };
-    }),
-    // No Offer schema is emitted until price and availability are verified for
-    // this exact configuration. Product facts must not imply live stock.
-  };
-  const breadcrumbSchema = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
+    "@graph": [
       {
-        "@type": "ListItem",
-        position: 1,
-        name: "Home",
-        item: company.website,
+        "@type": "Product",
+        name: title,
+        description: productMetaDescription(product),
+        image: images.map((image) => new URL(image.src, company.website).href),
+        brand: { "@type": "Brand", name: company.shortName },
+        manufacturer: { "@type": "Organization", name: company.legalName, url: company.website },
+        category: product.category,
+        url: productUrl,
+        additionalProperty: product.parameters.slice(0, 12).map(displayParameter).map(({ name, value, unit }) => ({
+          "@type": "PropertyValue", name, value, ...(unit ? { unitText: unit } : {}),
+        })),
       },
       {
-        "@type": "ListItem",
-        position: 2,
-        name: "Products",
-        item: `${company.website}/products`,
-      },
-      {
-        "@type": "ListItem",
-        position: 3,
-        name: product.title,
-        item: productUrl,
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { name: "Home", item: company.website },
+          { name: "Products", item: `${company.website}/products` },
+          { name: title, item: productUrl },
+        ].map((item, index) => ({ "@type": "ListItem", position: index + 1, ...item })),
       },
     ],
   };
 
   return (
-    <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
-      <Header />
-      <main className="bg-[var(--grey-50)]">
-        <section className="bg-white">
-          <div className="container-shell grid gap-12 py-12 lg:grid-cols-[0.88fr_1.12fr] lg:py-16">
-            <div className="relative min-h-[320px] rounded-lg bg-slate-50 md:min-h-[440px]">
-              <Image src={product.image} alt={product.title} fill priority className="object-contain p-8" />
-            </div>
-            <div>
-              <p className="eyebrow mb-4">{product.category}</p>
-              <h1 className="text-4xl font-black leading-tight text-[var(--navy-950)] md:text-5xl">{product.title}</h1>
-              <p className="mt-6 text-lg leading-8 text-slate-600">{product.description}</p>
-              <ul className="mt-8 grid gap-3 sm:grid-cols-2">
-                {product.specs.slice(0, 6).map((spec) => (
-                  <li key={spec} className="flex items-start gap-2 rounded-md bg-blue-50 px-4 py-3 text-sm font-bold text-[var(--navy-800)]">
-                    <CheckCircle2 className="mt-0.5 shrink-0 text-[var(--orange)]" size={16} />
-                    {spec}
-                  </li>
-                ))}
-              </ul>
-              <div className="mt-8 flex flex-wrap gap-4">
-                <Link className="button button-primary" href={`/products/${product.slug}?view=quote`}>Get Quote</Link>
-                <Link className="button button-secondary" href={`/products/${product.slug}?view=technical`}>Technical Data</Link>
-              </div>
+    <InteriorFrame path={path} breadcrumbs={[{ label: "Products", href: "/products" }, { label: product.category, href: familyHref }, { label: title }]}>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema).replace(/</g, "\\u003c") }} />
+      <section className="interior-white">
+        <div className="interior-shell interior-product-top">
+          <div className="interior-product-heading">
+            <p className="interior-kicker">{product.category}</p>
+            <h1 className="interior-title">{title}</h1>
+            <p className="interior-deck">{deck}</p>
+          </div>
+          <ProductGallery key={product.slug} title={title} model={product.model} images={images} />
+          <div className="interior-product-summary">
+            {specs.length > 0 && (
+              <dl className="interior-specs">
+                {specs.map(({ name, value, unit }) => {
+                  const Icon = /flow|capacity/i.test(name) ? Waves : /diameter|size/i.test(name) ? Ruler : Gauge;
+                  return <div key={name}><dt><Icon size={15} />{name}</dt><dd>{value} {unit && <small className="text-xs">{unit}</small>}</dd></div>;
+                })}
+              </dl>
+            )}
+            <div className={`interior-actions${specs.length ? "" : " mt-4"}`}>
+              <Link className="interior-button interior-primary" href={`${hrefForView("quote")}#product-information`} prefetch={false}>Request a quote <ArrowRight size={16} /></Link>
+              <Link className="interior-button" href={`${hrefForView("technical")}#product-information`} prefetch={false}>Technical data <Gauge size={16} /></Link>
             </div>
           </div>
-        </section>
-
-        <section className="container-shell grid gap-8 py-12 lg:grid-cols-[290px_1fr]">
-          <ProductSidebar activeSlug={product.slug} groups={groups} />
-
-          <div className="grid min-w-0 content-start gap-7">
-            <ProductViewNavigation slug={product.slug} activeView={activeView} />
-
-            {activeView === "overview" ? <ContentCard id="overview" eyebrow="Product overview" title="Product overview">
-              <div className="grid gap-4 text-base leading-8 text-slate-600">
-                {overviewLines.map((line) => (
-                  <p key={line}>{line}</p>
-                ))}
-              </div>
-              <ProductImageGrid images={overviewImages} title={`${product.title} overview image`} />
-            </ContentCard> : null}
-
-            {activeView === "configuration" ? <ContentCard id="configuration" eyebrow="Configuration" title="Main structure and package scope">
-              {!structureItems.length ? <p className="text-sm leading-7 text-slate-600">Configuration details are confirmed for the selected model and project duty point. Contact our team for the current technical file.</p> : null}
-              <div className="grid gap-4 md:grid-cols-2">
-                {structureItems.map((item, index) => (
-                  <div key={item} className="rounded-md bg-slate-50 p-5">
-                    <span className="text-sm font-black text-[var(--orange)]">Component {index + 1}</span>
-                    <p className="mt-2 text-sm font-bold leading-6 text-slate-700">{item}</p>
-                  </div>
-                ))}
-              </div>
-              <ProductImageGrid images={structureImages.length ? structureImages : overviewImages} title={`${product.title} structure image`} />
-            </ContentCard> : null}
-
-            {activeView === "applications" ? <ContentCard id="applications" eyebrow="Applications" title="Recommended project applications">
-              {!applicationItems.length ? <p className="text-sm leading-7 text-slate-600">Application suitability depends on the required flow, head and installation conditions. Please share your project brief for confirmation.</p> : null}
-              <div className="grid gap-4 md:grid-cols-2">
-                {applicationItems.map((item) => (
-                  <div key={item} className="flex items-center gap-3 rounded-md border border-slate-200 p-4">
-                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-orange-50 text-[var(--orange)]">
-                      <CheckCircle2 size={18} />
-                    </span>
-                    <strong className="text-sm text-[var(--navy-950)]">{item}</strong>
-                  </div>
-                ))}
-              </div>
-              <div className="mt-6 rounded-md bg-slate-50 p-5 text-sm leading-7 text-slate-700">
-                <strong className="text-[var(--navy-950)]">Selection information to provide:</strong> {knowledge.specificationKeywords.join(", ")}. Confirm actual approval, drawings and documentation requirements with the project team before final selection.
-              </div>
-            </ContentCard> : null}
-
-            {activeView === "technical" ? <ContentCard id="technical" eyebrow="Technical data" title="Specifications and selection data">
-              {!technicalGroups.length ? <p className="text-sm leading-7 text-slate-600">Model-specific performance data is available on request. Share your flow, head and power requirements for a verified selection.</p> : null}
-              <div className="grid gap-5 xl:grid-cols-3">
-                {technicalGroups.map((group) => (
-                  <section key={group.title} className="rounded-md border border-slate-200 bg-slate-50 p-5">
-                    <h3 className="text-base font-black text-[var(--navy-950)]">{group.title}</h3>
-                    <dl className="mt-4 grid gap-4">
-                      {group.lines.map((line) => {
-                        const spec = splitSpec(line);
-                        return (
-                          <div key={line}>
-                            <dt className="text-xs font-black text-slate-500">{spec.label}</dt>
-                            <dd className="mt-1 text-sm font-bold leading-6 text-[var(--navy-900)]">{spec.value}</dd>
-                          </div>
-                        );
-                      })}
-                    </dl>
-                  </section>
-                ))}
-              </div>
-              <p className="mt-6 text-sm leading-7 text-slate-600">Final performance curves, approval documents and configuration details are confirmed against the quoted duty point and project specification.</p>
-            </ContentCard> : null}
-
-            {activeView === "resources" ? <ContentCard id="resources" eyebrow="Resources" title="Related products, project guidance and news">
-              <RelatedProductCarousel title="Related products" items={related} />
-              <section className="mt-9 rounded-md bg-slate-50 p-5">
-                <h3 className="text-lg font-black text-[var(--navy-950)]">Selection checklist</h3>
-                <ul className="mt-4 grid gap-3 text-sm leading-6 text-slate-700 md:grid-cols-2">
-                  {knowledge.buyerPainPoints.map((item) => <li key={item} className="flex gap-2"><CheckCircle2 className="mt-0.5 shrink-0 text-[var(--orange)]" size={16} />{item}</li>)}
-                </ul>
-              </section>
-              {relatedNews.length ? (
-                <section className="mt-9">
-                  <h3 className="text-lg font-black text-[var(--navy-950)]">Related industry news</h3>
-                <div className="grid gap-4 md:grid-cols-3">
-                  {relatedNews.map((item) => (
-                    <Link key={item.id} href={`/news/${item.slug}`} className="rounded-md border border-slate-200 bg-slate-50 p-4 hover:bg-orange-50">
-                      <span className="text-xs font-black uppercase tracking-[0.1em] text-[var(--orange)]">{item.category}</span>
-                      <strong className="mt-2 block text-sm leading-6 text-[var(--navy-950)]">{item.title}</strong>
-                      <span className="mt-3 block text-xs font-bold text-slate-500">{(item.publishAt || item.sourcePublishedAt).slice(0, 10)}</span>
-                    </Link>
-                  ))}
-                </div>
-                </section>
-              ) : null}
-            </ContentCard> : null}
-
-            {activeView === "quote" ? <section className="rounded-lg bg-[var(--navy-950)] p-6 md:p-8">
-              <div className="grid gap-8 lg:grid-cols-[0.78fr_1.22fr]">
+        </div>
+      </section>
+      <div className="interior-shell interior-anchor" id="product-information">
+        <InteriorTabs label="Product information" links={views.map(({ id, label, icon: Icon }) => ({ label, href: hrefForView(id), current: active === id, icon: <Icon size={16} /> }))} />
+        <section className="interior-detail-panel" aria-label={views.find((item) => item.id === active)?.label}>
+          {active === "overview" && (
+            <>
+              <div className="interior-split">
                 <div>
-                  <p className="eyebrow mb-3">Get Quote</p>
-                  <h2 className="text-3xl font-black leading-tight text-white">Request price and technical data for {product.title}.</h2>
-                  <p className="mt-5 text-sm leading-7 text-slate-300">
-                    Send your working condition and we will reply with model recommendation, datasheet and quotation support.
-                  </p>
-                  <Link className="mt-6 inline-flex items-center gap-2 font-black text-[var(--orange)]" href="/contact">
-                    Contact sales center
-                    <ArrowRight size={16} />
-                  </Link>
+                  <SectionHeading eyebrow="Product overview" title={product.slug === "edj-fire-pump-set" ? "One package, three pump roles" : "Product overview"} />
+                  <p className="interior-copy">{deck}</p>
+                  {product.structureItems[0] && <p className="interior-copy mt-3">{product.structureItems[0]}</p>}
+                  <Link className="interior-text-link mt-4" href={hrefForView("configuration")} scroll={false} prefetch={false}>View configuration <ArrowRight size={15} /></Link>
                 </div>
-                <ProductInquiryForm productTitle={product.title} />
+                <ProductChecklist title="Project information" lines={projectInputs} />
               </div>
-            </section> : null}
-          </div>
+              {related.length > 0 && <div className="mt-9"><SectionHeading title="Related products" /><div className="interior-grid">{related.map((item) => <ProductCard key={item.slug} product={item} compact />)}</div></div>}
+            </>
+          )}
+          {active === "configuration" && (
+            <div className="interior-split">
+              <div>
+                <SectionHeading eyebrow="Configuration" title="Structure and package scope" />
+                {product.structureItems.length ? <ul className="interior-check-list">{product.structureItems.map((line, index) => <li key={index}><Check size={16} />{line}</li>)}</ul>
+                  : <p className="interior-copy">Configuration is confirmed for the selected model and duty point.</p>}
+              </div>
+              <ProductChecklist title="Selection inputs" lines={projectInputs} />
+            </div>
+          )}
+          {active === "technical" && (
+            <div className="interior-split">
+              <div><SectionHeading eyebrow="Technical data" title="Specifications and selection data" /><SpecificationTable product={product} />
+                <p className="interior-copy mt-4 text-sm">Confirm the final performance curve and connection details for the quoted configuration.</p>
+              </div>
+              <aside className="interior-detail-aside"><FileText size={24} /><h3 className="my-2">Model-specific documents</h3><Link className="interior-text-link" href={hrefForView("quote")} scroll={false} prefetch={false}>Request a curve or drawing <ArrowRight size={15} /></Link></aside>
+            </div>
+          )}
+          {active === "applications" && (
+            <div className="interior-split">
+              <div>
+                <SectionHeading eyebrow="Applications" title="Project applications" />
+                {product.applicationItems.length ? <ul className="interior-check-list">{product.applicationItems.map((line, index) => <li key={index}><Check size={16} />{line}</li>)}</ul>
+                  : <p className="interior-copy">Application suitability depends on the required flow, head and installation conditions.</p>}
+                {matchedApplications.map((app) => <div key={app.slug} className="mt-3"><Link className="interior-text-link" href={`/applications/${app.slug}`} prefetch={false}>{app.title} <ArrowRight size={15} /></Link></div>)}
+              </div>
+              <ProductChecklist title="Information to confirm" lines={knowledge.specificationKeywords} />
+            </div>
+          )}
+          {active === "resources" && (
+            <div className="interior-split">
+              <div>
+                <SectionHeading eyebrow="Documents" title="Catalog and project documents" />
+                <div className="interior-actions">
+                  <Link className="interior-button interior-primary" href="/downloads" prefetch={false}><Download size={16} /> Download center</Link>
+                  <Link className="interior-button" href={hrefForView("quote")} scroll={false} prefetch={false}>Request a technical file <ArrowRight size={15} /></Link>
+                </div>
+                {relatedNews.length > 0 && <div className="mt-7"><h3 className="text-lg font-extrabold">Related industry news</h3>
+                  <ul className="mt-3 grid gap-3">{relatedNews.map((item) => <li key={item.id}><Link className="interior-text-link" href={`/news/${item.slug}`} prefetch={false}>{item.title} <ArrowRight size={15} /></Link></li>)}</ul>
+                </div>}
+                {related.length > 0 && <div className="mt-8"><h3 className="text-lg font-extrabold">Related products</h3><ul className="mt-2 grid gap-2">{related.map((item) => <li key={item.slug}><Link className="interior-text-link" href={`/products/${item.slug}`} prefetch={false}>{item.title} <ArrowRight size={15} /></Link></li>)}</ul></div>}
+              </div>
+              <ProductChecklist title="Selection checklist" lines={knowledge.buyerPainPoints} />
+            </div>
+          )}
+          {active === "quote" && (
+            <div className="interior-split interior-quote-split">
+              <div><SectionHeading eyebrow="Project inquiry" title={`Request a quote for ${title}`} /><ul className="interior-check-list">{projectInputs.map((line) => <li key={line}><Check size={16} />{line}</li>)}</ul>
+                <a className="interior-text-link mt-4" href={`mailto:${company.email}`}><Mail size={16} />{company.email}</a>
+              </div>
+              <div className="interior-form-surface"><ProductInquiryForm productTitle={title} /></div>
+            </div>
+          )}
         </section>
-      </main>
-      <Footer />
-      <StickyCta />
-    </>
+      </div>
+    </InteriorFrame>
   );
 }

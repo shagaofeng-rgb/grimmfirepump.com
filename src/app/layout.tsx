@@ -5,6 +5,7 @@ import "./globals.css";
 import "./whatsapp-float.css";
 import { company } from "@/data/site";
 import { AnalyticsListener } from "@/components/analytics-listener";
+import { DocumentLocale } from "@/components/document-locale";
 
 export const metadata: Metadata = {
   metadataBase: new URL(company.website),
@@ -71,6 +72,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
     <html lang={languageMap[locale] || "en"} dir={locale === "ar" ? "rtl" : "ltr"}>
       <body>
         {children}
+        <DocumentLocale />
         <AnalyticsListener />
         <script
           type="application/ld+json"

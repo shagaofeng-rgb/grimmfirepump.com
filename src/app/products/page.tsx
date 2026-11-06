@@ -1,36 +1,42 @@
 import type { Metadata } from "next";
-import { ProductSection } from "@/components/home/product-section";
-import { SimplePage } from "@/components/simple-page";
+import Link from "next/link";
+import { Gauge } from "lucide-react";
+import { ProductCatalog } from "@/components/interior/catalog";
+import { InteriorFrame, PageMast } from "@/components/interior/frame";
 import { localizedAlternates } from "@/lib/i18n";
 import { getPageNumber } from "@/components/content-pagination";
-import { getPublicProductNavigation } from "@/lib/public-cms";
+import { getPublicProductNavigation, getPublicProducts } from "@/lib/public-cms";
+import { boundedQuery } from "@/lib/catalog-presentation";
 
 export async function generateMetadata({ searchParams }: ProductsPageProps): Promise<Metadata> {
-  const { group } = await searchParams;
+  const { group, q, sort } = await searchParams;
   const activeGroup = group ? (await getPublicProductNavigation()).find((item) => item.slug === group) : undefined;
   return {
     title: activeGroup ? `${activeGroup.title} | GRIMM PUMP Products` : "Fire Pump Products and Water System Catalog",
     description: activeGroup?.description || "Browse GRIMM fire pump packages, diesel fire pumps, electric fire pumps, jockey pumps, booster systems and sewage pump products.",
     alternates: localizedAlternates("/products"),
-    ...(activeGroup && !activeGroup.items.length ? { robots: { index: false, follow: true } } : {}),
+    ...(q || sort || (activeGroup && !activeGroup.items.length) ? { robots: { index: false, follow: true } } : {}),
   };
 }
 
 export const dynamic = "force-dynamic";
 
 type ProductsPageProps = {
-  searchParams: Promise<{ group?: string; page?: string }>;
+  searchParams: Promise<{ group?: string; page?: string; q?: string; sort?: string }>;
 };
 
 export default async function ProductsPage({ searchParams }: ProductsPageProps) {
-  const { group, page } = await searchParams;
+  const { group, page, q, sort } = await searchParams;
+  const [products, groups] = await Promise.all([getPublicProducts(), getPublicProductNavigation()]);
   return (
-    <SimplePage
-      eyebrow="Product Center"
-      title="Official GRIMM product catalog for fire pump and water system projects."
-      text="Synchronized from the current GRIMM website, including fire pump packages, diesel and electric fire pumps, jockey pumps, booster systems, sewage pumps and water supply equipment."
-    >
-      <ProductSection group={group} page={getPageNumber(page)} />
-    </SimplePage>
+    <InteriorFrame path="/products" breadcrumbs={[{ label: "Products" }]}>
+      <PageMast
+        eyebrow="Product families"
+        title="Fire pumps & water systems"
+        text="Find fire pump packages, water supply equipment and pumps by product family."
+        action={<Link href="/tools/fire-pump-selector" className="interior-button" prefetch={false}><Gauge size={16} /> Pump selector</Link>}
+      />
+      <ProductCatalog products={products} groups={groups} group={boundedQuery(group)} query={boundedQuery(q)} sort={sort === "name" || sort === "newest" ? sort : ""} page={getPageNumber(page)} />
+    </InteriorFrame>
   );
 }

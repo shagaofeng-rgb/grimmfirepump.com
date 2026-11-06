@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { BlogSection } from "@/components/home/blog-section";
-import { SimplePage } from "@/components/simple-page";
+import { ArrowRight, BookOpen } from "lucide-react";
+import { EditorialFeature, EditorialRows } from "@/components/interior/editorial";
+import { InteriorFrame, PageMast, SectionHeading } from "@/components/interior/frame";
 import { localizedAlternates } from "@/lib/i18n";
 import { getPublicPosts } from "@/lib/public-cms";
-import { getPageNumber } from "@/components/content-pagination";
+import { ContentPagination, getPageNumber, getPageSlice } from "@/components/content-pagination";
 
 export const dynamic = "force-dynamic";
 
@@ -23,26 +24,20 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function BlogPage({ searchParams }: BlogPageProps) {
   const posts = await getPublicPosts();
   const { page } = await searchParams;
-  if (!posts.length) {
-    return (
-      <SimplePage
-        eyebrow="Technical Resources"
-        title="Technical guidance is being refreshed."
-        text="Use the Knowledge Center for current fire pump selection, installation and maintenance resources."
-      >
-        <div className="mt-8">
-          <Link className="button button-primary" href="/knowledge">Browse Knowledge Center</Link>
-        </div>
-      </SimplePage>
-    );
-  }
+  const { currentPage, items } = getPageSlice(posts, getPageNumber(page), 6);
+  const [featured, ...rest] = items.map((post) => ({ ...post, label: post.category, href: `/blog/${post.slug}` }));
   return (
-    <SimplePage
-      eyebrow="Technical Blog"
-      title="Original fire pump engineering and procurement guidance."
-      text="Practical articles for EPC contractors, fire protection engineers and project buyers covering selection, installation, maintenance and documentation."
-    >
-      <BlogSection items={posts} basePath="/blog" eyebrow="Technical Blog" title="Fire pump selection, engineering and maintenance guidance." page={getPageNumber(page)} paginationPath="/blog" />
-    </SimplePage>
+    <InteriorFrame path="/blog" breadcrumbs={[{ label: "Blog" }]}>
+      <PageMast eyebrow="Resources" title="Technical blog" text="Practical reading for pump system buyers and project teams." />
+      <section className="interior-shell interior-band">
+        {featured ? <>
+          <SectionHeading title={currentPage === 1 ? "Latest articles" : "Technical articles"} />
+          <EditorialFeature item={featured} linkText="Read article" />
+          {rest.length > 0 && <div className="mt-5"><EditorialRows items={rest} images linkText="Read article" /></div>}
+          <ContentPagination currentPage={currentPage} totalItems={posts.length} pageSize={6} pathname="/blog" />
+        </> : <div className="interior-empty"><h2>No technical blog posts are published</h2><p>Engineering guides are available in the Knowledge Center.</p></div>}
+        <div className="interior-related-link"><BookOpen size={20} /><Link href="/knowledge" prefetch={false} className="interior-text-link">Knowledge center <ArrowRight size={15} /></Link></div>
+      </section>
+    </InteriorFrame>
   );
 }

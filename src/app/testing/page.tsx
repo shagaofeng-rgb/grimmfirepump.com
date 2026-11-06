@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import Image from "next/image";
-import Link from "next/link";
-import { SimplePage } from "@/components/simple-page";
+import { ClipboardCheck, FileText, Gauge, Settings2 } from "lucide-react";
+import { InteriorBanner } from "@/components/interior/content";
+import { InteriorFrame, PageMast, SectionHeading } from "@/components/interior/frame";
 import { localizedAlternates } from "@/lib/i18n";
 
 export const metadata: Metadata = {
@@ -11,41 +11,23 @@ export const metadata: Metadata = {
 };
 
 const testingSteps = [
-  "Pump assembly inspection before testing",
-  "Flow, head and pressure verification",
-  "Controller and starting logic check",
-  "Packaging, shipment and document review",
+  { icon: Settings2, title: "Assembly inspection", text: "Review the pump, driver and controller arrangement against the agreed scope." },
+  { icon: Gauge, title: "Operating checks", text: "Confirm the flow and pressure review points for the selected configuration." },
+  { icon: ClipboardCheck, title: "Controller and start checks", text: "Review the specified starting sequence and controller interfaces." },
+  { icon: FileText, title: "Project documentation", text: "Confirm the inspection records and submittal documents required for dispatch." },
 ];
 
 export default function TestingPage() {
   return (
-    <SimplePage
-      eyebrow="Testing Capability"
-      title="Testing evidence buyers can review before shipment."
-      text="Fire pump procurement depends on proof. This page turns workshop, test area and document review into a dedicated trust path instead of burying it in a long homepage."
-    >
-      <section className="section">
-        <div className="container-shell grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
-          <div className="relative min-h-[380px] overflow-hidden rounded-lg bg-slate-100">
-            <Image src="/assets/factory/factory-testing.webp" alt="Fire pump testing area" fill className="object-cover" />
-          </div>
-          <div>
-            <p className="eyebrow mb-4">Quality Flow</p>
-            <h2 className="text-3xl font-black text-[var(--navy-950)]">From assembled package to project submittal.</h2>
-            <div className="mt-7 grid gap-4">
-              {testingSteps.map((step, index) => (
-                <div key={step} className="flex gap-4 border-b border-slate-200 pb-4">
-                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[var(--orange)] text-sm font-black text-white">
-                    {index + 1}
-                  </span>
-                  <p className="pt-1 font-bold leading-7 text-slate-700">{step}</p>
-                </div>
-              ))}
-            </div>
-            <Link className="button button-primary mt-8" href="/downloads">Request Test Documents</Link>
-          </div>
+    <InteriorFrame path="/testing" breadcrumbs={[{ label: "Factory", href: "/factory" }, { label: "Testing" }]}>
+      <PageMast eyebrow="Quality & testing" title="Factory testing capability" text="Assembly, operating checks and documentation for project review." />
+      <section className="interior-shell interior-band interior-split">
+        <figure><video className="interior-video" controls preload="none" poster="/assets/applications/hero-edj.webp" src="/assets/videos/dual-power.mp4" aria-label="EDJ fire pump package demonstration" /><figcaption className="interior-copy mt-2 text-sm">EDJ fire pump package demonstration</figcaption></figure>
+        <div><SectionHeading eyebrow="Inspection workflow" title="Equipment review before dispatch" />
+          <dl className="interior-contact-list">{testingSteps.map(({ icon: Icon, title, text }) => <div key={title}><dt><Icon size={17} />{title}</dt><dd>{text}</dd></div>)}</dl>
         </div>
       </section>
-    </SimplePage>
+      <InteriorBanner title="Certificates & documents" text="Review the available certificates or request documentation for your configuration." href="/certificates" label="View documents" />
+    </InteriorFrame>
   );
 }

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { SimplePage } from "@/components/simple-page";
+import { ArrowRight, Factory, FileText, MapPin } from "lucide-react";
+import { InteriorFrame, PageMast, SectionHeading } from "@/components/interior/frame";
 import { company } from "@/data/site";
 import { localizedAlternates } from "@/lib/i18n";
 
@@ -10,42 +11,24 @@ export const metadata: Metadata = {
   alternates: localizedAlternates("/about"),
 };
 
-const proofPoints = [
-  "Fire pump, water supply, sewage and irrigation product lines inherited from the existing website.",
-  "Focus on complete EDJ, diesel + jockey and electric + jockey fire pump package requirements.",
-  "Factory evidence, testing documents, downloads and project cases are separated into dedicated pages.",
-];
-
 export default function AboutPage() {
   return (
-    <SimplePage
-      eyebrow="About GRIMM PUMP"
-      title="A clearer international brand for technical fire pump buyers."
-      text="The rebuilt website positions GRIMM PUMP as the export-facing fire pump systems brand of Grimm Water Treatment, with a stronger structure for trust, SEO and inquiries."
-    >
-      <section className="section">
-        <div className="container-shell grid gap-10 lg:grid-cols-[0.9fr_1.1fr]">
-          <div>
-            <p className="eyebrow mb-4">Company Positioning</p>
-            <h2 className="text-3xl font-black leading-tight text-[var(--navy-950)]">Factory-built pump systems with buyer evidence.</h2>
-            <p className="mt-5 leading-8 text-slate-600">
-              {company.shortName} serves EPC contractors, fire protection companies, distributors and project owners who need
-              clear product data, testing proof, downloadable documents and fast technical communication before placing an order.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-4">
-              <Link className="button button-primary" href="/contact">Contact Sales</Link>
-              <Link className="button button-secondary" href="/factory">View Factory</Link>
-            </div>
-          </div>
-          <div className="grid gap-4">
-            {proofPoints.map((point) => (
-              <div key={point} className="border-b border-slate-200 pb-4">
-                <p className="font-bold leading-7 text-[var(--navy-900)]">{point}</p>
-              </div>
-            ))}
-          </div>
+    <InteriorFrame path="/about" breadcrumbs={[{ label: "About" }]}>
+      <PageMast eyebrow="About the company" title="GRIMM PUMP" text="Fire pump systems, water supply equipment and pumping solutions."
+        image={{ src: "/assets/factory/real/vertical-pump-assembly.webp", alt: "Vertical pumps at the GRIMM workshop" }} />
+      <section className="interior-shell interior-band interior-split">
+        <div>
+          <SectionHeading eyebrow="Company profile" title={company.legalName} />
+          <p className="interior-copy">Based in Quzhou, Zhejiang, GRIMM supplies fire pump packages and water system equipment for contractors, distributors and project owners.</p>
+          <p className="interior-copy mt-3">Fire pump packages include EDJ, diesel and electric arrangements. The wider product range covers water supply, sewage and integrated pumping systems.</p>
+          <Link className="interior-text-link mt-4" href="/products" prefetch={false}>Explore the product catalog <ArrowRight size={15} /></Link>
         </div>
+        <dl className="interior-contact-list">
+          <div><dt><MapPin size={17} /> Company address</dt><dd>{company.address}</dd></div>
+          <div><dt><Factory size={17} /> Manufacturing</dt><dd><Link href="/factory" prefetch={false}>Visit the workshop</Link></dd></div>
+          <div><dt><FileText size={17} /> Company documents</dt><dd><Link href="/certificates" prefetch={false}>View certificates</Link></dd></div>
+        </dl>
       </section>
-    </SimplePage>
+    </InteriorFrame>
   );
 }

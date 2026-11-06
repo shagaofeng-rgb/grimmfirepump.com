@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-import { ApplicationSection } from "@/components/home/application-section";
-import { SimplePage } from "@/components/simple-page";
+import { MediaCard } from "@/components/interior/content";
+import { InteriorFrame, PageMast, SectionHeading } from "@/components/interior/frame";
+import { applications } from "@/data/site";
 import { localizedAlternates } from "@/lib/i18n";
 
 export const metadata: Metadata = {
@@ -11,12 +12,14 @@ export const metadata: Metadata = {
 
 export default function ApplicationsPage() {
   return (
-    <SimplePage
-      eyebrow="Applications"
-      title="Fire pump solutions by facility and industry."
-      text="Application pages map project risks, water supply conditions and recommended fire pump configurations for each buyer scenario."
-    >
-      <ApplicationSection />
-    </SimplePage>
+    <InteriorFrame path="/applications" breadcrumbs={[{ label: "Applications" }]}>
+      <PageMast eyebrow="Industries" title="Fire protection by application" text="Review fire-water equipment for facility types and project conditions." />
+      <section className="interior-shell interior-band">
+        <SectionHeading title="Industries" />
+        <div className="interior-grid">
+          {applications.map(({ slug, title, image, text, icon: Icon }) => <MediaCard key={slug} title={title} image={image} text={text} icon={<Icon size={19} />} href={`/applications/${slug}`} linkText="View application" />)}
+        </div>
+      </section>
+    </InteriorFrame>
   );
 }

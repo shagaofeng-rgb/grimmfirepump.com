@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Header } from "@/components/header";
-import { Footer } from "@/components/footer";
-import { StickyCta } from "@/components/sticky-cta";
+import { ArrowRight, BookOpen, Building2, CalendarDays, FileText, Package, Search } from "lucide-react";
+import { InteriorFrame, InteriorTabs, PageMast, SectionHeading } from "@/components/interior/frame";
+import { ContentPagination, getPageNumber, getPageSlice } from "@/components/content-pagination";
+import { applications, knowledgePosts } from "@/data/site";
+import { boundedQuery, catalogHref } from "@/lib/catalog-presentation";
 import { getPublicPosts, getPublicProducts } from "@/lib/public-cms";
 import { listPublishedNews } from "@/lib/news-automation";
-
-type SearchPageProps = { searchParams: Promise<{ q?: string }> };
 
 export const dynamic = "force-dynamic";
 
@@ -16,69 +16,70 @@ export const metadata: Metadata = {
   robots: { index: false, follow: true },
 };
 
-function score(text: string, query: string) {
-  const haystack = text.toLowerCase();
-  const terms = query.toLowerCase().split(/[^a-z0-9]+/).filter((term) => term.length > 1);
-  return terms.reduce((sum, term) => sum + (haystack.includes(term) ? 1 : 0), 0);
+const types = ["All", "Products", "Applications", "Guides", "Blog", "News"] as const;
+const icons = { Products: Package, Applications: Building2, Guides: BookOpen, Blog: FileText, News: CalendarDays };
+type SearchType = keyof typeof icons;
+type SearchResult = { type: SearchType; title: string; text: string; href: string; match: string };
+
+async function search(query: string): Promise<SearchResult[]> {
+  const [products, posts, news] = await Promise.all([getPublicProducts(), getPublicPosts(), listPublishedNews()]);
+  const results: SearchResult[] = [
+    ...products.map((item): SearchResult => ({
+      type: "Products", title: item.title, text: item.summary, href: `/products/${item.slug}`,
+      match: [item.model, item.category, item.description, item.keywords].join(" "),
+    })),
+    ...applications.map((item): SearchResult => ({
+      type: "Applications", title: `${item.title} Fire Protection`, text: item.text, href: `/applications/${item.slug}`, match: item.keyword,
+    })),
+    ...knowledgePosts.map((item): SearchResult => ({
+      type: "Guides", title: item.title, text: item.text, href: `/knowledge/${item.slug}`, match: item.category,
+    })),
+    ...posts.map((item): SearchResult => ({
+      type: "Blog", title: item.title, text: item.text, href: `/blog/${item.slug}`, match: `${item.category} ${item.content.join(" ")}`,
+    })),
+    ...news.map((item): SearchResult => ({
+      type: "News", title: item.title, text: item.summary, href: `/news/${item.slug}`, match: `${item.category} ${item.body.join(" ")}`,
+    })),
+  ];
+  const terms = [...new Set(query.toLowerCase().split(/[^\p{L}\p{N}]+/u).filter(Boolean))].slice(0, 12);
+  if (!terms.length) return [];
+  return results.map((item) => {
+    const title = item.title.toLowerCase();
+    const content = `${item.title} ${item.text} ${item.match}`.toLowerCase();
+    return { ...item, rank: terms.every((term) => content.includes(term)) ? terms.filter((term) => title.includes(term)).length + 1 : 0 };
+  }).filter((item) => item.rank > 0).sort((a, b) => b.rank - a.rank);
 }
 
-export default async function SearchPage({ searchParams }: SearchPageProps) {
-  const { q = "" } = await searchParams;
-  const query = q.trim();
-  const [products, posts, news] = await Promise.all([getPublicProducts(), getPublicPosts(), listPublishedNews()]);
-  const results = query
-    ? [
-        ...products.map((item) => ({
-          type: "Product",
-          title: item.title,
-          summary: item.summary,
-          href: `/products/${item.slug}`,
-          text: `${item.title} ${item.category} ${item.summary} ${item.description} ${item.keywords}`,
-        })),
-        ...news.map((item) => ({
-          type: "News",
-          title: item.title,
-          summary: item.summary,
-          href: `/news/${item.slug}`,
-          text: `${item.title} ${item.category} ${item.summary} ${item.body.join(" ")}`,
-        })),
-        ...posts.map((item) => ({
-          type: "Blog",
-          title: item.title,
-          summary: item.text,
-          href: `/blog/${item.slug}`,
-          text: `${item.title} ${item.category} ${item.text} ${item.content.join(" ")}`,
-        })),
-      ]
-        .map((item) => ({ ...item, score: score(item.text, query) }))
-        .filter((item) => item.score > 0)
-        .sort((a, b) => b.score - a.score)
-        .slice(0, 30)
-    : [];
+export default async function SearchPage({ searchParams }: { searchParams: Promise<{ q?: string; type?: string; page?: string }> }) {
+  const { q, type, page } = await searchParams;
+  const query = boundedQuery(q);
+  const selected = types.find((entry) => entry.toLowerCase() === boundedQuery(type).toLowerCase()) || "All";
+  const matches = query ? await search(query) : [];
+  const results = selected === "All" ? matches : matches.filter((item) => item.type === selected);
+  const { items, currentPage } = getPageSlice(results, getPageNumber(page), 6);
 
   return (
-    <>
-      <Header />
-      <main className="container-shell py-14">
-        <p className="eyebrow mb-4">Search</p>
-        <h1 className="text-4xl font-black text-[var(--navy-950)]">Search products, news and engineering articles.</h1>
-        <form className="mt-8 flex max-w-3xl gap-3" action="/search">
-          <input name="q" defaultValue={query} className="min-h-12 flex-1 rounded-md border border-slate-300 px-4 text-base" placeholder="Search fire pump, EDJ, NFPA20..." />
-          <button className="button button-primary" type="submit">Search</button>
+    <InteriorFrame path="/search" breadcrumbs={[{ label: "Search" }]}>
+      <PageMast eyebrow="GRIMM PUMP" title="Search" />
+      <section className="interior-shell interior-band interior-search">
+        <form className="interior-toolbar" action="/search" method="get" role="search">
+          <label className="interior-field"><span className="sr-only">Search the site</span><input name="q" type="search" defaultValue={query} maxLength={120} placeholder="Search by model, application or guide" /></label>
+          <button type="submit" className="interior-button interior-primary"><Search size={17} /> Search</button>
         </form>
-        <div className="mt-10 grid gap-4">
-          {results.map((item) => (
-            <Link key={`${item.type}-${item.href}`} href={item.href} className="rounded-lg border border-slate-200 bg-white p-5 hover:bg-slate-50">
-              <span className="text-xs font-black uppercase tracking-[0.12em] text-[var(--orange)]">{item.type}</span>
-              <strong className="mt-2 block text-xl text-[var(--navy-950)]">{item.title}</strong>
-              <span className="mt-2 block leading-7 text-slate-600">{item.summary}</span>
-            </Link>
-          ))}
-          {query && !results.length ? <div className="rounded-lg border border-dashed border-slate-300 bg-slate-50 p-6 font-bold text-slate-500">No matching product, news or blog result found.</div> : null}
-        </div>
-      </main>
-      <Footer />
-      <StickyCta />
-    </>
+        {query ? <>
+          <InteriorTabs label="Search result type" links={types.map((entry) => ({ label: entry, href: catalogHref("/search", { q: query, type: entry === "All" ? undefined : entry }), current: selected === entry }))} />
+          <div className="mt-5"><SectionHeading title={`Results for “${query}”`} action={<span className="interior-copy text-sm">{results.length} results</span>} /></div>
+          {items.length > 0 ? items.map((item) => {
+            const Icon = icons[item.type];
+            return <article className="interior-result" key={item.href}>
+              <Icon size={21} className="text-[var(--ip-accent)]" />
+              <div><p className="interior-card-meta">{item.type}</p><h3 className="interior-card-title"><Link href={item.href} prefetch={false}>{item.title}</Link></h3><p className="interior-card-copy mt-1 line-clamp-2">{item.text}</p></div>
+              <Link className="interior-icon-button" href={item.href} prefetch={false} aria-label={`Open ${item.title}`} title="Open result"><ArrowRight size={17} /></Link>
+            </article>;
+          }) : <div className="interior-empty"><h2>No matching results</h2><p>Try a product name, model or shorter term.</p><Link className="interior-button" href="/products" prefetch={false}>Browse products <ArrowRight size={16} /></Link></div>}
+          <ContentPagination currentPage={currentPage} totalItems={results.length} pageSize={6} pathname="/search" searchParams={{ q: query, type: selected === "All" ? undefined : selected }} />
+        </> : <div className="interior-actions"><Link className="interior-button" href="/products" prefetch={false}><Package size={17} /> Products</Link><Link className="interior-button" href="/knowledge" prefetch={false}><BookOpen size={17} /> Knowledge center</Link></div>}
+      </section>
+    </InteriorFrame>
   );
 }
