@@ -4,6 +4,7 @@ import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { SectionHeading } from "@/components/section-heading";
 import { ContentPagination, getPageSlice } from "@/components/content-pagination";
 import { getPublicProductNavigation, getPublicProducts } from "@/lib/public-cms";
+import { keyParameters } from "@/lib/catalog-presentation";
 
 type ProductSectionProps = {
   featuredOnly?: boolean;
@@ -30,7 +31,7 @@ export async function ProductSection({ featuredOnly = false, group, page = 1 }: 
                 </figure>
                 <div>
                   <h3>{item.title}</h3>
-                  <p>{item.summary}</p>
+                  <p>{keyParameters(item.parameters, 2).map(({ name, value, unit }) => `${name}: ${value}${unit ? ` ${unit}` : ""}`).join(" · ") || item.summary}</p>
                   <span>Learn More <ArrowRight size={15} /></span>
                 </div>
               </Link>

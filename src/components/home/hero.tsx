@@ -28,7 +28,7 @@ export function Hero() {
         <div className="home-hero-copy">
           <p className="home-hero-kicker">FIRE PUMP SYSTEMS. FOR A SAFER TOMORROW.</p>
           <h1>Engineered<br />Fire Protection<br /><em>Without Compromise</em></h1>
-          <p>GRIMM PUMP designs and manufactures reliable fire pump systems for commercial, industrial and infrastructure projects worldwide. Built to perform. Certified for confidence.</p>
+          <p>GRIMM PUMP designs and manufactures fire pump systems for commercial, industrial and infrastructure projects. Compare drive types, duty points and available documentation.</p>
           <div className="home-hero-actions">
             <Link className="home-primary-button" href="/products">Explore Our Products <ArrowRight size={18} /></Link>
             <Link className="home-secondary-link" href="/contact">Contact Our Team</Link>

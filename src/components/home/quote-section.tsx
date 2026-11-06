@@ -4,12 +4,14 @@ import { FormEvent, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { company } from "@/data/site";
-import { getVisitorContext, hasAnalyticsConsent } from "@/components/analytics-listener";
+import { getVisitorContext, trackSiteEvent } from "@/components/analytics-listener";
+import { useSubmissionToken } from "@/components/use-submission-token";
 
 export function QuoteSection() {
   const [message, setMessage] = useState("Tell us your project requirement and our team will reply by email or WhatsApp.");
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const submission = useSubmissionToken();
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -23,17 +25,15 @@ export function QuoteSection() {
       const response = await fetch("/api/inquiries", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...data, ...visitor, sourcePage: window.location.pathname }),
+        body: JSON.stringify({ ...data, ...visitor, sourcePage: window.location.pathname, submissionToken: submission.tokenFor(data) }),
       });
       if (!response.ok) throw new Error("Submission failed");
-      if (hasAnalyticsConsent()) void fetch("/api/analytics", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ event: "inquiry_submit", path: window.location.pathname, label: String(data.product || "project brief"), ...visitor }),
-      }).catch(() => undefined);
+      const receipt = await response.json();
+      if (!receipt.duplicate && receipt.id) void trackSiteEvent("inquiry_submit", String(data.product || "project brief"));
       setSubmitted(true);
       setMessage("Project brief received. Our team will reply using the contact details you provided.");
       form.reset();
+      submission.clear();
     } catch {
       setMessage("Submission failed. Please email us or contact WhatsApp directly.");
     } finally {

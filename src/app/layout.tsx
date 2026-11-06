@@ -42,7 +42,7 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   const locale = (await headers()).get("x-site-locale") || "en";
-  const languageMap: Record<string, string> = { en: "en", es: "es", ru: "ru", ar: "ar", fr: "fr", pt: "pt-BR" };
+  const languageMap: Record<string, string> = { en: "en", es: "es", ru: "ru", ar: "ar", fr: "fr", pt: "pt-BR", "zh-CN": "zh-CN" };
   const organizationSchema = {
     "@context": "https://schema.org",
     "@type": "Organization",
@@ -52,7 +52,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
     email: company.email,
     telephone: company.phone,
     address: company.address,
-    sameAs: [company.facebookUrl],
+    sameAs: [company.facebookUrl, company.youtubeUrl],
   };
 
   const websiteSchema = {

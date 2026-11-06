@@ -1,12 +1,14 @@
 import { NextResponse } from "next/server";
-import { isAdminAuthenticated } from "@/lib/admin-auth";
+import { getCurrentAdmin } from "@/lib/admin-auth";
 import { getAdminData } from "@/lib/admin-data";
 
 type CsvRecord = Record<string, unknown>;
+const exportSections = { leads: "inquiries", products: "cmsProducts", news: "cmsNews", downloads: "cmsDownloads", events: "events" } as const;
+const exportRoles = { leads: ["sales"], products: ["product_manager"], news: ["content_manager"], downloads: ["content_manager", "product_manager"], events: ["analyst"] };
 
 function safeCell(value: unknown) {
   const raw = value == null ? "" : String(value);
-  const escaped = /^[=+\-@]/.test(raw) ? `'${raw}` : raw;
+  const escaped = /^(?:\s*[=+\-@]|[\t\r\n])/.test(raw) ? `'${raw}` : raw;
   return `"${escaped.replace(/"/g, '""')}"`;
 }
 
@@ -26,12 +28,16 @@ function flatten(value: unknown) {
 }
 
 export async function GET(request: Request) {
-  if (!(await isAdminAuthenticated())) {
+  const admin = await getCurrentAdmin();
+  if (!admin) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const type = new URL(request.url).searchParams.get("type") || "leads";
-  const data = await getAdminData();
+  if (!Object.hasOwn(exportSections, type)) return NextResponse.json({ error: "Unsupported export type" }, { status: 400 });
+  const key = type as keyof typeof exportSections;
+  if (admin.role !== "super_admin" && !exportRoles[key].includes(admin.role)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  const data = await getAdminData([exportSections[key]]);
   const rowsByType: Record<string, CsvRecord[]> = {
     leads: data.inquiries.map((item) => ({
       id: item.id,

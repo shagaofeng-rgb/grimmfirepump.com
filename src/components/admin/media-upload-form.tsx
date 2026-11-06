@@ -10,7 +10,7 @@ const maxFileSize = 15 * 1024 * 1024;
 function filename(name: string) {
   const extension = name.includes(".") ? `.${name.split(".").pop()}` : "";
   const base = name.slice(0, name.length - extension.length).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
-  return `${base || "media-image"}${extension.toLowerCase()}`;
+  return `${base.slice(0, 120) || "media-image"}${extension.toLowerCase()}`;
 }
 
 export function MediaUploadForm({ action }: { action: (formData: FormData) => void | Promise<void> }) {
@@ -39,7 +39,7 @@ export function MediaUploadForm({ action }: { action: (formData: FormData) => vo
   }
   return <form action={action} className="grid gap-4 rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
     <div><h2 className="text-xl font-black text-slate-950">上传媒体资源</h2><p className="mt-1 text-sm leading-6 text-slate-500">上传图片后自动填写文件地址；PDF、视频和其他资料可填写已托管的公开地址。</p></div>
-    <input ref={input} className="sr-only" type="file" accept="image/jpeg,image/png,image/webp,image/avif" onChange={(event) => void uploadFile(event.target.files?.[0])} />
+    <input ref={input} className="sr-only" type="file" aria-label="选择素材图片" accept="image/jpeg,image/png,image/webp,image/avif" onChange={(event) => void uploadFile(event.target.files?.[0])} />
     <div className="grid min-h-32 place-items-center rounded-md border-2 border-dashed border-slate-300 bg-slate-50 p-4 text-center"><div className="grid justify-items-center gap-2">{uploading ? <LoaderCircle className="animate-spin text-orange-600" size={28} /> : <UploadCloud className="text-orange-600" size={28} />}<p className="text-sm font-bold text-slate-700">选择需要上传的图片</p><button className="button button-secondary min-h-10" type="button" onClick={() => input.current?.click()} disabled={uploading}><ImagePlus size={16} />{uploading ? "正在上传" : "选择图片"}</button></div></div>
     {status ? <p className="text-sm font-bold text-slate-600" aria-live="polite">{status}</p> : null}
     <label className="grid gap-2 text-sm font-bold text-slate-700">文件名称<input name="name" required className="min-h-11 rounded-md border border-slate-300 px-3 font-normal" /></label>

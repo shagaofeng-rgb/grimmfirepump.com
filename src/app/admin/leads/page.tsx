@@ -5,7 +5,7 @@ import { DateRangeFilter } from "@/components/admin/date-range-filter";
 import { AdminPageHeader, EmptyState, StatusPill, inputClass } from "@/components/admin/admin-widgets";
 import { getAdminData, type InquiryRecord } from "@/lib/admin-data";
 import { getSiteSettings } from "@/lib/admin-cms";
-import { isWithinReportingDateRange, paginationPageSize, parsePositiveInt, resolveDateRange } from "@/lib/admin-listing";
+import { formatReportingTimestamp, isWithinReportingDateRange, paginationPageSize, parsePositiveInt, resolveDateRange } from "@/lib/admin-listing";
 import { paginate } from "@/lib/visitor-analytics";
 
 export const dynamic = "force-dynamic";
@@ -23,18 +23,16 @@ function matches(lead: InquiryRecord, query: string) {
   return [lead.name, lead.email, lead.company, lead.country, lead.product, lead.phone, lead.sourcePage, lead.owner].join(" ").toLowerCase().includes(value);
 }
 
-function stamp(value: string) {
-  return new Intl.DateTimeFormat("zh-CN", { dateStyle: "medium", timeStyle: "short" }).format(new Date(value));
-}
 
 export default async function LeadsPage({ searchParams }: PageProps) {
   const params = await searchParams;
   const settings = await getSiteSettings();
+  const stamp = (timestamp: string) => formatReportingTimestamp(timestamp, settings.timezone);
   const range = resolveDateRange(param(params, "range"), { from: param(params, "from"), to: param(params, "to"), timeZone: settings.timezone || "Asia/Shanghai" });
   const filters = { range: range.preset, query: param(params, "query"), source: param(params, "source") || "all", status: param(params, "status") || "all", intent: param(params, "intent") || "all", from: range.from, to: range.to };
   const page = parsePositiveInt(param(params, "page"));
   const pageSize = paginationPageSize(param(params, "pageSize"));
-  const { inquiries } = await getAdminData(["inquiries"]);
+  const { inquiries } = await getAdminData(["inquiries"], { ...range, timeZone: settings.timezone || "Asia/Shanghai" });
   const filtered = inquiries.filter((lead) => {
     if (!matches(lead, filters.query)) return false;
     if (filters.source !== "all" && lead.sourceType !== filters.source) return false;
@@ -51,10 +49,10 @@ export default async function LeadsPage({ searchParams }: PageProps) {
       <form className="grid gap-3 border-b border-slate-200 bg-slate-50 p-4 md:grid-cols-2 xl:grid-cols-4" method="get">
         <div className="xl:col-span-4"><DateRangeFilter pathname="/admin/leads" query={filters} preset={range.preset} from={range.from} to={range.to} /></div>
         <input name="query" defaultValue={filters.query} className={inputClass} placeholder="姓名、公司、邮箱、产品或负责人" />
-        <select name="source" defaultValue={filters.source} className={inputClass}><option value="all">全部来源</option>{sourceOptions.map((source) => <option key={source} value={source}>{source}</option>)}</select>
-        <select name="status" defaultValue={filters.status} className={inputClass}><option value="all">全部跟进状态</option>{["new", "pending", "contacted", "quoted", "following", "sample", "negotiating", "won", "lost", "spam", "invalid"].map((status) => <option key={status} value={status}>{status}</option>)}</select>
-        <select name="intent" defaultValue={filters.intent} className={inputClass}><option value="all">全部意向等级</option><option value="A">A 高意向</option><option value="B">B 中意向</option><option value="C">C 低意向</option><option value="unrated">未判断</option></select>
-        <select name="pageSize" defaultValue={String(paged.pageSize)} className={inputClass}><option value="20">20 条 / 页</option><option value="25">25 条 / 页</option><option value="50">50 条 / 页</option><option value="100">100 条 / 页</option></select>
+        <select name="source" aria-label="询盘来源" defaultValue={filters.source} className={inputClass}><option value="all">全部来源</option>{sourceOptions.map((source) => <option key={source} value={source}>{source}</option>)}</select>
+        <select name="status" aria-label="发布状态" defaultValue={filters.status} className={inputClass}><option value="all">全部跟进状态</option>{["new", "pending", "contacted", "quoted", "following", "sample", "negotiating", "won", "lost", "spam", "invalid"].map((status) => <option key={status} value={status}>{status}</option>)}</select>
+        <select name="intent" aria-label="意向等级" defaultValue={filters.intent} className={inputClass}><option value="all">全部意向等级</option><option value="A">A 高意向</option><option value="B">B 中意向</option><option value="C">C 低意向</option><option value="unrated">未判断</option></select>
+        <select name="pageSize" aria-label="每页条数" defaultValue={String(paged.pageSize)} className={inputClass}><option value="20">20 条 / 页</option><option value="25">25 条 / 页</option><option value="50">50 条 / 页</option><option value="100">100 条 / 页</option></select>
         <button className="button button-primary min-h-11" type="submit">应用筛选</button>
       </form>
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 px-5 py-3 text-sm text-slate-500"><span>显示 {paged.items.length} / {paged.total} 条线索</span><span>按提交时间从新到旧排列</span></div>

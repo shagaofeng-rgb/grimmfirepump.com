@@ -105,7 +105,7 @@ export default async function LogsPage({ searchParams }: Props) {
             <option value="success">成功</option>
             <option value="failed">失败</option>
           </select>
-          <select name="pageSize" defaultValue={String(pagination.pageSize)} className={inputClass}>
+          <select name="pageSize" aria-label="每页条数" defaultValue={String(pagination.pageSize)} className={inputClass}>
             <option value="20">20 条 / 页</option>
             <option value="25">25 条 / 页</option>
             <option value="50">50 条 / 页</option>

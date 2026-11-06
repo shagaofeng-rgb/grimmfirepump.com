@@ -13,7 +13,8 @@ export function AdminNavLink({ href, label, icon: Icon, mobile = false }: {
   const pathname = usePathname();
   const active = pathname === href || pathname.startsWith(`${href}/`);
 
-  return <Link href={href} aria-current={active ? "page" : undefined} className={mobile ? "admin-mobile-link" : "admin-nav-link"}>
+  return <Link href={href} prefetch={false} aria-current={active ? "page" : undefined} className={mobile ? "admin-mobile-link" : "admin-nav-link"}
+    onClick={mobile ? (event) => { event.currentTarget.closest("details")?.removeAttribute("open"); } : undefined}>
     {Icon}
     <span>{label}</span>
   </Link>;

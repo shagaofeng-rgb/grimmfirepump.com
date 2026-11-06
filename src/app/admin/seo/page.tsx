@@ -1,7 +1,8 @@
 import { AdminShell } from "@/components/admin/admin-shell";
 import { AdminPagination } from "@/components/admin/admin-pagination";
 import { AdminPageHeader, AdminCard, StatusPill } from "@/components/admin/admin-widgets";
-import { getSiteSettings, listCmsProducts, listCmsNews } from "@/lib/admin-cms";
+import { company } from "@/data/site";
+import { getPublicPosts, getPublicProducts } from "@/lib/public-cms";
 import { paginationPageSize, parsePositiveInt } from "@/lib/admin-listing";
 import { listSitemapRuns } from "@/lib/sitemap-service";
 import { paginate } from "@/lib/visitor-analytics";
@@ -17,11 +18,14 @@ function param(params: Record<string, string | string[] | undefined>, name: stri
 
 export default async function SeoPage({ searchParams }: PageProps) {
   const params = await searchParams;
-  const [settings, products, news, sitemapRuns] = await Promise.all([getSiteSettings(), listCmsProducts(), listCmsNews(), listSitemapRuns()]);
+  const [products, blog, sitemapRuns] = await Promise.all([getPublicProducts(), getPublicPosts(), listSitemapRuns()]);
   const sitemap = sitemapRuns[0];
+  const googleRun = sitemapRuns.find((run) => run.trigger === "cron" && run.searchConsole.attempted);
+  const lastGoogleSuccess = sitemapRuns.find((run) => run.trigger === "cron" && run.searchConsole.success);
+  const gaEnabled = Boolean(process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || process.env.NEXT_PUBLIC_GA_ID);
   const seoIssues = [
-    ...products.filter((item) => !item.seoTitle || item.seoDescription.length < 70).map((item) => ({ type: "Product", title: item.title, issue: "SEO 标题或描述不足" })),
-    ...news.filter((item) => !item.seoTitle || item.seoDescription.length < 70).map((item) => ({ type: "News", title: item.title, issue: "SEO 标题或描述不足" })),
+    ...products.filter((item) => item.indexable && !item.summary.trim()).map((item) => ({ type: "产品", title: item.title, issue: "缺少产品简介" })),
+    ...blog.filter((item) => item.indexable && !item.content.length).map((item) => ({ type: "博客", title: item.title, issue: "缺少文章正文" })),
   ];
   const pageSize = paginationPageSize(param(params, "pageSize"));
   const pagedIssues = paginate(seoIssues, parsePositiveInt(param(params, "page")), pageSize);
@@ -31,12 +35,9 @@ export default async function SeoPage({ searchParams }: PageProps) {
       <div className="mt-8 grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
         <AdminCard title="网站级 SEO 设置">
           <div className="grid gap-3 text-sm text-slate-600">
-            <p><strong>Canonical 域名：</strong>{settings.website}</p>
-            <p className="flex items-center justify-between gap-4"><strong>GA4</strong><StatusPill value={settings.ga4Id ? "configured" : "not_configured"} /></p>
-            <p className="flex items-center justify-between gap-4"><strong>GTM</strong><StatusPill value={settings.gtmId ? "configured" : "not_configured"} /></p>
-            <p className="flex items-center justify-between gap-4"><strong>Meta Pixel</strong><StatusPill value={settings.metaPixelId ? "configured" : "not_configured"} /></p>
-            <p className="flex items-center justify-between gap-4"><strong>Google 验证</strong><StatusPill value={settings.googleVerification ? "configured" : "not_configured"} /></p>
-            <p className="flex items-center justify-between gap-4"><strong>Bing 验证</strong><StatusPill value={settings.bingVerification ? "configured" : "not_configured"} /></p>
+            <p><strong>规范域名：</strong>{company.website}</p>
+            <p className="flex items-center justify-between gap-4"><strong>GA4</strong><StatusPill value={gaEnabled ? "configured" : "not_configured"} /></p>
+            <p className="flex items-center justify-between gap-4"><strong>Google 验证标签</strong><StatusPill value={process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION ? "configured" : "not_configured"} /></p>
           </div>
         </AdminCard>
         <AdminCard title="SEO 异常提醒">
@@ -53,14 +54,16 @@ export default async function SeoPage({ searchParams }: PageProps) {
             <p className="flex items-center justify-between gap-4"><strong>公开入口</strong><a className="font-bold text-blue-700 underline" href="/sitemap.xml" target="_blank">/sitemap.xml</a></p>
             <p className="flex items-center justify-between gap-4"><strong>最近状态</strong><StatusPill value={sitemap?.status || "not_run"} /></p>
             <p><strong>最近执行：</strong>{sitemap?.finishedAt ? new Date(sitemap.finishedAt).toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" }) : "尚无执行记录"}</p>
-            <p><strong>已收录 URL：</strong>{sitemap?.success ?? 0}，跳过 {sitemap?.skipped ?? 0}，错误 {sitemap?.errors.length ?? 0}</p>
+            <p><strong>地图中的网址：</strong>{sitemap?.success ?? 0}，跳过 {sitemap?.skipped ?? 0}，错误 {sitemap?.errors.length ?? 0}</p>
             <p><strong>内容差异：</strong>新增 {sitemap?.added.length ?? 0}，修改 {sitemap?.modified.length ?? 0}，删除 {sitemap?.removed.length ?? 0}</p>
           </div>
         </AdminCard>
         <AdminCard title="Google Search Console 提交">
           <div className="grid gap-3 text-sm text-slate-600">
-            <p className="flex items-center justify-between gap-4"><strong>最近提交</strong><StatusPill value={sitemap?.searchConsole.status || "not_configured"} /></p>
-            <p>{sitemap?.searchConsole.message || "管理员完成搜索服务授权后即可启用。"}</p>
+            <p><strong>计划：</strong>每周一 11:00（北京时间）</p>
+            <p className="flex items-center justify-between gap-4"><strong>最近提交结果</strong><StatusPill value={googleRun?.searchConsole.status || "not_run"} /></p>
+            <p><strong>最近成功：</strong>{lastGoogleSuccess ? new Date(lastGoogleSuccess.finishedAt).toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" }) : "暂无成功记录"}</p>
+            {googleRun?.searchConsole.httpStatus && <p><strong>Google 响应：</strong>HTTP {googleRun.searchConsole.httpStatus}</p>}
             <p className="text-xs leading-6 text-slate-500">提交成功只表示 Google 已接收 Sitemap，不代表页面已经抓取或收录。最终状态以 Search Console 为准。</p>
           </div>
         </AdminCard>

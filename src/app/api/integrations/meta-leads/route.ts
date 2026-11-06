@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createHash, createHmac, timingSafeEqual } from "node:crypto";
-import { appendStore } from "@/lib/local-store";
+import { insertStoreItem } from "@/lib/local-store";
 import { scoreLead } from "@/lib/lead-scoring";
 
 type MetaField = {
@@ -98,7 +98,7 @@ export async function POST(request: Request) {
     createdAt: now,
     payload,
   };
-  await appendStore("facebook-leads.json", rawRecord);
+  await insertStoreItem("facebook-leads.json", rawRecord);
 
   const changes = payload.entry?.flatMap((entry) => entry.changes || []) || [];
   const created = [];
@@ -134,8 +134,7 @@ export async function POST(request: Request) {
       rawFields: fields,
       ...leadInput,
     };
-    await appendStore("inquiries.json", lead);
-    created.push(lead.id);
+    if (await insertStoreItem("inquiries.json", lead)) created.push(lead.id);
   }
 
   return NextResponse.json({ ok: true, stored: rawRecord.id, createdLeads: created.length });

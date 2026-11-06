@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { isAdminAuthenticated } from "@/lib/admin-auth";
-import { appendStore, createId, readStore } from "@/lib/local-store";
+import { getCurrentAdmin } from "@/lib/admin-auth";
+import { insertStoreItem, readStore, readStoreItem, submissionId } from "@/lib/local-store";
 import { checkRequestRateLimit } from "@/lib/request-rate-limit";
 import { listDownloadAssets } from "@/lib/admin-cms";
 
@@ -13,21 +13,21 @@ const downloadLeadSchema = z.object({
   company: z.string().trim().max(180).optional().default(""),
   sourcePage: z.string().trim().max(500).optional().default("/downloads"),
   website: z.string().trim().max(500).optional().default(""),
+  submissionToken: z.string().uuid().optional(),
+  visitorId: z.string().max(120).optional().default(""),
+  sessionId: z.string().max(120).optional().default(""),
 });
 
 export async function GET() {
-  if (!(await isAdminAuthenticated())) {
+  const admin = await getCurrentAdmin();
+  if (!admin || !["super_admin", "sales"].includes(admin.role)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   const leads = await readStore("download-leads.json", []);
-  return NextResponse.json({ leads });
+  return NextResponse.json({ leads }, { headers: { "Cache-Control": "private, no-store" } });
 }
 
 export async function POST(request: Request) {
-  const rate = await checkRequestRateLimit(request, "download", { limit: 12, windowMs: 60 * 60 * 1000 });
-  if (!rate.allowed) {
-    return NextResponse.json({ error: "Too many requests" }, { status: 429, headers: { "Retry-After": String(rate.retryAfterSeconds) } });
-  }
   const body = await request.json().catch(() => null);
   const parsed = downloadLeadSchema.safeParse(body);
   if (!parsed.success) {
@@ -43,14 +43,24 @@ export async function POST(request: Request) {
   if (!asset || !uniqueAsset || !asset.gated || !(asset.fileUrl.startsWith("/") && !asset.fileUrl.startsWith("//") || asset.fileUrl.startsWith("https://"))) {
     return NextResponse.json({ error: "Document unavailable" }, { status: 404 });
   }
+  const { submissionToken, website: _honeypot, ...data } = parsed.data;
+  const id = submissionId("dl", submissionToken, `${asset.id}:${data.email.toLowerCase()}`);
+  const headers = { "Cache-Control": "no-store" };
+  if (submissionToken && await readStoreItem("download-leads.json", id)) {
+    return NextResponse.json({ ok: true, id, file: asset.fileUrl, duplicate: true }, { headers });
+  }
+  const rate = await checkRequestRateLimit(request, "download", { limit: 12, windowMs: 60 * 60 * 1000 });
+  if (!rate.allowed) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429, headers: { "Retry-After": String(rate.retryAfterSeconds) } });
+  }
 
   const lead = {
-    id: createId("dl"),
+    id,
     createdAt: new Date().toISOString(),
-    ...parsed.data,
+    ...data,
     assetTitle: asset.title,
   };
 
-  await appendStore("download-leads.json", lead);
-  return NextResponse.json({ ok: true, id: lead.id, file: asset.fileUrl }, { headers: { "Cache-Control": "no-store" } });
+  const inserted = await insertStoreItem("download-leads.json", lead);
+  return NextResponse.json({ ok: true, id, file: asset.fileUrl, ...(!inserted ? { duplicate: true } : {}) }, { headers });
 }

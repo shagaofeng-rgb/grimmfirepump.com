@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { isAdminAuthenticated } from "@/lib/admin-auth";
+import { getCurrentAdmin } from "@/lib/admin-auth";
 import type { WhatsAppClickRecord } from "@/lib/admin-data";
-import { appendStore, createId, readStore } from "@/lib/local-store";
+import { insertStoreItem, readStore, readStoreItem, readStoreRange, submissionId } from "@/lib/local-store";
 import { scoreLead } from "@/lib/lead-scoring";
 import { checkRequestRateLimit } from "@/lib/request-rate-limit";
+import { externalReferrer, trafficChannel } from "@/lib/traffic-context";
 
 const inquirySchema = z.object({
   name: z.string().trim().min(2).max(120),
@@ -39,21 +40,19 @@ const inquirySchema = z.object({
   sessionId: z.string().trim().max(120).optional().default(""),
   visitNumber: z.coerce.number().int().min(1).max(100000).optional().default(1),
   website: z.string().trim().max(500).optional().default(""),
+  submissionToken: z.string().uuid().optional(),
 });
 
 export async function GET() {
-  if (!(await isAdminAuthenticated())) {
+  const admin = await getCurrentAdmin();
+  if (!admin || !["super_admin", "sales"].includes(admin.role)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   const inquiries = await readStore("inquiries.json", []);
-  return NextResponse.json({ inquiries });
+  return NextResponse.json({ inquiries }, { headers: { "Cache-Control": "private, no-store" } });
 }
 
 export async function POST(request: Request) {
-  const rate = await checkRequestRateLimit(request, "inquiry", { limit: 6, windowMs: 60 * 60 * 1000 });
-  if (!rate.allowed) {
-    return NextResponse.json({ error: "Too many requests" }, { status: 429, headers: { "Retry-After": String(rate.retryAfterSeconds) } });
-  }
   const body = await request.json().catch(() => null);
   const parsed = inquirySchema.safeParse(body);
   if (!parsed.success) {
@@ -62,23 +61,39 @@ export async function POST(request: Request) {
   if (parsed.data.website) {
     return NextResponse.json({ ok: true });
   }
+  const { submissionToken, website: _honeypot, ...data } = parsed.data;
+  const id = submissionId("inq", submissionToken, data.email.toLowerCase());
+  const headers = { "Cache-Control": "no-store" };
+  if (submissionToken && await readStoreItem("inquiries.json", id)) {
+    return NextResponse.json({ ok: true, id, duplicate: true }, { headers });
+  }
+  const rate = await checkRequestRateLimit(request, "inquiry", { limit: 6, windowMs: 60 * 60 * 1000 });
+  if (!rate.allowed) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429, headers: { "Retry-After": String(rate.retryAfterSeconds) } });
+  }
 
-  const scoring = scoreLead(parsed.data);
-  const whatsappClicks = await readStore<WhatsAppClickRecord[]>("whatsapp-clicks.json", []);
+  const scoring = scoreLead(data);
+  const attributionMatch = data.visitorId ? { field: "visitorId", value: data.visitorId } : data.sessionId ? { field: "sessionId", value: data.sessionId } : undefined;
+  const whatsappClicks = attributionMatch ? await readStoreRange<WhatsAppClickRecord>("whatsapp-clicks.json", { match: attributionMatch }) : [];
   const submittedAt = new Date().toISOString();
   const whatsappAttribution = whatsappClicks
-    .filter((click) => click.trafficType === "real" && Date.parse(click.createdAt) <= Date.parse(submittedAt))
-    .filter((click) => (parsed.data.sessionId && click.sessionId === parsed.data.sessionId) || (parsed.data.visitorId && click.visitorId === parsed.data.visitorId))
+    .filter((click) => {
+      const age = Date.parse(submittedAt) - Date.parse(click.createdAt);
+      return click.trafficType === "real" && age >= 0 && age <= 30 * 86400000;
+    })
+    .filter((click) => (data.sessionId && click.sessionId === data.sessionId) || (data.visitorId && click.visitorId === data.visitorId))
     .sort((left, right) => Date.parse(right.createdAt) - Date.parse(left.createdAt))[0];
   const inquiry = {
-    id: createId("inq"),
+    id,
     createdAt: submittedAt,
     stage: scoring.status,
     status: "new",
     intent: scoring.score >= 70 ? "A" : scoring.score >= 45 ? "B" : "C",
     score: scoring.score,
     userAgent: request.headers.get("user-agent") || "",
-    ...parsed.data,
+    ...data,
+    referrer: externalReferrer(data.referrer),
+    channel: data.visitorId || data.referrer || data.utmSource ? trafficChannel(data) : "",
     ...(whatsappAttribution ? {
       whatsappClickId: whatsappAttribution.id,
       whatsappAccountId: whatsappAttribution.accountId,
@@ -89,6 +104,6 @@ export async function POST(request: Request) {
     } : {}),
   };
 
-  await appendStore("inquiries.json", inquiry);
-  return NextResponse.json({ ok: true, id: inquiry.id }, { headers: { "Cache-Control": "no-store" } });
+  const inserted = await insertStoreItem("inquiries.json", inquiry);
+  return NextResponse.json({ ok: true, id, ...(!inserted ? { duplicate: true } : {}) }, { headers });
 }

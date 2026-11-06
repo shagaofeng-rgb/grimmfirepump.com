@@ -62,7 +62,7 @@ export function ProductGallery({ images, title, model }: { images: ImageItem[]; 
               <Image src={interiorProductPhoto(image.src)} alt="" fill sizes="60px" />
             </button>
           ))}
-          <button type="button" className="interior-thumb-count" onClick={openImage} aria-label={`View all ${images.length} product photos`}>{images.length} photos</button>
+          <button type="button" className="interior-thumb-count" onClick={openImage} aria-label={`View all ${images.length} photos`}>{images.length} photos</button>
         </div>
       )}
       <ImageDialog title={title} dialogRef={dialog} image={open ? { ...current, src: interiorProductPhoto(current.src) } : undefined} onClose={() => setOpen(false)}>

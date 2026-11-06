@@ -2,6 +2,7 @@ import Link from "next/link";
 import { deleteCategory, saveCategory } from "@/app/admin/actions";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { AdminPagination } from "@/components/admin/admin-pagination";
+import { EditorForm } from "@/components/admin/editor-form";
 import { AdminPageHeader, EmptyState, Field, StatusPill, inputClass, textareaClass } from "@/components/admin/admin-widgets";
 import { listCmsProducts, listProductCategories } from "@/lib/admin-cms";
 import { paginationPageSize, parsePositiveInt } from "@/lib/admin-listing";
@@ -32,9 +33,10 @@ export default async function ProductCategoriesPage({ searchParams }: Props) {
   return (
     <AdminShell>
       <AdminPageHeader eyebrow="内容管理" title="产品分类" description="维护分类层级、排序、展示状态和搜索信息。" />
+      {value(params, "saved") === "1" && <p role="status" className="mt-4 text-sm font-semibold text-emerald-800">分类已保存。</p>}
       {value(params, "error") === "category-in-use" ? <p className="mt-5 rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">此分类仍有关联产品，请先调整产品分类。</p> : null}
-      <div className="mt-8 grid gap-6 xl:grid-cols-[360px_minmax(0,1fr)]">
-        <form action={saveCategory} className="grid content-start gap-4 rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+      <div className="mt-8 grid grid-cols-1 gap-6 xl:grid-cols-[360px_minmax(0,1fr)]">
+        <EditorForm action={saveCategory} className="grid content-start gap-4 rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
           <div className="flex items-center justify-between gap-3">
             <h2 className="text-xl font-black text-slate-950">{editing ? "编辑分类" : "新增分类"}</h2>
             {editing ? <Link className="text-sm font-bold text-[var(--navy-800)]" href="/admin/product-categories">取消</Link> : null}
@@ -57,12 +59,12 @@ export default async function ProductCategoriesPage({ searchParams }: Props) {
           <label className="flex items-center gap-2 text-sm font-bold text-slate-700"><input name="enabled" type="checkbox" defaultChecked={editing?.enabled ?? true} /> 启用分类</label>
           <label className="flex items-center gap-2 text-sm font-bold text-slate-700"><input name="indexable" type="checkbox" defaultChecked={editing?.indexable ?? true} /> 允许收录</label>
           <button className="button button-primary" type="submit">{editing ? "更新分类" : "保存分类"}</button>
-        </form>
+        </EditorForm>
 
         <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-          <form className="flex gap-3 border-b border-slate-200 bg-slate-50 p-4" method="get">
-            <input name="query" defaultValue={query} className={inputClass} placeholder="搜索分类名称或路径" />
-            <select name="pageSize" defaultValue={String(paged.pageSize)} className={inputClass}>
+          <form className="grid gap-3 border-b border-slate-200 bg-slate-50 p-4 sm:grid-cols-[minmax(0,1fr)_auto_auto]" method="get">
+            <input name="query" aria-label="搜索分类" defaultValue={query} className={inputClass} placeholder="搜索分类名称或路径" />
+            <select name="pageSize" aria-label="每页条数" defaultValue={String(paged.pageSize)} className={inputClass}>
               {[20, 25, 50, 100].map((size) => <option key={size} value={size}>{size} 条 / 页</option>)}
             </select>
             <button className="button button-primary min-h-11" type="submit">筛选</button>

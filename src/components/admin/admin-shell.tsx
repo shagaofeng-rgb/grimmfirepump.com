@@ -24,7 +24,7 @@ import {
 import { AdminNavLink } from "@/components/admin/admin-nav-link";
 import { company } from "@/data/site";
 import { getCurrentAdmin, type AdminRole } from "@/lib/admin-auth";
-import { getAdminData } from "@/lib/admin-data";
+import { countPendingInquiries } from "@/lib/local-store";
 
 const allRoles: AdminRole[] = ["super_admin", "content_manager", "product_manager", "sales", "analyst"];
 const adminNav: Array<{ label: string; href: string; icon: typeof LayoutDashboard; roles: AdminRole[]; group: string }> = [
@@ -59,9 +59,10 @@ function roleName(role?: string) {
 }
 
 export async function AdminShell({ children }: { children: ReactNode }) {
-  const [admin, data] = await Promise.all([getCurrentAdmin(), getAdminData()]);
+  const admin = await getCurrentAdmin();
   const visibleNav = adminNav.filter((item) => admin && item.roles.includes(admin.role));
-  const pendingLeads = data.inquiries.filter((item) => ["new", "pending"].includes(item.status || item.stage || "new")).length;
+  const canReadLeads = admin?.role === "super_admin" || admin?.role === "sales";
+  const pendingLeads = canReadLeads ? await countPendingInquiries() : null;
   const groups = [...new Set(visibleNav.map((item) => item.group))];
 
   return (
@@ -97,7 +98,7 @@ export async function AdminShell({ children }: { children: ReactNode }) {
               <div className="min-w-0"><p className="text-sm font-bold text-slate-900">GRIMM PUMP</p><p className="text-xs text-slate-500">{admin?.displayName || "管理账号"} · {roleName(admin?.role)}</p></div>
             </div>
             <div className="flex min-w-0 items-center justify-end gap-2 sm:gap-3">
-              {admin && ["super_admin", "sales"].includes(admin.role) ? <Link href="/admin/leads" className="admin-pending-link">
+              {canReadLeads ? <Link href="/admin/leads" className="admin-pending-link">
                 <Inbox size={15} strokeWidth={1.8} />待跟进 <strong>{pendingLeads}</strong>
               </Link> : null}
               <Link href="/" className="admin-site-link" target="_blank" rel="noopener noreferrer" aria-label="查看网站" title="查看网站">

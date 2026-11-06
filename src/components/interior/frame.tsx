@@ -65,7 +65,7 @@ async function InteriorHeader({ path, productMenu, locale }: { path: string; pro
           <span className="interior-utility-name">GRIMM WATER TREATMENT</span>
           <div className="interior-utility-links">
             <a className="interior-sales" href={`mailto:${company.email}`}><Mail size={14} /> {copy?.labels.contactSales || "Engineering sales"}</a>
-            <InteriorDisclosure className="interior-language" label={ui.language} icon={<><Globe2 size={15} /> {locale.toUpperCase()}</>}>
+            <InteriorDisclosure className="interior-language" label={`${ui.language}: ${locale.toUpperCase()}`} icon={<><Globe2 size={15} /> {locale.toUpperCase()}</>}>
               <nav className="interior-dropdown" aria-label="Languages">
                 {languages.map(([label, language, code]) => (
                   <Link key={language} href={languageTarget(path, language)} prefetch={false} hrefLang={language} lang={language} aria-current={locale === language ? "true" : undefined}>{label}<small>{code}</small></Link>
@@ -76,7 +76,7 @@ async function InteriorHeader({ path, productMenu, locale }: { path: string; pro
         </div>
       </div>
       <div className="interior-header-bar interior-shell">
-        <Link href={localizedPath("/", locale)} className="interior-brand" aria-label="GRIMM PUMP" prefetch={false}>
+        <Link href={localizedPath("/", locale)} className="interior-brand" prefetch={false}>
           <Image src="/assets/images/logo.png" alt="" width={38} height={38} />
           <span><strong>{company.shortName}</strong><small>Fire Pump Systems</small></span>
         </Link>

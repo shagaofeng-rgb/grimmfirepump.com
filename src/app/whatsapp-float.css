@@ -1,3 +1,7 @@
+.home-editorial :is(.home-primary-button, .home-certifications-copy > a, .home-final-cta a:first-child) { background: var(--orange-button); }
+.home-editorial :is(.home-primary-button, .home-certifications-copy > a, .home-final-cta a:first-child):hover { background: var(--orange-ink); }
+.home-editorial :is(.home-section-heading > div > p, .home-section-heading > a, .home-system-card > div > span, .home-certifications-copy > p, .home-final-cta p) { color: var(--orange-ink); }
+
 .whatsapp-float {
   position: fixed;
   z-index: 60;
@@ -8,7 +12,7 @@
   height: 58px;
   place-items: center;
   color: #fff;
-  background: #25d366;
+  background: #08783f;
   border: 2px solid rgba(255, 255, 255, .94);
   border-radius: 50%;
   box-shadow: 0 13px 30px rgba(8, 45, 33, .28);
@@ -36,32 +40,44 @@
 
 .whatsapp-float:hover {
   color: #fff;
-  background: #1fbd5c;
+  background: #076635;
   box-shadow: 0 17px 36px rgba(8, 45, 33, .34);
   transform: translateY(-50%) scale(1.06);
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .whatsapp-float { animation: whatsapp-float-glow 2.8s ease-in-out infinite, whatsapp-float-lift 2.8s ease-in-out infinite; }
-  .whatsapp-float::before { animation: whatsapp-float-ring 2.8s ease-out infinite; }
-  .whatsapp-float svg { animation: whatsapp-float-icon 2.8s ease-in-out infinite; }
+@media (max-width: 640px) {
+  .home-editorial .home-hero-copy { padding: 32px 20px 24px; }
+  .home-editorial .home-hero-copy h1 { font-size: 40px; line-height: 1.02; letter-spacing: 0; overflow-wrap: anywhere; }
+  .home-editorial .whatsapp-float { right: 8px; width: 44px; height: 44px; }
+  .home-editorial .whatsapp-float svg { width: 24px; height: 24px; }
+  .home-editorial .home-hero-actions {
+    align-items: flex-start;
+    flex-direction: column;
+    width: min(100%, calc(100vw - 80px));
+  }
+  .home-editorial .home-hero-actions a { min-height: 44px; font-size: 13px; }
+  .home-editorial .home-hero-actions .home-primary-button { display: flex; align-items: center; justify-content: center; gap: 9px; }
+  .home-editorial .home-hero-actions .home-secondary-link { display: inline-flex; }
+}
+@media (max-width: 380px) {
+  .home-editorial .home-hero-copy h1 { font-size: 36px; }
 }
 
-@keyframes whatsapp-float-glow {
-  0%, 100% { box-shadow: 0 13px 30px rgba(8, 45, 33, .28); }
-  50% { box-shadow: 0 13px 35px rgba(37, 211, 102, .58), 0 0 0 7px rgba(37, 211, 102, .11); }
+@media (prefers-reduced-motion: no-preference) {
+  .whatsapp-float::before { animation: whatsapp-float-ring 2.4s ease-out 2; }
+  .whatsapp-float svg { animation: whatsapp-float-icon 2.4s ease-in-out 2; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .whatsapp-float,
+  .home-editorial .home-system-card,
+  .home-editorial .home-certificate-card { transition: none; }
 }
 
 @keyframes whatsapp-float-ring {
   0%, 35% { opacity: 0; transform: scale(.88); }
   42% { opacity: .7; }
   78%, 100% { opacity: 0; transform: scale(1.32); }
-}
-
-@keyframes whatsapp-float-lift {
-  0%, 100% { margin-top: 0; }
-  48% { margin-top: -4px; }
-  58% { margin-top: 0; }
 }
 
 @keyframes whatsapp-float-icon {

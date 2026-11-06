@@ -1,4 +1,4 @@
-import { readStore } from "@/lib/local-store";
+import { readStore, readStoreRange } from "@/lib/local-store";
 import {
   listAdminUsers,
   listAuditLogs,
@@ -126,13 +126,14 @@ export type AnalyticsEventRecord = {
 
 type AdminDataSection = "inquiries" | "downloadLeads" | "events" | "whatsappClicks" | "cmsProducts" | "cmsNews" | "categories" | "media" | "cmsDownloads" | "pages" | "users" | "auditLogs";
 
-export async function getAdminData(selected?: AdminDataSection[]) {
+export async function getAdminData(selected?: AdminDataSection[], range?: { from: string; to: string; timeZone: string }) {
   const wants = (section: AdminDataSection) => !selected || selected.includes(section);
+  const read = <T extends { createdAt: string }>(file: string) => range ? readStoreRange<T>(file, range) : readStore<T[]>(file, []);
   const [inquiries, downloadLeads, events, whatsappClicks, cmsProducts, cmsNews, categories, media, cmsDownloads, pages, users, auditLogs] = await Promise.all([
-    wants("inquiries") ? readStore<InquiryRecord[]>("inquiries.json", []) : [],
-    wants("downloadLeads") ? readStore<DownloadLeadRecord[]>("download-leads.json", []) : [],
-    wants("events") ? readStore<AnalyticsEventRecord[]>("analytics-events.json", []) : [],
-    wants("whatsappClicks") ? readStore<WhatsAppClickRecord[]>("whatsapp-clicks.json", []) : [],
+    wants("inquiries") ? read<InquiryRecord>("inquiries.json") : [],
+    wants("downloadLeads") ? read<DownloadLeadRecord>("download-leads.json") : [],
+    wants("events") ? read<AnalyticsEventRecord>("analytics-events.json") : [],
+    wants("whatsappClicks") ? read<WhatsAppClickRecord>("whatsapp-clicks.json") : [],
     wants("cmsProducts") ? listCmsProducts() : [],
     wants("cmsNews") ? listCmsNews() : [],
     wants("categories") ? listProductCategories() : [],

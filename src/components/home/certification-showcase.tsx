@@ -3,60 +3,15 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useRef, useState } from "react";
+import { certificatePreviews } from "@/data/certificate-previews";
 
-const certificates = [
-  {
-    src: "/assets/certificates/public/fire-pump-emc-attestation.jpg",
-    title: "Machinery & EMC Attestation",
-    redactions: [
-      { left: "37%", top: "53%", width: "30%", height: "5%" },
-      { left: "37%", top: "74%", width: "22%", height: "11%" },
-    ],
-  },
-  {
-    src: "/assets/certificates/home/iso-45001-ohs.png",
-    title: "ISO 45001 Occupational Health & Safety",
-    redactions: [{ left: "30%", top: "65%", width: "18%", height: "10%" }],
-  },
-  {
-    src: "/assets/certificates/home/iso-9001-quality.png",
-    title: "ISO 9001 Quality Management",
-    redactions: [{ left: "30%", top: "65%", width: "18%", height: "10%" }],
-  },
-  {
-    src: "/assets/certificates/home/iso-14001-environmental.png",
-    title: "ISO 14001 Environmental Management",
-    redactions: [{ left: "30%", top: "65%", width: "18%", height: "10%" }],
-  },
-];
-
-function CertificatePreview({ certificate, sizes, priority = false }: { certificate: typeof certificates[number]; sizes: string; priority?: boolean }) {
-  return (
-    <>
-      <Image src={certificate.src} alt={certificate.title} fill className="object-contain" sizes={sizes} priority={priority} quality={60} />
-      {certificate.redactions.map((area, index) => (
-        <span
-          key={`${certificate.title}-${index}`}
-          aria-hidden="true"
-          className="certificate-date-redaction"
-          style={area}
-        />
-      ))}
-    </>
-  );
-}
+const certificates = ["Machinery & EMC", "ISO 45001", "ISO 9001", "ISO 14001"].flatMap((label) =>
+  certificatePreviews.filter((certificate) => certificate.label === label));
 
 export function CertificationShowcase() {
   const [selected, setSelected] = useState<number | null>(null);
-
-  useEffect(() => {
-    const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setSelected(null);
-    };
-    window.addEventListener("keydown", closeOnEscape);
-    return () => window.removeEventListener("keydown", closeOnEscape);
-  }, []);
+  const dialog = useRef<HTMLDialogElement>(null);
 
   return (
     <section className="home-certifications" id="certifications" aria-labelledby="certifications-title">
@@ -65,26 +20,22 @@ export function CertificationShowcase() {
           <p>OUR COMMITMENT TO QUALITY</p>
           <h2 id="certifications-title">Compliance &amp;<br />Certifications</h2>
           <h3>Verified documentation<br />for project confidence.</h3>
-          <span>Our products are manufactured under strict quality, environmental and management systems. GRIMM PUMP holds internationally recognized certifications, ensuring our fire pump systems meet global standards and customer requirements.</span>
+          <span>Review our ISO management system certificates and machinery and EMC attestation. Confirm the applicable document and scope for your specified model before procurement.</span>
           <Link href="/certificates">View all certificates <ArrowRight size={17} /></Link>
         </div>
         <div className="home-certificate-stage" aria-label="Certificate previews">
           {certificates.map((certificate, index) => (
-            <button key={certificate.title} type="button" className={`home-certificate-card home-certificate-card-${index}`} onClick={() => setSelected(index)} aria-label={`Open ${certificate.title}`}>
-              <CertificatePreview certificate={certificate} sizes="(min-width: 1100px) 16vw, 38vw" />
+            <button key={certificate.title} type="button" className={`home-certificate-card home-certificate-card-${index}`} onClick={() => { setSelected(index); dialog.current?.showModal(); }} aria-label={`Open ${certificate.title}`}>
+              <Image src={certificate.src} alt={certificate.title} fill className="object-contain" sizes="(min-width: 1100px) 16vw, 24vw" />
             </button>
           ))}
           <p>GLOBAL STANDARDS. A STRONGER TOMORROW.</p>
         </div>
       </div>
-      {selected !== null ? (
-        <div className="home-certificate-dialog-backdrop" role="presentation" onMouseDown={() => setSelected(null)}>
-          <div className="home-certificate-dialog" role="dialog" aria-modal="true" aria-label={certificates[selected].title} onMouseDown={(event) => event.stopPropagation()}>
-            <button type="button" onClick={() => setSelected(null)} aria-label="Close certificate preview"><X size={22} /></button>
-            <CertificatePreview certificate={certificates[selected]} sizes="90vw" priority />
-          </div>
-        </div>
-      ) : null}
+      <dialog ref={dialog} className="home-certificate-dialog" aria-label={selected === null ? "Certificate preview" : certificates[selected].title} onClose={() => setSelected(null)}>
+        <button type="button" onClick={() => dialog.current?.close()} aria-label="Close certificate preview" autoFocus><X size={22} /></button>
+        {selected !== null && <Image src={certificates[selected].src} alt={certificates[selected].title} fill className="object-contain" sizes="(max-width: 768px) 90vw, 690px" loading="eager" />}
+      </dialog>
     </section>
   );
 }

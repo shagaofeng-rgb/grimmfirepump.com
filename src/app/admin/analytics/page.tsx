@@ -7,7 +7,7 @@ import { DateRangeFilter } from "@/components/admin/date-range-filter";
 import { AdminCard, AdminPageHeader, EmptyState, StatCard } from "@/components/admin/admin-widgets";
 import { getAdminData } from "@/lib/admin-data";
 import { getSiteSettings } from "@/lib/admin-cms";
-import { paginationPageSize, parsePositiveInt, resolveDateRange } from "@/lib/admin-listing";
+import { formatReportingTimestamp, paginationPageSize, parsePositiveInt, resolveDateRange } from "@/lib/admin-listing";
 import { filterAnalyticsEvents, getAnalyticsSummary, getVisitorProfiles, paginate, type AnalyticsFilters } from "@/lib/visitor-analytics";
 
 export const dynamic = "force-dynamic";
@@ -19,9 +19,6 @@ function param(params: Record<string, string | string[] | undefined>, name: stri
   return Array.isArray(value) ? value[0] || "" : value || "";
 }
 
-function formatDate(value: string) {
-  return new Intl.DateTimeFormat("zh-CN", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }).format(new Date(value));
-}
 
 function MiniList({ items, empty }: { items: Array<[string, number]>; empty: string }) {
   if (!items.length) return <EmptyState text={empty} />;
@@ -32,6 +29,7 @@ function MiniList({ items, empty }: { items: Array<[string, number]>; empty: str
 export default async function AdminAnalyticsPage({ searchParams }: PageProps) {
   const params = await searchParams;
   const settings = await getSiteSettings();
+  const formatDate = (timestamp: string) => formatReportingTimestamp(timestamp, settings.timezone);
   const range = resolveDateRange(param(params, "range"), {
     from: param(params, "from"),
     to: param(params, "to"),
@@ -49,7 +47,7 @@ export default async function AdminAnalyticsPage({ searchParams }: PageProps) {
   const page = parsePositiveInt(param(params, "page"));
   const visitorPage = parsePositiveInt(param(params, "visitorPage"));
   const pageSize = paginationPageSize(param(params, "pageSize"));
-  const { events } = await getAdminData(["events"]);
+  const { events } = await getAdminData(["events"], { ...range, timeZone: filters.timeZone || "Asia/Shanghai" });
   const summary = getAnalyticsSummary(events, filters);
   const visibleEvents = filterAnalyticsEvents(events, filters).sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt));
   const profiles = getVisitorProfiles(events, filters);
@@ -61,14 +59,14 @@ export default async function AdminAnalyticsPage({ searchParams }: PageProps) {
 
   return (
     <AdminShell>
-      <AdminPageHeader eyebrow="数据概览" title="访问与转化数据" action={<AnalyticsRefresh />} />
+      <AdminPageHeader eyebrow="数据概览" title="访问与转化数据" description="本站第一方统计 · 仅含同意统计的访客" action={<AnalyticsRefresh />} />
 
       <section className="admin-filter-band mt-8 rounded-md border border-slate-200 bg-white p-5 md:p-6">
         <div className="flex flex-col gap-2 xl:flex-row xl:items-center xl:justify-between"><h2 className="flex items-center gap-2 text-base font-bold text-slate-800"><Activity size={18} className="text-[#b64d29]" />访问表现</h2><span className="text-sm text-slate-500">当前范围 <strong className="ml-1 text-slate-800">{range.label}</strong></span></div>
         <form className="mt-6 grid gap-3 xl:grid-cols-[1.3fr_repeat(4,minmax(0,1fr))]" method="get">
           <DateRangeFilter pathname="/admin/analytics" query={baseQuery} preset={range.preset} from={range.from} to={range.to} compact />
-          <select name="country" defaultValue={filters.country} className="min-h-11 rounded-md border border-white/15 bg-white px-3 text-sm text-slate-900"><option value="all">全部国家</option>{availableCountries.map(([code, name]) => <option key={code} value={code}>{name}</option>)}</select>
-          <select name="channel" defaultValue={filters.channel} className="min-h-11 rounded-md border border-white/15 bg-white px-3 text-sm text-slate-900"><option value="all">全部渠道</option>{availableChannels.map((channel) => <option key={channel} value={channel}>{channel}</option>)}</select>
+          <select name="country" aria-label="国家或地区" defaultValue={filters.country} className="min-h-11 rounded-md border border-white/15 bg-white px-3 text-sm text-slate-900"><option value="all">全部国家</option>{availableCountries.map(([code, name]) => <option key={code} value={code}>{name}</option>)}</select>
+          <select name="channel" aria-label="访问渠道" defaultValue={filters.channel} className="min-h-11 rounded-md border border-white/15 bg-white px-3 text-sm text-slate-900"><option value="all">全部渠道</option>{availableChannels.map((channel) => <option key={channel} value={channel}>{channel}</option>)}</select>
           <div className="flex gap-2 xl:col-span-2"><input name="query" defaultValue={filters.query} placeholder="页面、访客或来源..." className="min-h-11 min-w-0 flex-1 rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-900" /><button className="button button-primary min-h-11" type="submit"><Filter size={16} />应用筛选</button></div>
         </form>
       </section>
@@ -90,7 +88,7 @@ export default async function AdminAnalyticsPage({ searchParams }: PageProps) {
       </div>
 
       <section className="mt-8 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-        <div className="flex flex-col gap-3 border-b border-slate-200 p-5 md:flex-row md:items-center md:justify-between"><div><p className="text-sm font-black text-orange-700">访客中心</p><h2 className="mt-1 text-xl font-black text-slate-950">按客户归属查看完整访问路径</h2></div><form method="get" className="flex gap-2"><input type="hidden" name="range" value={range.preset} /><input type="hidden" name="from" value={range.from} /><input type="hidden" name="to" value={range.to} /><input type="hidden" name="country" value={filters.country} /><input type="hidden" name="channel" value={filters.channel} /><input type="hidden" name="traffic" value={filters.traffic} /><input type="hidden" name="query" value={filters.query} /><select name="pageSize" defaultValue={String(pageSize)} className="min-h-10 rounded-md border border-slate-200 px-2 text-sm"><option value="20">20 / 页</option><option value="25">25 / 页</option><option value="50">50 / 页</option><option value="100">100 / 页</option></select><button className="rounded-md border border-slate-200 px-3 py-2 text-sm font-bold">更新</button></form></div>
+        <div className="flex flex-col gap-3 border-b border-slate-200 p-5 md:flex-row md:items-center md:justify-between"><div><p className="text-sm font-black text-orange-700">访客中心</p><h2 className="mt-1 text-xl font-black text-slate-950">按客户归属查看完整访问路径</h2></div><form method="get" className="flex gap-2"><input type="hidden" name="range" value={range.preset} /><input type="hidden" name="from" value={range.from} /><input type="hidden" name="to" value={range.to} /><input type="hidden" name="country" value={filters.country} /><input type="hidden" name="channel" value={filters.channel} /><input type="hidden" name="traffic" value={filters.traffic} /><input type="hidden" name="query" value={filters.query} /><select name="pageSize" aria-label="每页条数" defaultValue={String(pageSize)} className="min-h-10 rounded-md border border-slate-200 px-2 text-sm"><option value="20">20 / 页</option><option value="25">25 / 页</option><option value="50">50 / 页</option><option value="100">100 / 页</option></select><button className="rounded-md border border-slate-200 px-3 py-2 text-sm font-bold">更新</button></form></div>
         <div className="overflow-x-auto"><table className="min-w-[900px] w-full text-left text-sm"><thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500"><tr><th className="px-5 py-3">访客</th><th className="px-5 py-3">国家 / 来源</th><th className="px-5 py-3">访问</th><th className="px-5 py-3">最后路径</th><th className="px-5 py-3">最后访问</th><th className="px-5 py-3"></th></tr></thead><tbody className="divide-y divide-slate-100">{pagedProfiles.items.map((profile) => <tr key={profile.visitorId} className="hover:bg-slate-50/70"><td className="px-5 py-4"><strong className="block text-slate-900">{profile.visitorId.slice(0, 12)}</strong><span className="text-xs text-slate-500">{profile.ipMasked || "IP 已隐藏"}</span></td><td className="px-5 py-4">{profile.country}<span className="block text-xs text-slate-500">{profile.channel}</span></td><td className="px-5 py-4">{profile.visits} 次 / {profile.sessions} 会话<span className="block text-xs text-slate-500">{profile.conversions} 转化</span></td><td className="max-w-[280px] px-5 py-4"><span className="block truncate font-bold text-slate-800">{profile.latestPath}</span></td><td className="px-5 py-4 text-slate-600">{formatDate(profile.lastSeenAt)}</td><td className="px-5 py-4"><Link href={`/admin/analytics/visitors/${encodeURIComponent(profile.visitorId)}?range=${range.preset}&from=${range.from}&to=${range.to}`} className="inline-flex items-center gap-1 font-black text-orange-700">访问详情 <ArrowRight size={14} /></Link></td></tr>)}</tbody></table>{!pagedProfiles.items.length ? <div className="p-5"><EmptyState text="没有符合条件的真实访客。" /></div> : null}</div>
         <AdminPagination pathname="/admin/analytics" query={baseQuery} page={pagedProfiles.page} totalPages={pagedProfiles.totalPages} total={pagedProfiles.total} pageSize={pagedProfiles.pageSize} label="访客" pageParam="visitorPage" />
       </section>

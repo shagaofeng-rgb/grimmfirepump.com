@@ -1,10 +1,10 @@
-import { BadgeCheck, Factory, Globe2, Headset } from "lucide-react";
+import { BadgeCheck, Factory, Gauge, Headset } from "lucide-react";
 
 const inputs = [
-  { value: "10+", title: "Years of Experience", Icon: BadgeCheck },
-  { value: "50+", title: "Countries Served", Icon: Globe2 },
-  { value: "1,000+", title: "Projects Delivered", Icon: Factory },
-  { value: "24/7", title: "Technical Support", Icon: Headset },
+  { value: "Factory", title: "Pump assembly", Icon: Factory },
+  { value: "Testing", title: "Flow and pressure", Icon: Gauge },
+  { value: "Documents", title: "Certificates and catalogs", Icon: BadgeCheck },
+  { value: "Support", title: "Project inquiries", Icon: Headset },
 ];
 
 export function AdvantageSection() {

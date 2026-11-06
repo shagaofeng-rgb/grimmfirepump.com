@@ -81,8 +81,8 @@ function LocalizedHeader({ locale }: { locale: LocalizedLocale }) {
   return (
     <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/92 backdrop-blur-xl" lang={content.htmlLang} dir={content.dir}>
       <div className="mx-auto flex min-h-[76px] max-w-[1280px] items-center justify-between gap-3 px-4 py-3 md:px-6">
-        <Link href={localizedPath("/", locale)} className="flex min-w-0 items-center gap-3" aria-label={`${company.shortName} home`}>
-          <Image src="/assets/images/logo.png" alt={`${company.shortName} logo`} width={42} height={42} className="object-contain" />
+        <Link href={localizedPath("/", locale)} className="flex min-w-0 items-center gap-3">
+          <Image src="/assets/images/logo.png" alt="" width={42} height={42} className="object-contain" />
           <span className="flex flex-col leading-none">
             <strong className="text-base tracking-[0.04em] text-[var(--navy-900)]">{company.shortName}</strong>
             <small className="mt-1 text-xs text-slate-500">Fire Pump Systems</small>
@@ -165,7 +165,7 @@ function ProofSection({ locale }: { locale: LocalizedLocale }) {
       <div className="container-shell grid gap-4 md:grid-cols-3">
         {content.home.proof.map((item, index) => (
           <article key={item} className="card p-6">
-            <span className="text-sm font-black text-[var(--orange)]">0{index + 1}</span>
+            <span className="text-sm font-black text-[var(--orange-ink)]">0{index + 1}</span>
             <h2 className="mt-3 text-xl font-black leading-tight text-[var(--navy-950)]">{item}</h2>
           </article>
         ))}
@@ -234,7 +234,7 @@ function LocalizedFooter({ locale, interior = false }: { locale: LocalizedLocale
       <div className="mx-auto grid max-w-[1240px] gap-10 md:grid-cols-[1.2fr_0.8fr]">
         <div>
           <Link href={localizedPath("/", locale)} className="flex items-center gap-3">
-            <Image src="/assets/images/logo.png" alt={`${company.shortName} logo`} width={42} height={42} className="invert" />
+            <Image src="/assets/images/logo.png" alt="" width={42} height={42} className="invert" />
             <strong className="text-white">{company.shortName}</strong>
           </Link>
           <p className="mt-5 max-w-xl text-sm leading-7">{content.home.text}</p>

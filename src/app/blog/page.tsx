@@ -17,7 +17,7 @@ export async function generateMetadata(): Promise<Metadata> {
     title: "Fire Pump Technical Blog and Selection Guides",
     description: "Read original GRIMM technical guides for fire pump selection, engineering, installation, maintenance and project procurement.",
     alternates: localizedAlternates("/blog"),
-    robots: posts.length ? { index: true, follow: true } : { index: false, follow: true },
+    robots: posts.some((post) => post.indexable) ? { index: true, follow: true } : { index: false, follow: true },
   };
 }
 

@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { ArrowRight, ChevronDown, Globe2, Menu, MessageCircle, Package, X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { company, navItems } from "@/data/site";
 import type { ProductNavigationGroup } from "@/lib/product-navigation";
 
@@ -27,6 +27,8 @@ export function HeaderClient({ groups }: { groups: ProductNavigationGroup[] }) {
   const [productsOpen, setProductsOpen] = useState(false);
   const [resourcesOpen, setResourcesOpen] = useState(false);
   const [mobileProductsOpen, setMobileProductsOpen] = useState(false);
+  const header = useRef<HTMLElement>(null);
+  const menuToggle = useRef<HTMLButtonElement>(null);
   const desktopNavItems = navItems.filter((item) => ["About", "Products", "Applications", "Projects", "Factory"].includes(item.label));
   const resourceItems = navItems.filter((item) => ["Testing", "Downloads", "News", "Knowledge", "Search"].includes(item.label));
 
@@ -34,12 +36,29 @@ export function HeaderClient({ groups }: { groups: ProductNavigationGroup[] }) {
     setOpen(false);
     setMobileProductsOpen(false);
   };
+  useEffect(() => {
+    if (!open && !productsOpen && !resourcesOpen) return;
+    const closeOnOutside = (event: PointerEvent) => {
+      if (header.current?.contains(event.target as Node)) return;
+      setOpen(false);
+      setMobileProductsOpen(false);
+      setProductsOpen(false);
+      setResourcesOpen(false);
+    };
+    document.addEventListener("pointerdown", closeOnOutside);
+    return () => document.removeEventListener("pointerdown", closeOnOutside);
+  }, [open, productsOpen, resourcesOpen]);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur-xl">
+    <header ref={header} className="sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur-xl" onKeyDown={(event) => {
+      if (event.key !== "Escape") return;
+      if (open) { closeMobileMenu(); menuToggle.current?.focus(); }
+      if (productsOpen) { setProductsOpen(false); header.current?.querySelector<HTMLAnchorElement>('nav[aria-label="Primary"] a[href="/products"]')?.focus(); }
+      if (resourcesOpen) { setResourcesOpen(false); header.current?.querySelector<HTMLButtonElement>('[aria-controls="home-resource-menu"]')?.focus(); }
+    }}>
       <div className="mx-auto flex h-[72px] max-w-[1280px] items-center justify-between gap-5 px-5 md:px-6">
-        <Link href="/" className="flex min-w-0 items-center gap-3" aria-label={`${company.shortName} Fire Pump home`}>
-          <Image src="/assets/images/logo.png" alt={`${company.shortName} logo`} width={42} height={42} className="object-contain" />
+        <Link href="/" className="flex min-w-0 items-center gap-3">
+          <Image src="/assets/images/logo.png" alt="" width={42} height={42} className="object-contain" />
           <span className="flex flex-col leading-none">
             <strong className="text-base text-[var(--navy-900)]">{company.shortName}</strong>
             <small className="mt-1 text-xs text-slate-500">Fire Pump Systems</small>
@@ -55,6 +74,7 @@ export function HeaderClient({ groups }: { groups: ProductNavigationGroup[] }) {
                 onMouseEnter={() => setProductsOpen(true)}
                 onMouseLeave={() => setProductsOpen(false)}
                 onFocus={() => setProductsOpen(true)}
+                onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node)) setProductsOpen(false); }}
               >
                 <Link
                   href={item.href}
@@ -75,17 +95,19 @@ export function HeaderClient({ groups }: { groups: ProductNavigationGroup[] }) {
             className="group relative"
             onMouseEnter={() => setResourcesOpen(true)}
             onMouseLeave={() => setResourcesOpen(false)}
-            onFocus={() => setResourcesOpen(true)}
+            onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node)) setResourcesOpen(false); }}
           >
             <button
               className="flex items-center gap-1 border-b-2 border-transparent py-[25px] font-bold hover:border-[var(--orange)]"
               type="button"
               aria-expanded={resourcesOpen}
+              aria-controls="home-resource-menu"
+              onClick={() => setResourcesOpen((value) => !value)}
             >
               Resources
               <ChevronDown size={15} className={`transition ${resourcesOpen ? "rotate-180" : ""}`} />
             </button>
-            <div className={`absolute right-0 top-[64px] w-56 rounded-md border border-slate-200 bg-white p-2 shadow-[0_18px_36px_rgba(7,20,38,0.12)] transition ${resourcesOpen ? "visible opacity-100" : "invisible pointer-events-none opacity-0"}`}>
+            <div id="home-resource-menu" className={`absolute right-0 top-[64px] w-56 rounded-md border border-slate-200 bg-white p-2 shadow-[0_18px_36px_rgba(7,20,38,0.12)] transition ${resourcesOpen ? "visible opacity-100" : "invisible pointer-events-none opacity-0"}`}>
               {resourceItems.map((item) => (
                 <Link key={item.href} href={item.href} className="block rounded px-3 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50 hover:text-[var(--navy-900)]">
                   {item.label}
@@ -97,7 +119,7 @@ export function HeaderClient({ groups }: { groups: ProductNavigationGroup[] }) {
 
         <div className="flex items-center gap-3">
           <details className="relative hidden xl:block">
-            <summary className="flex min-h-11 cursor-pointer list-none items-center gap-1 text-sm font-bold text-[var(--navy-800)] [&::-webkit-details-marker]:hidden" aria-label="Select language"><Globe2 size={17} aria-hidden="true" /> EN <ChevronDown size={13} aria-hidden="true" /></summary>
+            <summary className="flex min-h-11 cursor-pointer list-none items-center gap-1 text-sm font-bold text-[var(--navy-800)] [&::-webkit-details-marker]:hidden" aria-label="Select language: EN"><Globe2 size={17} aria-hidden="true" /> EN <ChevronDown size={13} aria-hidden="true" /></summary>
             <nav className="absolute right-0 top-full z-50 grid min-w-40 rounded-md border border-slate-200 bg-white p-2 shadow-xl" aria-label="Languages">
               {languages.map((language) => <Link key={language.href} href={language.href} className="rounded px-3 py-2 text-sm hover:bg-slate-100">{language.name}</Link>)}
             </nav>
@@ -120,8 +142,11 @@ export function HeaderClient({ groups }: { groups: ProductNavigationGroup[] }) {
           <button
             className="grid h-11 w-11 place-items-center rounded-md border border-slate-200 xl:hidden"
             type="button"
+            ref={menuToggle}
             onClick={() => setOpen((value) => !value)}
-            aria-label="Open menu"
+            aria-label={open ? "Close menu" : "Open menu"}
+            aria-expanded={open}
+            aria-controls="home-mobile-navigation"
           >
             {open ? <X size={20} /> : <Menu size={20} />}
           </button>
@@ -129,7 +154,7 @@ export function HeaderClient({ groups }: { groups: ProductNavigationGroup[] }) {
       </div>
 
       {open ? (
-        <nav className="max-h-[calc(100vh-72px)] overflow-y-auto border-t border-slate-100 bg-white px-5 pb-5 shadow-xl xl:hidden" aria-label="Mobile">
+        <nav id="home-mobile-navigation" className="max-h-[calc(100dvh-72px)] overflow-y-auto overscroll-y-contain border-t border-slate-100 bg-white px-5 pb-5 shadow-xl xl:hidden" aria-label="Mobile">
           {navItems.map((item) =>
             item.label === "Products" ? (
               <div key={item.href} className="border-b border-slate-100">
@@ -186,7 +211,7 @@ function MobileProductMenu({ groups, closeMenu }: { groups: ProductNavigationGro
               </Link>
             ))}
           </div>
-          <Link className="mt-3 inline-flex items-center gap-1 text-xs font-black text-[var(--orange)]" href={group.href} onClick={closeMenu}>
+          <Link className="mt-3 inline-flex items-center gap-1 text-xs font-black text-[var(--orange-ink)]" href={group.href} onClick={closeMenu}>
             More
             <ArrowRight size={14} />
           </Link>

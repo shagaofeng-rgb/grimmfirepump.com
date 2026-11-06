@@ -8,14 +8,27 @@ export type ResolvedDateRange = {
 };
 
 export function dateParts(date: Date, timeZone: string) {
-  const parts = new Intl.DateTimeFormat("en-CA", {
-    timeZone,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).formatToParts(date);
-  const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
-  return `${values.year}-${values.month}-${values.day}`;
+  return dateFormatter(timeZone).format(date);
+}
+
+export function formatReportingTimestamp(value: string, timeZone = "Asia/Shanghai") {
+  const date = new Date(value);
+  if (!Number.isFinite(date.getTime())) return "—";
+  return new Intl.DateTimeFormat("zh-CN", { timeZone, dateStyle: "medium", timeStyle: "short" }).format(date);
+}
+
+const dateFormatters = new Map<string, Intl.DateTimeFormat>();
+function dateFormatter(timeZone: string) {
+  const existing = dateFormatters.get(timeZone);
+  if (existing) return existing;
+  const formatter = new Intl.DateTimeFormat("sv-SE", { timeZone, year: "numeric", month: "2-digit", day: "2-digit" });
+  if (dateFormatters.size < 32) dateFormatters.set(timeZone, formatter);
+  return formatter;
+}
+
+function validDay(value?: string) {
+  return value && /^\d{4}-\d{2}-\d{2}$/.test(value) && Number.isFinite(Date.parse(value))
+    && new Date(value).toISOString().slice(0, 10) === value ? value : "";
 }
 
 export function isWithinReportingDateRange(createdAt: string | undefined, from: string, to: string, timeZone = "Asia/Shanghai") {
@@ -61,9 +74,9 @@ export function resolveDateRange(
   if (preset === "custom") {
     return {
       preset,
-      from: options.from || "",
-      to: options.to || "",
-      label: options.from || options.to ? "自定义范围" : "自定义范围",
+      from: validDay(options.from),
+      to: validDay(options.to),
+      label: "自定义范围",
     };
   }
   return { preset: "last30", from: shiftDate(today, -29), to: today, label: "最近 30 天" };

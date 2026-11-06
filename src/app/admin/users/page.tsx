@@ -25,14 +25,16 @@ export default async function UsersPage({ searchParams }: PageProps) {
   return (
     <AdminShell>
       <AdminPageHeader eyebrow="系统管理" title="账号管理" />
-      <div className="mt-8 grid gap-6 xl:grid-cols-[1fr_420px]">
-        <section className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+      <div className="mt-8 grid gap-6 xl:grid-cols-[minmax(0,1fr)_420px]">
+        <section className="min-w-0 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+          <div className="overflow-x-auto" tabIndex={0} aria-label="账号列表">
           <table className="w-full min-w-[760px] text-left text-sm">
             <thead className="bg-slate-50 text-slate-600"><tr>{["账号", "显示名", "角色", "状态", "权限"].map((head) => <th key={head} className="px-4 py-3 font-black">{head}</th>)}</tr></thead>
             <tbody>
               {pagedUsers.items.map((user) => <tr key={user.id} className="border-t border-slate-100"><td className="px-4 py-4">{user.username}</td><td className="px-4 py-4">{user.displayName}</td><td className="px-4 py-4">{user.role}</td><td className="px-4 py-4"><StatusPill value={user.status} /></td><td className="px-4 py-4">{user.role === "super_admin" ? permissions.join(" / ") : "按角色限制"}</td></tr>)}
             </tbody>
           </table>
+          </div>
           <AdminPagination pathname="/admin/users" query={{ pageSize: String(pageSize) }} page={pagedUsers.page} totalPages={pagedUsers.totalPages} total={pagedUsers.total} pageSize={pagedUsers.pageSize} label="账号" />
         </section>
         <PasswordForm />

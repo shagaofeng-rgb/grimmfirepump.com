@@ -1,10 +1,11 @@
 import { saveNews } from "@/app/admin/actions";
 import { Field, inputClass, textareaClass } from "@/components/admin/admin-widgets";
+import { EditorForm } from "@/components/admin/editor-form";
 import type { CmsNews } from "@/lib/admin-cms";
 
 export function NewsForm({ news }: { news?: CmsNews }) {
   return (
-    <form action={saveNews} className="grid gap-6">
+    <EditorForm action={saveNews} className="grid gap-6">
       <input type="hidden" name="id" value={news?.id || ""} />
       <section className="grid gap-4 rounded-lg border border-slate-200 bg-white p-6 shadow-sm md:grid-cols-2">
         <h2 className="text-xl font-black text-slate-950 md:col-span-2">文章基础信息</h2>
@@ -15,7 +16,7 @@ export function NewsForm({ news }: { news?: CmsNews }) {
         <Field label="标签，逗号分隔"><input name="tags" defaultValue={news?.tags.join(", ")} className={inputClass} /></Field>
         <Field label="作者"><input name="author" defaultValue={news?.author || "GRIMM PUMP"} className={inputClass} /></Field>
         <Field label="封面图片"><input name="coverImage" defaultValue={news?.coverImage} className={inputClass} /></Field>
-        <Field label="发布时间"><input name="publishAt" type="datetime-local" defaultValue={news?.publishAt?.slice(0, 16)} className={inputClass} /></Field>
+        <Field label="发布时间（UTC）"><input name="publishAt" type="datetime-local" defaultValue={news?.publishAt?.slice(0, 16)} className={inputClass} /></Field>
         <Field label="状态">
           <select name="status" defaultValue={news?.status || "draft"} className={inputClass}>
             <option value="draft">草稿</option>
@@ -46,6 +47,6 @@ export function NewsForm({ news }: { news?: CmsNews }) {
         <button className="button button-primary" type="submit">保存文章</button>
         <a className="button button-secondary" href="/admin/news">返回列表</a>
       </div>
-    </form>
+    </EditorForm>
   );
 }

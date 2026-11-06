@@ -6,7 +6,10 @@ import { AdminPagination } from "@/components/admin/admin-pagination";
 import { DateRangeFilter } from "@/components/admin/date-range-filter";
 import { AdminCard, AdminPageHeader, EmptyState, StatCard } from "@/components/admin/admin-widgets";
 import { getAdminData } from "@/lib/admin-data";
-import { paginationPageSize, parsePositiveInt, resolveDateRange } from "@/lib/admin-listing";
+import type { AnalyticsEventRecord } from "@/lib/admin-data";
+import { getCurrentAdmin } from "@/lib/admin-auth";
+import { readStoreRange } from "@/lib/local-store";
+import { formatReportingTimestamp, paginationPageSize, parsePositiveInt, resolveDateRange } from "@/lib/admin-listing";
 import { getSiteSettings } from "@/lib/admin-cms";
 import { getVisitorProfile, getVisitorSessions, paginate, type AnalyticsFilters } from "@/lib/visitor-analytics";
 
@@ -22,13 +25,11 @@ function value(params: Record<string, string | string[] | undefined>, key: strin
   return Array.isArray(current) ? current[0] || "" : current || "";
 }
 
-function stamp(value: string) {
-  return new Intl.DateTimeFormat("zh-CN", { dateStyle: "medium", timeStyle: "short" }).format(new Date(value));
-}
 
 export default async function VisitorDetailPage({ params, searchParams }: Props) {
   const [{ visitorId }, raw] = await Promise.all([params, searchParams]);
   const settings = await getSiteSettings();
+  const stamp = (timestamp: string) => formatReportingTimestamp(timestamp, settings.timezone);
   const range = resolveDateRange(value(raw, "range"), {
     from: value(raw, "from"),
     to: value(raw, "to"),
@@ -37,7 +38,11 @@ export default async function VisitorDetailPage({ params, searchParams }: Props)
   const filters: AnalyticsFilters = { from: range.from, to: range.to, timeZone: settings.timezone || "Asia/Shanghai", traffic: "real" };
   const page = parsePositiveInt(value(raw, "page"));
   const pageSize = paginationPageSize(value(raw, "pageSize"));
-  const { events, inquiries, downloadLeads } = await getAdminData(["events", "inquiries", "downloadLeads"]);
+  const admin = await getCurrentAdmin();
+  const [events, { inquiries, downloadLeads }] = await Promise.all([
+    readStoreRange<AnalyticsEventRecord>("analytics-events.json", { ...range, timeZone: filters.timeZone, match: { field: "visitorId", value: visitorId } }),
+    getAdminData(admin?.role === "super_admin" ? ["inquiries", "downloadLeads"] : []),
+  ]);
   const profile = getVisitorProfile(events, visitorId, filters);
   if (!profile) notFound();
 
@@ -68,17 +73,17 @@ export default async function VisitorDetailPage({ params, searchParams }: Props)
         <StatCard label="最新来源" value={profile.channel} hint={`${profile.country} · ${profile.ipMasked || "IP 已隐藏"}`} />
       </div>
 
-      <div className="mt-8 grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
+      <div className="mt-8 grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1.2fr)_minmax(0,.8fr)]">
         <AdminCard title="客户归属与识别状态">
           <div className="grid gap-4 text-sm leading-6 text-slate-600">
             <div className="flex items-start gap-3 rounded-md bg-slate-50 p-4"><UserRound className="mt-0.5 text-orange-700" size={18} /><div><strong className="block text-slate-900">访客档案</strong>用于归并同一浏览器内的访问记录，并在客户提交表单后显示已关联信息。</div></div>
             <div className="flex items-start gap-3 rounded-md bg-slate-50 p-4"><Globe2 className="mt-0.5 text-orange-700" size={18} /><div><strong className="block text-slate-900">最近地理与来源</strong>{profile.country} · {profile.channel} · 脱敏 IP {profile.ipMasked || "不可用"}。</div></div>
-            <div className="flex items-start gap-3 rounded-md bg-slate-50 p-4"><Mail className="mt-0.5 text-orange-700" size={18} /><div><strong className="block text-slate-900">已关联客户记录</strong>{relatedInquiries.length ? `${relatedInquiries.length} 条询盘已关联，可在客户询盘中继续跟进。` : "尚未关联询盘。提交表单并携带 visitor ID 后会自动关联。"}</div></div>
+            {admin?.role === "super_admin" && <div className="flex items-start gap-3 rounded-md bg-slate-50 p-4"><Mail className="mt-0.5 text-orange-700" size={18} /><div><strong className="block text-slate-900">已关联客户记录</strong>{relatedInquiries.length ? `${relatedInquiries.length} 条询盘已关联，可在客户询盘中继续跟进。` : "尚未关联询盘。提交表单并携带 visitor ID 后会自动关联。"}</div></div>}
           </div>
         </AdminCard>
         <AdminCard title="关键页面与行为">
-          <div className="grid gap-3">
-            {profile.paths.slice(0, 8).map((path) => <div key={path} className="flex items-center gap-2 rounded-md bg-slate-50 p-3 text-sm font-bold text-slate-700"><Route size={15} className="text-orange-700" /><span className="truncate">{path}</span></div>)}
+          <div className="grid grid-cols-1 gap-3">
+            {profile.paths.slice(0, 8).map((path) => <div key={path} className="flex min-w-0 items-center gap-2 rounded-md bg-slate-50 p-3 text-sm font-bold text-slate-700"><Route size={15} className="shrink-0 text-orange-700" /><span className="min-w-0 break-all">{path}</span></div>)}
             {!profile.paths.length ? <EmptyState text="当前时间范围内没有页面浏览记录。" /> : null}
           </div>
         </AdminCard>
@@ -91,13 +96,13 @@ export default async function VisitorDetailPage({ params, searchParams }: Props)
             <article key={session.sessionId} className="rounded-lg border border-slate-200 p-4">
               <div className="flex flex-col gap-3 border-b border-slate-100 pb-3 md:flex-row md:items-center md:justify-between">
                 <div><strong className="text-slate-950">{stamp(session.startedAt)} 至 {stamp(session.endedAt)}</strong><p className="mt-1 text-sm text-slate-500">{session.country} · {session.channel} · {session.eventCount} 个行为</p></div>
-                <span className="w-fit rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-600">{session.entryPath} → {session.exitPath}</span>
+                <span className="w-fit max-w-full break-all rounded-md bg-slate-100 px-3 py-1 text-xs font-black text-slate-600">{session.entryPath} → {session.exitPath}</span>
               </div>
               <ol className="mt-4 grid gap-3 border-l-2 border-orange-200 pl-4">
                 {session.events.map((event) => (
                   <li key={event.id} className="relative text-sm">
                     <span className="absolute -left-[22px] top-1.5 h-2.5 w-2.5 rounded-full bg-orange-500" />
-                    <div className="flex flex-wrap items-center gap-2"><strong className="text-slate-900">{event.path || "/"}</strong><span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-bold text-slate-600"><MousePointerClick className="mr-1 inline" size={12} />{event.event}</span><time className="text-xs text-slate-500">{stamp(event.createdAt)}</time></div>
+                    <div className="flex flex-wrap items-center gap-2"><strong className="min-w-0 break-all text-slate-900">{event.path || "/"}</strong><span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-bold text-slate-600"><MousePointerClick className="mr-1 inline" size={12} />{event.event}</span><time className="text-xs text-slate-500">{stamp(event.createdAt)}</time></div>
                     {event.label ? <p className="mt-1 text-xs text-slate-500">{event.label}</p> : null}
                   </li>
                 ))}

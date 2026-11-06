@@ -16,12 +16,15 @@ export async function generateMetadata({ params }: BlogDetailProps): Promise<Met
   const { slug } = await params;
   const post = await getPublicPost(slug);
   if (!post) return {};
+  const title = post.seoTitle || post.title;
+  const description = post.seoDescription || post.text;
   return {
-    title: post.title,
-    description: post.text,
+    title,
+    description,
     alternates: { canonical: post.canonicalUrl || `/blog/${post.slug}` },
     robots: post.indexable ? { index: true, follow: true } : { index: false, follow: true },
-    openGraph: { title: post.title, description: post.text, images: [post.image] },
+    openGraph: { type: "article", title, description, url: post.canonicalUrl, images: [post.image], publishedTime: post.publishedAt, modifiedTime: post.updatedAt },
+    twitter: { card: "summary_large_image", title, description, images: [post.image] },
   };
 }
 
@@ -38,9 +41,9 @@ export default async function BlogDetailPage({ params }: BlogDetailProps) {
     headline: post.title,
     description: post.text,
     image: [imageUrl],
-    datePublished: post.date,
+    datePublished: post.publishedAt,
     dateModified: post.updatedAt,
-    author: { "@type": "Organization", name: company.shortName, url: company.website },
+    ...(post.author === company.shortName ? { author: { "@type": "Organization", name: company.shortName, url: company.website } } : {}),
     publisher: {
       "@type": "Organization",
       name: company.shortName,

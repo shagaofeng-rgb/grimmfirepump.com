@@ -9,8 +9,7 @@ import { ProductInquiryForm } from "@/components/product-inquiry-form";
 import { applications, company } from "@/data/site";
 import { catalogHref, displayParameter, keyParameters } from "@/lib/catalog-presentation";
 import { getRelatedNewsForProduct } from "@/lib/news-automation";
-import { getPublicProduct, getPublicProducts, type PublicProduct } from "@/lib/public-cms";
-import { getProductKnowledge } from "@/lib/product-knowledge";
+import { getPublicProduct, getPublicProductKnowledge, getPublicProducts, type PublicProduct } from "@/lib/public-cms";
 
 type ProductPageProps = {
   params: Promise<{ slug: string }>;
@@ -27,15 +26,8 @@ const views = [
 ] as const;
 type ProductView = (typeof views)[number]["id"];
 
-function productDeck(product: PublicProduct) {
-  if (product.slug === "edj-fire-pump-set" || product.slug === "vertical-stainless-steel-multistage-pump-jockey-pump") {
-    return getProductKnowledge(product.slug, product.title, product.category).solutionSummary;
-  }
-  return product.description || product.summary;
-}
-
 function productMetaDescription(product: PublicProduct) {
-  const text = `${product.title}. ${productDeck(product)}`.replace(/\s+/g, " ").trim();
+  const text = `${product.title}. ${product.description || product.summary}`.replace(/\s+/g, " ").trim();
   return text.length > 170 ? `${text.slice(0, 169).replace(/\s+\S*$/, "").replace(/[., ]+$/, "")}.` : text;
 }
 
@@ -44,13 +36,15 @@ export const dynamic = "force-dynamic";
 export async function generateMetadata({ params }: Pick<ProductPageProps, "params">): Promise<Metadata> {
   const product = await getPublicProduct((await params).slug);
   if (!product) return {};
-  const description = productMetaDescription(product);
+  const title = product.seoTitle || product.title;
+  const description = product.seoDescription || productMetaDescription(product);
   return {
-    title: product.title,
+    title,
     description,
     alternates: { canonical: product.canonicalUrl || `/products/${product.slug}` },
     robots: { index: product.indexable, follow: true },
-    openGraph: { title: product.title, description, images: [product.image] },
+    openGraph: { title, description, url: product.canonicalUrl, images: [product.ogImage] },
+    twitter: { card: "summary_large_image", title, description, images: [product.ogImage] },
   };
 }
 
@@ -90,14 +84,14 @@ export default async function ProductDetailPage({ params, searchParams }: Produc
   const active = view === "documents" ? "resources" : views.find((entry) => entry.id === view)?.id || "overview";
   const images = Array.from(new Map([{ src: product.image, alt: product.title }, ...product.detailImages].map((item) => [item.src, item])).values());
   const specs = keyParameters(product.parameters);
-  const knowledge = getProductKnowledge(product.slug, product.title, product.category);
-  const matchedApplications = applications.filter((app) => knowledge.relatedApplicationSlugs.includes(app.slug));
+  const { details: knowledge, summary } = await getPublicProductKnowledge(product);
+  const matchedApplications = applications.filter((app) => knowledge?.relatedApplicationSlugs.includes(app.slug));
   const related = active === "overview" || active === "resources"
     ? (await getPublicProducts()).filter((item) => item.slug !== product.slug && item.groupSlug === product.groupSlug).slice(0, 3)
     : [];
   const relatedNews = active === "resources" ? await getRelatedNewsForProduct(product.slug, 3) : [];
   const title = product.title;
-  const deck = productDeck(product);
+  const deck = summary || product.description || product.summary;
   const familyHref = catalogHref("/products", { group: product.groupSlug });
   const productUrl = `${company.website}${path}`;
   const schema = {
@@ -197,7 +191,7 @@ export default async function ProductDetailPage({ params, searchParams }: Produc
                   : <p className="interior-copy">Application suitability depends on the required flow, head and installation conditions.</p>}
                 {matchedApplications.map((app) => <div key={app.slug} className="mt-3"><Link className="interior-text-link" href={`/applications/${app.slug}`} prefetch={false}>{app.title} <ArrowRight size={15} /></Link></div>)}
               </div>
-              <ProductChecklist title="Information to confirm" lines={knowledge.specificationKeywords} />
+              {!!knowledge?.specificationKeywords.length && <ProductChecklist title="Information to confirm" lines={knowledge.specificationKeywords} />}
             </div>
           )}
           {active === "resources" && (
@@ -213,7 +207,7 @@ export default async function ProductDetailPage({ params, searchParams }: Produc
                 </div>}
                 {related.length > 0 && <div className="mt-8"><h3 className="text-lg font-extrabold">Related products</h3><ul className="mt-2 grid gap-2">{related.map((item) => <li key={item.slug}><Link className="interior-text-link" href={`/products/${item.slug}`} prefetch={false}>{item.title} <ArrowRight size={15} /></Link></li>)}</ul></div>}
               </div>
-              <ProductChecklist title="Selection checklist" lines={knowledge.buyerPainPoints} />
+              {!!knowledge?.buyerPainPoints.length && <ProductChecklist title="Selection checklist" lines={knowledge.buyerPainPoints} />}
             </div>
           )}
           {active === "quote" && (

@@ -6,10 +6,10 @@ import { z } from "zod";
 import { createPasswordHash, getConfiguredAdminUser, getCurrentAdmin, type AdminCredential, verifyAdminPassword } from "@/lib/admin-auth";
 import {
   cmsStore,
+  getSiteSettings,
   listCmsNews,
   listCmsProducts,
   listDownloadAssets,
-  listManagedPages,
   listMediaFiles,
   listProductCategories,
   listCmsProductKnowledge,
@@ -18,16 +18,16 @@ import {
   type CmsProductCategory,
   type CmsProductKnowledge,
   type DownloadAsset,
-  type ManagedPage,
   type MediaFile,
   type PublishStatus,
   type SiteSetting,
   logAudit,
 } from "@/lib/admin-cms";
-import { createId, deleteStoreItem, readStore, upsertStore, writeStore } from "@/lib/local-store";
+import { createId, deleteStoreItem, patchStoreItem, upsertStore } from "@/lib/local-store";
 import type { InquiryRecord } from "@/lib/admin-data";
 import { markSitemapDirty } from "@/lib/sitemap-dirty";
-import { company } from "@/data/site";
+import { validTrafficExclusions } from "@/lib/traffic-context";
+import type { EditorResult } from "@/components/admin/editor-form";
 
 const statusSchema = z.enum(["draft", "review", "published", "offline", "archived"]);
 
@@ -88,10 +88,10 @@ const categorySchema = z.object({
   indexable: z.boolean(),
 });
 
-export async function saveCategory(formData: FormData) {
+export async function saveCategory(_: EditorResult, formData: FormData): Promise<EditorResult> {
   await requireAdmin(["super_admin", "product_manager"]);
   const now = new Date().toISOString();
-  const parsed = categorySchema.parse({
+  const result = categorySchema.safeParse({
     id: text(formData, "id"),
     name: text(formData, "name"),
     slug: text(formData, "slug"),
@@ -109,15 +109,17 @@ export async function saveCategory(formData: FormData) {
     ogImage: text(formData, "ogImage"),
     indexable: checkbox(formData, "indexable"),
   });
+  if (!result.success) return { error: "请输入分类名称，并使用小写字母、数字和连字符作为路径标识。" };
+  const parsed = result.data;
   const categories = await listProductCategories();
   const existing = categories.find((item) => item.id === parsed.id);
   if (categories.some((item) => item.id !== parsed.id && item.slug.toLowerCase() === parsed.slug.toLowerCase())) {
-    throw new Error("This category URL slug is already in use.");
+    return { error: "该分类路径标识已被使用，请输入其他标识。" };
   }
   if (parsed.parentId) {
     const parent = categories.find((item) => item.id === parsed.parentId);
     if (!parent || !parent.enabled || parent.parentId || parent.id === parsed.id) {
-      throw new Error("Choose an enabled top-level parent category.");
+      return { error: "请选择已启用的一级分类作为上级。" };
     }
   }
   const item: CmsProductCategory = {
@@ -133,6 +135,7 @@ export async function saveCategory(formData: FormData) {
   revalidatePath("/products");
   revalidatePath("/admin/product-categories");
   await refreshSitemap("category_saved");
+  redirect("/admin/product-categories?saved=1");
 }
 
 export async function deleteCategory(formData: FormData) {
@@ -157,7 +160,7 @@ export async function deleteCategory(formData: FormData) {
   await refreshSitemap("category_archived");
 }
 
-export async function saveProduct(formData: FormData) {
+export async function saveProduct(_: EditorResult, formData: FormData): Promise<EditorResult> {
   await requireAdmin(["super_admin", "product_manager"]);
   const now = new Date().toISOString();
   const id = text(formData, "id") || createId("prod");
@@ -166,20 +169,16 @@ export async function saveProduct(formData: FormData) {
   const categories = await listProductCategories();
   const categoryId = text(formData, "categoryId");
   const category = categories.find((item) => item.id === categoryId);
-  if (!category || !category.enabled) throw new Error("Choose an enabled product category before saving.");
+  if (!category || !category.enabled) return { error: "请选择已启用的产品分类。" };
   if (category.parentId && !categories.some((item) => item.id === category.parentId && item.enabled)) {
-    throw new Error("The selected category has no enabled parent.");
+    return { error: "该分类的上级已停用，请更换分类。" };
   }
-  const status = statusSchema.parse(text(formData, "status", "draft")) as PublishStatus;
+  const parsedStatus = statusSchema.safeParse(text(formData, "status", "draft"));
+  if (!parsedStatus.success) return { error: "请选择有效的发布状态。" };
+  const status = parsedStatus.data;
   const slug = text(formData, "slug");
+  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/i.test(slug) || slug.length > 160) return { error: "产品路径只能包含字母、数字和连字符。" };
   const canonicalPath = `/products/${slug.toLowerCase()}`;
-  const canonicalInput = text(formData, "canonicalUrl");
-  if (canonicalInput) {
-    const canonical = new URL(canonicalInput, `${company.website}/`);
-    if (canonical.origin !== company.website || canonical.pathname.toLowerCase() !== canonicalPath || canonical.search || canonical.hash) {
-      throw new Error("Product canonical URL must point to this product's public URL.");
-    }
-  }
   const item: CmsProduct = {
     id,
     createdAt: existing?.createdAt || now,
@@ -224,9 +223,9 @@ export async function saveProduct(formData: FormData) {
     ogImage: text(formData, "ogImage"),
     indexable: checkbox(formData, "indexable"),
   };
-  z.object({ title: z.string().min(2), slug: z.string().min(2) }).parse(item);
+  if (item.title.length < 2 || item.title.length > 180) return { error: "产品名称须为 2 至 180 个字符。" };
   if (allProducts.some((product) => product.id !== id && product.slug.trim().toLowerCase() === item.slug.trim().toLowerCase())) {
-    throw new Error("This product URL slug is already in use.");
+    return { error: "该产品路径标识已被使用，请输入其他标识。" };
   }
   await cmsStore.upsertProduct(item);
   revalidateTag("cms-products");
@@ -279,20 +278,27 @@ export async function saveProductKnowledge(formData: FormData) {
     prohibitedClaims: commaList("prohibitedClaims"),
   };
   await cmsStore.upsertProductKnowledge(item);
+  revalidateTag("cms-product-knowledge");
+  revalidatePath(`/products/${item.productSlug.toLowerCase()}`);
   await audit("save_product_knowledge", item.id);
   revalidatePath("/admin/product-knowledge");
   redirect("/admin/product-knowledge?saved=1");
 }
 
-export async function saveNews(formData: FormData) {
+export async function saveNews(_: EditorResult, formData: FormData): Promise<EditorResult> {
   await requireAdmin(["super_admin", "content_manager"]);
   const now = new Date().toISOString();
   const id = text(formData, "id") || createId("news");
   const allNews = await listCmsNews();
   const existing = allNews.find((item) => item.id === id);
   const requestedSlug = text(formData, "slug");
+  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(requestedSlug) || requestedSlug.length > 160) return { error: "文章路径只能包含小写字母、数字和连字符。" };
+  const enteredDate = text(formData, "publishAt");
+  const date = enteredDate ? new Date(`${enteredDate}Z`) : new Date(now);
+  if (!Number.isFinite(date.getTime())) return { error: "请输入有效的发布时间。" };
+  const publishAt = date.toISOString();
   if (allNews.some((item) => item.id !== id && item.slug === requestedSlug)) {
-    throw new Error("An article with this URL slug already exists. Choose a unique slug before saving.");
+    return { error: "该文章路径标识已被使用，请输入其他标识。" };
   }
   const item: CmsNews = {
     id,
@@ -311,12 +317,12 @@ export async function saveNews(formData: FormData) {
     featured: checkbox(formData, "featured"),
     pinned: checkbox(formData, "pinned"),
     source: text(formData, "source"),
-    publishAt: text(formData, "publishAt") || now,
+    publishAt,
     seoTitle: text(formData, "seoTitle"),
     seoDescription: text(formData, "seoDescription"),
     indexable: checkbox(formData, "indexable"),
   };
-  z.object({ title: z.string().min(2), slug: z.string().min(2) }).parse(item);
+  if (item.title.length < 2 || item.title.length > 180) return { error: "文章标题须为 2 至 180 个字符。" };
   await cmsStore.upsertNews(item);
   revalidateTag("cms-blog");
   await audit("save_news", item.id);
@@ -399,77 +405,36 @@ export async function saveDownloadAsset(formData: FormData) {
   revalidatePath("/admin/downloads");
 }
 
-export async function saveManagedPage(formData: FormData) {
-  await requireAdmin(["super_admin", "content_manager"]);
-  const now = new Date().toISOString();
-  const id = text(formData, "id") || createId("page");
-  const existing = (await listManagedPages()).find((item) => item.id === id);
-  const item: ManagedPage = {
-    id,
-    createdAt: existing?.createdAt || now,
-    updatedAt: now,
-    title: text(formData, "title"),
-    slug: text(formData, "slug"),
-    module: text(formData, "module", "Controlled component page"),
-    banner: text(formData, "banner"),
-    content: text(formData, "content"),
-    cta: text(formData, "cta", "/contact"),
-    status: statusSchema.parse(text(formData, "status", "published")) as PublishStatus,
-    seoTitle: text(formData, "seoTitle"),
-    seoDescription: text(formData, "seoDescription"),
-  };
-  await cmsStore.upsertPage(item);
-  await audit("save_page", item.id);
-  revalidatePath("/admin/pages");
-  revalidatePath(item.slug || "/");
-  await refreshSitemap("page_saved");
-}
-
 export async function saveSettings(formData: FormData) {
   await requireAdmin(["super_admin"]);
-  const now = new Date().toISOString();
+  const settings = await getSiteSettings();
+  const timezone = text(formData, "timezone", "Asia/Shanghai");
+  try { new Intl.DateTimeFormat("en", { timeZone: timezone }); } catch { redirect("/admin/settings?result=timezone"); }
+  const analyticsExcludedIps = text(formData, "analyticsExcludedIps");
+  if (analyticsExcludedIps.length > 4000 || !validTrafficExclusions(analyticsExcludedIps)) redirect("/admin/settings?result=ip");
   const item: SiteSetting = {
-    id: "site_settings",
-    createdAt: text(formData, "createdAt") || now,
-    updatedAt: now,
-    companyName: text(formData, "companyName"),
-    website: text(formData, "website"),
-    email: text(formData, "email"),
-    whatsapp: text(formData, "whatsapp"),
-    address: text(formData, "address"),
-    defaultLanguage: text(formData, "defaultLanguage", "en"),
-    timezone: text(formData, "timezone", "Asia/Shanghai"),
-    ga4Id: text(formData, "ga4Id"),
-    gtmId: text(formData, "gtmId"),
-    metaPixelId: text(formData, "metaPixelId"),
-    googleVerification: text(formData, "googleVerification"),
-    bingVerification: text(formData, "bingVerification"),
-    robotsPolicy: text(formData, "robotsPolicy", "index,follow"),
-    analyticsExcludedIps: text(formData, "analyticsExcludedIps"),
-    analyticsExcludedUserAgents: text(formData, "analyticsExcludedUserAgents", "collects,playwright,puppeteer,selenium,lighthouse"),
-    analyticsIpRetentionDays: text(formData, "analyticsIpRetentionDays", "90"),
+    ...settings,
+    updatedAt: new Date().toISOString(),
+    timezone,
+    analyticsExcludedIps,
+    analyticsExcludedUserAgents: text(formData, "analyticsExcludedUserAgents").slice(0, 4000),
   };
   await cmsStore.upsertSettings(item);
   await audit("save_settings", "site_settings");
+  revalidateTag("traffic-settings");
   revalidatePath("/admin/settings");
+  redirect("/admin/settings?result=saved");
 }
 
 export async function updateLeadStatus(formData: FormData) {
   await requireAdmin(["super_admin", "sales"]);
   const id = text(formData, "id");
-  const inquiries = await readStore<InquiryRecord[]>("inquiries.json", []);
-  const next = inquiries.map((item) =>
-    item.id === id
-      ? {
-          ...item,
-          status: text(formData, "status", item.status || "new"),
-          intent: text(formData, "intent", item.intent || "unrated") as InquiryRecord["intent"],
-          owner: text(formData, "owner", item.owner || ""),
-          notes: text(formData, "notes", item.notes || ""),
-        }
-      : item,
-  );
-  await writeStore("inquiries.json", next);
+  const status = z.enum(["new", "pending", "contacted", "quoted", "following", "sample", "negotiating", "won", "lost", "spam", "invalid"]).parse(text(formData, "status"));
+  const intent = z.enum(["A", "B", "C", "unrated"]).parse(text(formData, "intent", "unrated"));
+  const updated = await patchStoreItem<InquiryRecord>("inquiries.json", id, {
+    status, intent, owner: text(formData, "owner").slice(0, 120), notes: text(formData, "notes").slice(0, 12000),
+  });
+  if (!updated) return;
   await audit("update_lead", id);
   revalidatePath("/admin/leads");
   revalidatePath(`/admin/leads/${id}`);

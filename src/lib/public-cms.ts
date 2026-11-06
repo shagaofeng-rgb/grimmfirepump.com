@@ -3,19 +3,27 @@ import { cache } from "react";
 import { unstable_cache } from "next/cache";
 import { getProductDisplayName, getProductFamily } from "@/lib/product-taxonomy";
 import { buildProductNavigation, publicCategorySlug, publicProductCategory } from "@/lib/product-navigation";
+import { readStoreItem } from "@/lib/local-store";
+import { getProductKnowledge } from "@/lib/product-knowledge";
+import type { CmsProductKnowledge } from "@/lib/admin-cms";
 
 const publicContentRevalidateSeconds = 3600;
 const cachedCmsProducts = unstable_cache(listCmsProducts, ["public-cms-products-v2"], { revalidate: publicContentRevalidateSeconds, tags: ["cms-products"] });
 const cachedProductCategories = unstable_cache(listProductCategories, ["public-cms-product-categories-v1"], { revalidate: publicContentRevalidateSeconds, tags: ["cms-product-categories"] });
 const cachedCmsNews = unstable_cache(listCmsNews, ["public-cms-blog-v3"], { revalidate: publicContentRevalidateSeconds, tags: ["cms-blog"] });
+const cachedProductKnowledge = unstable_cache((slug: string) => readStoreItem<CmsProductKnowledge>("cms-product-knowledge.json", `knowledge_${slug}`), ["public-cms-knowledge-v1"], { revalidate: publicContentRevalidateSeconds, tags: ["cms-product-knowledge"] });
 
 export type PublicProduct = {
   slug: string;
+  knowledgeSlug: string;
   updatedAt: string;
   canonicalUrl: string;
   indexable: boolean;
   sourceUrl: string;
   title: string;
+  seoTitle: string;
+  seoDescription: string;
+  ogImage: string;
   category: string;
   groupSlug: string;
   releaseTime: string;
@@ -41,6 +49,10 @@ export type PublicPost = {
   sourceUrl: string;
   category: string;
   title: string;
+  seoTitle: string;
+  seoDescription: string;
+  author: string;
+  publishedAt: string;
   date: string;
   image: string;
   text: string;
@@ -94,11 +106,15 @@ function mapProduct(item: CmsProduct, categories: Map<string, CmsProductCategory
   const gallery = item.gallery.length ? item.gallery : [image];
   return {
     slug,
+    knowledgeSlug: item.slug,
     updatedAt: item.updatedAt || item.createdAt,
     canonicalUrl: `/products/${slug}`,
     indexable: item.indexable,
     sourceUrl: "",
     title: getProductDisplayName(item.slug, item.title),
+    seoTitle: item.seoTitle?.trim().toLowerCase() === item.title.trim().toLowerCase() ? "" : item.seoTitle?.trim() || "",
+    seoDescription: item.seoDescription?.trim() || "",
+    ogImage: item.ogImage || image,
     category: publicCategory?.name || category?.name || family.name,
     groupSlug: category ? publicCategorySlug(category.slug) : family.id,
     releaseTime: item.createdAt.slice(0, 10),
@@ -126,6 +142,10 @@ function mapPost(item: CmsNews): PublicPost {
     sourceUrl: item.source || "",
     category: item.category || "News",
     title: item.title,
+    seoTitle: item.seoTitle?.trim() || "",
+    seoDescription: item.seoDescription?.trim() || "",
+    author: item.author || "",
+    publishedAt: item.publishAt || item.createdAt,
     date: (item.publishAt || item.createdAt).slice(0, 10),
     image: publicArticleImage(item.coverImage),
     text: item.excerpt || item.subtitle || item.title,
@@ -141,7 +161,13 @@ export const getPublicProducts = cache(async function getPublicProducts() {
     .filter((item) => item.status === "published" && publicProductCategory(item.categoryId, byId))
     .sort((a, b) => a.sortOrder - b.sortOrder)
     .map((item) => mapProduct(item, byId));
-  return cmsMapped;
+  const descriptions = new Map<string, number>();
+  for (const { seoDescription } of cmsMapped) {
+    if (seoDescription) descriptions.set(seoDescription.toLowerCase(), (descriptions.get(seoDescription.toLowerCase()) || 0) + 1);
+  }
+  return cmsMapped.map((product) => /^(flow|head|pressure)\s*:/i.test(product.seoDescription) || (descriptions.get(product.seoDescription.toLowerCase()) || 0) > 1
+    ? { ...product, seoDescription: "" }
+    : product);
 });
 
 export const getPublicProductNavigation = cache(async function getPublicProductNavigation() {
@@ -151,6 +177,15 @@ export const getPublicProductNavigation = cache(async function getPublicProductN
 
 export async function getPublicProduct(slug: string) {
   return (await getPublicProducts()).find((item) => item.slug === slug.trim().toLowerCase());
+}
+
+export async function getPublicProductKnowledge(product: PublicProduct) {
+  const record = await cachedProductKnowledge(product.knowledgeSlug);
+  const defaults = getProductKnowledge(product.slug, product.title, product.category);
+  const details = record ? record.enabled ? record : null : defaults;
+  const useKnowledgeSummary = details && (details.solutionSummary !== defaults.solutionSummary
+    || ["edj-fire-pump-set", "vertical-stainless-steel-multistage-pump-jockey-pump"].includes(product.slug));
+  return { details, summary: useKnowledgeSummary ? details.solutionSummary : "" };
 }
 
 export async function getPublicPosts() {

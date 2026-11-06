@@ -2,12 +2,13 @@ import crypto from "node:crypto";
 import path from "node:path";
 import { unstable_cache } from "next/cache";
 import { applications, company, knowledgePosts } from "@/data/site";
-import { listCmsNews, listCmsProducts, listManagedPages } from "@/lib/admin-cms";
 import { isLocalizedPathIndexable, localizedLocales, localizedPath, supportedLocalizedPaths } from "@/lib/i18n";
-import { acquireTaskLock, createId, readStore, writeStore } from "@/lib/local-store";
+import { acquireTaskLock, createId, readStore, upsertStore, writeStore } from "@/lib/local-store";
 import { listPublishedNews } from "@/lib/news-automation";
+import { getPublicPosts, getPublicProducts } from "@/lib/public-cms";
 import { submitSitemapToSearchConsole, type SearchConsoleSubmission } from "@/lib/search-console";
 import { markSitemapDirty } from "@/lib/sitemap-dirty";
+import { sitePages } from "@/lib/site-pages";
 import {
   buildSitemapIndexXml,
   chunkSitemapEntries,
@@ -23,7 +24,7 @@ const MANIFEST_STORE = "sitemap-manifest.json";
 const RUNS_STORE = "sitemap-runs.json";
 const DIRTY_STORE = "sitemap-dirty.json";
 // Updated when shared editorial pages change. Product, Blog and News dates come from their records.
-const STATIC_CONTENT_UPDATED_AT = "2026-09-05T06:19:20.000Z";
+const STATIC_CONTENT_UPDATED_AT = "2026-11-06T00:00:00.000Z";
 const GROUPS: SitemapGroup[] = ["pages", "products", "knowledge", "categories"];
 
 export type SitemapManifest = {
@@ -101,10 +102,9 @@ function addEntry(map: Map<string, SitemapEntry>, entry: SitemapEntry, errors: s
 }
 
 async function buildSitemapBundleUncached(): Promise<SitemapBundle> {
-  const [products, blogPosts, managedPages, automatedNews] = await Promise.all([
-    listCmsProducts(),
-    listCmsNews(),
-    listManagedPages(),
+  const [products, blogPosts, automatedNews] = await Promise.all([
+    getPublicProducts(),
+    getPublicPosts(),
     listPublishedNews(),
   ]);
   const maps = new Map<SitemapGroup, Map<string, SitemapEntry>>(GROUPS.map((group) => [group, new Map()]));
@@ -114,15 +114,8 @@ async function buildSitemapBundleUncached(): Promise<SitemapBundle> {
     addEntry(maps.get(group)!, { group, url: absoluteUrl(pathname), lastModified }, errors);
   };
 
-  const managedPageBySlug = new Map(managedPages.map((page) => [page.slug === "/" ? "/" : `/${page.slug.replace(/^\//, "")}`, page]));
-  const pagePaths = ["/", "/about", "/projects", "/factory", "/testing", "/certificates", "/downloads", "/contact", "/privacy", "/terms", "/tools/fire-pump-selector"];
-  for (const pathname of pagePaths) {
-    const managed = managedPageBySlug.get(pathname);
-    if (managed && managed.status !== "published") {
-      skipped.push(`${pathname}: page status is ${managed.status}`);
-      continue;
-    }
-    add("pages", pathname, managed?.updatedAt || (["/privacy", "/terms"].includes(pathname) ? "2026-10-21T00:00:00.000Z" : STATIC_CONTENT_UPDATED_AT));
+  for (const page of sitePages) {
+    if ("sitemap" in page) add("pages", page.path, STATIC_CONTENT_UPDATED_AT);
   }
 
   for (const locale of localizedLocales) {
@@ -135,21 +128,21 @@ async function buildSitemapBundleUncached(): Promise<SitemapBundle> {
   for (const product of products) {
     const normalizedSlug = product.slug.trim().toLowerCase();
     const pathname = `/products/${normalizedSlug}`;
-    if (product.status !== "published" || !product.indexable) {
-      skipped.push(`${pathname}: unpublished or noindex`);
+    if (!product.indexable) {
+      skipped.push(`${pathname}: noindex`);
       continue;
     }
     if (!safeSlug(normalizedSlug)) {
       skipped.push(`${pathname}: invalid slug`);
       continue;
     }
-    add("products", pathname, product.updatedAt || product.createdAt);
+    add("products", pathname, product.updatedAt);
   }
 
   for (const post of blogPosts) {
     const pathname = `/blog/${post.slug}`;
-    if (post.status !== "published" || !post.indexable || new Date(post.publishAt).getTime() > Date.now()) {
-      skipped.push(`${pathname}: unpublished, scheduled or noindex`);
+    if (!post.indexable) {
+      skipped.push(`${pathname}: noindex`);
       continue;
     }
     if (!safeSlug(post.slug)) {
@@ -170,8 +163,8 @@ async function buildSitemapBundleUncached(): Promise<SitemapBundle> {
 
   for (const post of knowledgePosts) add("knowledge", `/knowledge/${post.slug}`, post.date);
 
-  const productDates = products.filter((item) => item.status === "published" && item.indexable).map((item) => item.updatedAt || item.createdAt);
-  const blogDates = blogPosts.filter((item) => item.status === "published" && item.indexable).map((item) => item.updatedAt || item.publishAt);
+  const productDates = products.filter((item) => item.indexable && safeSlug(item.slug)).map((item) => item.updatedAt);
+  const blogDates = blogPosts.filter((item) => item.indexable && safeSlug(item.slug)).map((item) => item.updatedAt || item.date);
   const newsDates = automatedNews.map((item) => item.updatedAt || item.publishAt || item.createdAt);
   const knowledgeDates = knowledgePosts.map((item) => item.date);
   add("categories", "/products", latestDate(productDates));
@@ -196,19 +189,13 @@ async function buildSitemapBundleUncached(): Promise<SitemapBundle> {
   };
 }
 
-export const buildSitemapBundle = unstable_cache(buildSitemapBundleUncached, ["sitemap-bundle-v3"], {
+export const buildSitemapBundle = unstable_cache(buildSitemapBundleUncached, ["sitemap-bundle-v4"], {
   revalidate: 300,
   tags: ["sitemap-data"],
 });
 
-/**
- * News and CMS writes mark the Sitemap dirty before the scheduled maintenance
- * job persists a new manifest. Public Sitemap requests must not serve the old
- * cached bundle during that short window.
- */
 export async function getCurrentSitemapBundle() {
-  const dirty = await readStore<Array<{ id: string }>>(DIRTY_STORE, []);
-  return dirty.length ? buildSitemapBundleUncached() : buildSitemapBundle();
+  return buildSitemapBundle();
 }
 
 function digestEntries(entries: SitemapEntry[]) {
@@ -222,8 +209,7 @@ export async function listSitemapRuns() {
 }
 
 async function saveRun(run: SitemapRun) {
-  const runs = await readStore<SitemapRun[]>(RUNS_STORE, []);
-  await writeStore(RUNS_STORE, [run, ...runs.filter((item) => item.id !== run.id)].slice(0, 100));
+  await upsertStore(RUNS_STORE, run);
 }
 
 export async function runSitemapMaintenance(options: {

@@ -1,0 +1,18 @@
+export const sitePages = [
+  { path: "/", label: "首页", group: "网站", sitemap: true },
+  { path: "/about", label: "公司介绍", group: "网站", sitemap: true },
+  { path: "/factory", label: "工厂实力", group: "网站", sitemap: true },
+  { path: "/testing", label: "检测能力", group: "网站", sitemap: true },
+  { path: "/certificates", label: "资质文件", group: "网站", sitemap: true },
+  { path: "/projects", label: "项目案例", group: "网站", sitemap: true },
+  { path: "/products", label: "产品目录", group: "产品", editor: "/admin/products" },
+  { path: "/applications", label: "应用场景", group: "产品" },
+  { path: "/tools/fire-pump-selector", label: "选型工具", group: "产品", sitemap: true },
+  { path: "/downloads", label: "资料下载", group: "资源", sitemap: true, editor: "/admin/downloads" },
+  { path: "/knowledge", label: "知识中心", group: "资源" },
+  { path: "/news", label: "行业资讯", group: "资源", editor: "/admin/news-automation" },
+  { path: "/blog", label: "技术博客", group: "资源", editor: "/admin/news" },
+  { path: "/contact", label: "联系我们", group: "联系", sitemap: true, editor: "/admin/leads" },
+  { path: "/privacy", label: "隐私政策", group: "法律", sitemap: true },
+  { path: "/terms", label: "使用条款", group: "法律", sitemap: true },
+] as const;

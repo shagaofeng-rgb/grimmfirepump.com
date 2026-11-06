@@ -1,6 +1,7 @@
 import { saveProduct } from "@/app/admin/actions";
 import { Field, inputClass, textareaClass } from "@/components/admin/admin-widgets";
 import { ProductMediaFields } from "@/components/admin/product-media-fields";
+import { EditorForm } from "@/components/admin/editor-form";
 import type { CmsProduct, CmsProductCategory } from "@/lib/admin-cms";
 import { ArrowLeft, FileText, Image as ImageIcon, Info, Save, Search } from "lucide-react";
 
@@ -8,7 +9,7 @@ export function ProductForm({ product, categories }: { product?: CmsProduct; cat
   const parameters = product?.parameters.map((item) => `${item.name}|${item.value}|${item.unit}`).join("\n") || "";
 
   return (
-    <form action={saveProduct} className="admin-editor-form">
+    <EditorForm action={saveProduct} className="admin-editor-form">
       <input type="hidden" name="id" value={product?.id || ""} />
       <div className="admin-editor-main">
       <section className="grid gap-4 rounded-lg border border-slate-200 bg-white p-6 shadow-sm md:grid-cols-2">
@@ -73,7 +74,7 @@ export function ProductForm({ product, categories }: { product?: CmsProduct; cat
       <section className="grid gap-4 rounded-lg border border-slate-200 bg-white p-6 shadow-sm md:grid-cols-2">
         <h2 className="text-xl font-black text-slate-950 md:col-span-2"><Search size={19} />SEO 设置</h2>
         <Field label="SEO Title"><input name="seoTitle" defaultValue={product?.seoTitle} className={inputClass} /></Field>
-        <Field label="Canonical URL"><input name="canonicalUrl" defaultValue={product?.canonicalUrl} className={inputClass} /></Field>
+        {product && <Field label="规范网址"><input value={`/products/${product.slug.toLowerCase()}`} readOnly className={inputClass} /></Field>}
         <Field label="SEO Keywords"><input name="seoKeywords" defaultValue={product?.seoKeywords} className={inputClass} /></Field>
         <Field label="Meta Description"><textarea name="seoDescription" rows={3} defaultValue={product?.seoDescription} className={textareaClass} /></Field>
         <label className="flex items-center gap-2 text-sm font-bold text-slate-700 md:col-span-2">
@@ -86,6 +87,6 @@ export function ProductForm({ product, categories }: { product?: CmsProduct; cat
         <a className="button button-secondary" href="/admin/products"><ArrowLeft size={16} />返回列表</a>
         <button className="button button-primary" type="submit"><Save size={16} />保存产品</button>
       </div>
-    </form>
+    </EditorForm>
   );
 }

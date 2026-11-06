@@ -60,6 +60,7 @@ function adminApiAllowed(pathname: string, role = "") {
   if (role === "super_admin") return true;
   if (pathname.startsWith("/api/admin/news")) return role === "content_manager";
   if (pathname.startsWith("/api/admin/uploads")) return role === "content_manager" || role === "product_manager";
+  if (pathname === "/api/admin/export") return ["sales", "analyst", "content_manager", "product_manager"].includes(role);
   if (pathname === "/api/inquiries" || pathname === "/api/download-leads") return role === "sales";
   if (pathname === "/api/analytics") return role === "analyst";
   return false;
@@ -112,7 +113,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(target, 301);
   }
   const requestHeaders = new Headers(request.headers);
-  requestHeaders.set("x-site-locale", pathname.match(localePattern)?.[1] || "en");
+  requestHeaders.set("x-site-locale", /^\/admin(?:\/|$)/.test(pathname) ? "zh-CN" : pathname.match(localePattern)?.[1] || "en");
 
   const protectsAdminPage = pathname.startsWith("/admin") && pathname !== "/admin/login";
   const protectsAdminApi = pathname.startsWith("/api/admin/")

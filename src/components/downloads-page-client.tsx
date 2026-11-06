@@ -3,7 +3,8 @@
 import { useId, useRef, useState, type FormEvent } from "react";
 import { Download, X } from "lucide-react";
 import Link from "next/link";
-import { hasAnalyticsConsent } from "@/components/analytics-listener";
+import { getVisitorContext, hasAnalyticsConsent, trackSiteEvent } from "@/components/analytics-listener";
+import { useSubmissionToken } from "@/components/use-submission-token";
 
 export function DownloadRequest({ id, title }: { id: string; title: string }) {
   const dialog = useRef<HTMLDialogElement>(null);
@@ -12,6 +13,8 @@ export function DownloadRequest({ id, title }: { id: string; title: string }) {
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const revision = useRef(0);
+  const submission = useSubmissionToken();
+  const started = useRef(false);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -23,18 +26,14 @@ export function DownloadRequest({ id, title }: { id: string; title: string }) {
       const response = await fetch("/api/download-leads", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...data, assetId: id, sourcePage: window.location.pathname }),
+        body: JSON.stringify({ ...data, ...getVisitorContext(), assetId: id, sourcePage: window.location.pathname, submissionToken: submission.tokenFor(data) }),
       });
       if (!response.ok) throw new Error("Download request failed");
       const result = await response.json();
       if (typeof result.file !== "string" || !(/^\/(?!\/)/.test(result.file) || result.file.startsWith("https://"))) throw new Error("Missing file");
       if (run !== revision.current) return;
       setFile(result.file);
-      if (hasAnalyticsConsent()) void fetch("/api/analytics", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ event: "download_click", path: window.location.pathname, label: title }),
-      }).catch(() => undefined);
+      submission.clear();
     } catch {
       if (run === revision.current) setError("Unable to prepare the download. Try again or contact our team.");
     } finally {
@@ -44,12 +43,13 @@ export function DownloadRequest({ id, title }: { id: string; title: string }) {
 
   return (
     <>
-      <button className="interior-button interior-primary" type="button" onClick={() => dialog.current?.showModal()}><Download size={16} /> Get document</button>
+      <button className="interior-button interior-primary" type="button" onClick={() => { dialog.current?.showModal(); void trackSiteEvent("form_open", title); }}><Download size={16} /> Get document</button>
       <dialog className="interior-dialog interior-download-dialog" ref={dialog} aria-labelledby={headingId} onClose={() => {
         revision.current++;
         setError("");
         setFile("");
         setSubmitting(false);
+        started.current = false;
       }}>
         <div className="interior-dialog-head">
           <h2 id={headingId}>{title}</h2>
@@ -58,10 +58,15 @@ export function DownloadRequest({ id, title }: { id: string; title: string }) {
         {file ? (
           <div role="status">
             <p className="interior-copy mb-3">Your download is ready.</p>
-            <a className="interior-button interior-primary" href={file} target="_blank" rel="noopener noreferrer" autoFocus><Download size={16} /> Open document</a>
+            <a className="interior-button interior-primary" href={file} target="_blank" rel="noopener noreferrer" data-event="download_click" data-label={title} autoFocus><Download size={16} /> Open document</a>
           </div>
         ) : (
-          <form className="interior-form" method="post" onSubmit={submit}>
+          <form className="interior-form" method="post" onSubmit={submit} onChange={() => {
+            if (!started.current && hasAnalyticsConsent()) {
+              started.current = true;
+              void trackSiteEvent("form_start", title);
+            }
+          }}>
             <input name="website" className="hidden" tabIndex={-1} autoComplete="off" />
             <label className="interior-field">Full name * <input name="name" required minLength={2} maxLength={120} autoComplete="name" /></label>
             <label className="interior-field">Work email * <input name="email" type="email" required maxLength={254} autoComplete="email" /></label>

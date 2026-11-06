@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev -p 4174",
     "build": "next build",
-    "build:vercel": "npm run news:sources:import && npm run news:sources:validate && npm run news:sources:probe && npm run audit:products && npm run test:news-sources && npm run test:news-quality && npm run test:news-schedule && npm run test:sitemap && npm run test:admin-listing && npm run test:interior && npm run build",
+    "build:vercel": "npm run news:sources:import && npm run news:sources:validate && npm run news:sources:probe && npm run audit:products && npm run test:news-sources && npm run test:news-quality && npm run test:news-schedule && npm run test:sitemap && npm run test:admin-listing && npm run test:interior && npm run test:store && npm run build",
     "start": "next start -p 4174",
     "typecheck": "tsc --noEmit",
     "lint": "tsc --noEmit",
@@ -21,7 +21,8 @@
     "test:news-quality": "node --test --experimental-strip-types tests/news-quality-gates.test.mjs",
     "test:news-schedule": "node --test --experimental-strip-types tests/news-publish-schedule.test.mjs",
     "test:admin-listing": "node --test --experimental-strip-types tests/admin-listing.test.mjs",
-    "test:interior": "node --test --experimental-strip-types tests/interior-presentation.test.mjs"
+    "test:interior": "node --test --experimental-strip-types tests/interior-presentation.test.mjs",
+    "test:store": "node --test tests/store-safety.test.mjs"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",
@@ -30,16 +31,19 @@
     "clsx": "^2.1.1",
     "framer-motion": "^12.23.25",
     "lucide-react": "^0.468.0",
-    "next": "15.5.21",
+    "next": "15.5.29",
     "postcss": "8.5.26",
     "react": "19.0.4",
     "react-dom": "19.0.4",
-    "zod": "^4.1.13"
+    "zod": "^4.6.6"
   },
   "overrides": {
     "nanoid": "3.3.18",
     "postcss": "8.5.26",
-    "sharp": "0.35.4"
+    "sharp": "0.35.5",
+    "@vercel/cli-config": "0.3.7",
+    "source-map-js": "1.2.2",
+    "undici": "6.29.1"
   },
   "devDependencies": {
     "@types/node": "^22.19.19",

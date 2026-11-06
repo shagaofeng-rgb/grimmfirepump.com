@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { company } from "@/data/site";
-import { getVisitorContext, hasAnalyticsConsent } from "@/components/analytics-listener";
+import { getVisitorContext, hasAnalyticsConsent, trackSiteEvent } from "@/components/analytics-listener";
+import { useSubmissionToken } from "@/components/use-submission-token";
 
 type ProductInquiryFormProps = {
   productTitle?: string;
@@ -15,6 +16,8 @@ type ProductInquiryFormProps = {
 export function ProductInquiryForm({ productTitle, products = [], initial }: ProductInquiryFormProps) {
   const [result, setResult] = useState<{ ok: boolean; text: string }>();
   const [submitting, setSubmitting] = useState(false);
+  const submission = useSubmissionToken();
+  const started = useRef(false);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -28,17 +31,16 @@ export function ProductInquiryForm({ productTitle, products = [], initial }: Pro
       const response = await fetch("/api/inquiries", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...data, ...visitor, sourcePage: window.location.pathname }),
+        body: JSON.stringify({ ...data, ...visitor, sourcePage: window.location.pathname, submissionToken: submission.tokenFor(data) }),
       });
       if (!response.ok) throw new Error("Submission failed");
-      if (hasAnalyticsConsent()) void fetch("/api/analytics", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ event: "inquiry_submit", path: window.location.pathname, label: String(data.product || "project brief"), ...visitor }),
-      }).catch(() => undefined);
+      const receipt = await response.json();
+      if (!receipt.duplicate && receipt.id) void trackSiteEvent("inquiry_submit", String(data.product || "project brief"));
 
       setResult({ ok: true, text: "Inquiry received. Our team will reply using the contact details you provided." });
       form.reset();
+      submission.clear();
+      started.current = false;
     } catch {
       setResult({ ok: false, text: `Unable to send your inquiry. Please try again or email ${company.email}.` });
     } finally {
@@ -47,7 +49,12 @@ export function ProductInquiryForm({ productTitle, products = [], initial }: Pro
   }
 
   return (
-    <form onSubmit={submit} method="post" className="interior-form">
+    <form onSubmit={submit} onChange={() => {
+      if (!started.current && hasAnalyticsConsent()) {
+        started.current = true;
+        void trackSiteEvent("form_start", productTitle || "Inquiry");
+      }
+    }} method="post" className="interior-form">
       <input name="website" className="hidden" tabIndex={-1} autoComplete="off" />
       {productTitle && <input name="product" type="hidden" value={productTitle} readOnly />}
       <label className="interior-field">Full name * <input name="name" required minLength={2} maxLength={120} autoComplete="name" /></label>

@@ -33,7 +33,7 @@ function csvCell(value) {
 
 async function fetchText(pathname, options = {}) {
   const started = Date.now();
-  const response = await fetch(`${baseUrl}${pathname}`, { redirect: "manual", ...options });
+  const response = await fetch(`${baseUrl}${pathname}`, { redirect: "manual", signal: AbortSignal.timeout(20000), ...options });
   return { response, text: await response.text(), elapsed: Date.now() - started };
 }
 
@@ -151,7 +151,9 @@ async function main() {
   const robots = await fetchText("/robots.txt");
   assert(robots.response.status === 200, "robots.txt is unavailable");
   assert(robots.text.includes(`Sitemap: ${productionOrigin}/sitemap.xml`), "robots.txt Sitemap declaration is incorrect");
-  assert(robots.text.includes("Disallow: /admin/"), "robots.txt does not disallow admin routes");
+  assert(/^Disallow:\s*\/admin\/?\s*$/mi.test(robots.text), "robots.txt does not disallow admin routes");
+  assert(/^Disallow:\s*\/api\/\s*$/mi.test(robots.text), "robots.txt does not disallow API routes");
+  assert(!/^Disallow:\s*\/(?:es\/|ru\/|ar\/|fr\/|pt\/)?search\s*$/mi.test(robots.text), "Robots blocks search pages before crawlers can read their noindex");
 
   const admin = await fetchText("/admin");
   assert([302, 303, 307, 308].includes(admin.response.status), `/admin should redirect to login, got ${admin.response.status}`);

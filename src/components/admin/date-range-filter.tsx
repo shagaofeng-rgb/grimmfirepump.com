@@ -41,11 +41,14 @@ export function DateRangeFilter({
 
   return (
     <div className={compact ? "admin-date-filter grid gap-2" : "admin-date-filter grid gap-3"}>
+      <input type="hidden" name="range" value={preset} />
       <div className="flex flex-wrap gap-2" aria-label="时间范围">
         {options.map((item) => (
           <Link
             key={item.value}
             href={hrefFor(pathname, values, item.value)}
+            aria-current={preset === item.value ? "true" : undefined}
+            prefetch={false}
             className={preset === item.value
               ? "rounded-md bg-[var(--navy-950)] px-3 py-2 text-xs font-black text-white"
               : "rounded-md border border-slate-200 bg-white px-3 py-2 text-xs font-black text-slate-600 hover:border-orange-300 hover:text-orange-700"}
@@ -55,7 +58,6 @@ export function DateRangeFilter({
         ))}
       </div>
       {preset === "custom" ? <div className="grid gap-2 sm:grid-cols-[1fr_1fr_auto]">
-        <input type="hidden" name="range" value="custom" />
         <input type="date" name="from" defaultValue={from} className="min-h-10 rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-900" aria-label="开始日期" />
         <input type="date" name="to" defaultValue={to} className="min-h-10 rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-900" aria-label="结束日期" />
         {compact ? <button type="submit" className="min-h-10 rounded-md border border-slate-300 bg-white px-4 text-xs font-bold text-slate-900 hover:bg-slate-50">应用日期</button> : null}

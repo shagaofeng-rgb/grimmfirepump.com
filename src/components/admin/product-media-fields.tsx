@@ -16,7 +16,7 @@ const maxFileSize = 15 * 1024 * 1024;
 function safeFilename(name: string) {
   const extension = name.includes(".") ? `.${name.split(".").pop()}` : "";
   const base = name.slice(0, name.length - extension.length).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
-  return `${base || "product-image"}${extension.toLowerCase()}`;
+  return `${base.slice(0, 120) || "product-image"}${extension.toLowerCase()}`;
 }
 
 export function ProductMediaFields({ initialMainImage = "", initialGallery = [], initialOgImage = "" }: ProductMediaFieldsProps) {

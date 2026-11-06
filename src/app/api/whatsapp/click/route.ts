@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import type { AnalyticsEventRecord, WhatsAppClickRecord } from "@/lib/admin-data";
-import { getSiteSettings } from "@/lib/admin-cms";
 import { company } from "@/data/site";
-import { appendStore, createId, readStore } from "@/lib/local-store";
+import { insertStoreItem, readStoreItem, submissionId } from "@/lib/local-store";
 import { checkRequestRateLimit } from "@/lib/request-rate-limit";
+import { classifyTraffic, externalReferrer, trafficChannel, trafficLocation } from "@/lib/traffic-context";
 
 const account = {
   id: "grimm-main",
@@ -16,7 +16,7 @@ const clickSchema = z.object({
   accountId: z.literal(account.id).default(account.id),
   targetUrl: z.string().url().max(500),
   placement: z.string().trim().min(2).max(80).default("website"),
-  path: z.string().trim().max(500).default("/"),
+  path: z.string().trim().max(500).regex(/^\/(?![\/\\])[^?#]*$/).default("/"),
   label: z.string().trim().max(200).optional().default(""),
   clientClickId: z.string().trim().min(8).max(160),
   visitorId: z.string().trim().max(120).optional().default(""),
@@ -29,56 +29,6 @@ const clickSchema = z.object({
   testTraffic: z.boolean().optional().default(false),
 });
 
-const botPattern = /(bot|crawler|spider|lighthouse|headless|playwright|puppeteer|selenium|curl|wget|collects)/i;
-const socialPattern = /(facebook|instagram|linkedin|tiktok|youtube|x\.com|twitter|pinterest)/i;
-const searchPattern = /(google|bing|yahoo|baidu|duckduckgo|yandex)/i;
-
-function clientIp(request: Request) {
-  return request.headers.get("x-forwarded-for")?.split(",")[0]?.trim()
-    || request.headers.get("x-real-ip")?.trim()
-    || "";
-}
-
-function maskIp(ip: string) {
-  if (!ip) return "";
-  if (ip.includes(".")) {
-    const parts = ip.split(".");
-    return parts.length === 4 ? `${parts[0]}.${parts[1]}.${parts[2]}.0` : "masked";
-  }
-  return ip.includes(":") ? `${ip.split(":").slice(0, 3).join(":")}::` : "masked";
-}
-
-function countryName(code: string) {
-  if (!code) return "Unknown";
-  try { return new Intl.DisplayNames(["en"], { type: "region" }).of(code) || code; } catch { return code; }
-}
-
-function channelFor(input: { referrer: string; utmSource: string; utmMedium: string }) {
-  const referrer = input.referrer.toLowerCase();
-  const medium = input.utmMedium.toLowerCase();
-  if (medium.includes("cpc") || medium.includes("paid") || medium.includes("ppc")) return "Paid";
-  if (input.utmSource || medium.includes("email")) return medium.includes("email") ? "Email" : "Campaign";
-  if (searchPattern.test(referrer)) return "Organic search";
-  if (socialPattern.test(referrer)) return "Social";
-  if (referrer) return "Referral";
-  return "Direct";
-}
-
-async function classifyTraffic(request: Request, input: z.infer<typeof clickSchema>) {
-  const host = request.headers.get("host") || "";
-  const ua = request.headers.get("user-agent") || "";
-  const ip = clientIp(request);
-  const settings = await getSiteSettings();
-  const excludedIps = [process.env.ANALYTICS_EXCLUDED_IPS || "", settings.analyticsExcludedIps]
-    .join(",").split(",").map((item) => item.trim()).filter(Boolean);
-  const excludedAgents = [process.env.ANALYTICS_EXCLUDED_USER_AGENTS || "", settings.analyticsExcludedUserAgents]
-    .join(",").split(",").map((item) => item.trim().toLowerCase()).filter(Boolean);
-  if (host.endsWith(".vercel.app") || host.includes("localhost") || input.testTraffic) return { trafficType: "test" as const, trafficReason: "preview_or_test_environment" };
-  if (excludedIps.includes(ip)) return { trafficType: "test" as const, trafficReason: "excluded_ip" };
-  if (excludedAgents.some((item) => ua.toLowerCase().includes(item))) return { trafficType: "test" as const, trafficReason: "excluded_user_agent" };
-  if (botPattern.test(ua)) return { trafficType: "bot" as const, trafficReason: "automated_user_agent" };
-  return { trafficType: "real" as const, trafficReason: "" };
-}
 
 function isConfiguredAccountUrl(targetUrl: string) {
   try {
@@ -99,15 +49,12 @@ export async function POST(request: Request) {
   const rate = await checkRequestRateLimit(request, "whatsapp-click", { limit: 90, windowMs: 10 * 60 * 1000 });
   if (!rate.allowed) return NextResponse.json({ error: "Too many requests" }, { status: 429, headers: { "Retry-After": String(rate.retryAfterSeconds) } });
 
-  const existing = await readStore<WhatsAppClickRecord[]>("whatsapp-clicks.json", []);
-  const duplicate = existing.find((item) => item.clientClickId === parsed.data.clientClickId);
-  if (duplicate) return NextResponse.json({ ok: true, trackingId: duplicate.id, duplicate: true }, { headers: { "Cache-Control": "no-store" } });
-
-  const traffic = await classifyTraffic(request, parsed.data);
-  const countryCode = request.headers.get("x-vercel-ip-country") || "";
+  const id = submissionId("wa", parsed.data.clientClickId, account.id);
+  const previous = await readStoreItem<WhatsAppClickRecord>("whatsapp-clicks.json", id);
+  const traffic = previous || await classifyTraffic(request, parsed.data.path, parsed.data.testTraffic);
   const createdAt = new Date().toISOString();
-  const click: WhatsAppClickRecord = {
-    id: createId("wa"),
+  const candidate: WhatsAppClickRecord = {
+    id,
     createdAt,
     accountId: account.id,
     accountLabel: account.label,
@@ -117,23 +64,22 @@ export async function POST(request: Request) {
     visitorId: parsed.data.visitorId,
     sessionId: parsed.data.sessionId,
     visitNumber: parsed.data.visitNumber,
-    countryCode,
-    country: countryName(countryCode),
-    region: request.headers.get("x-vercel-ip-country-region") || "",
-    city: request.headers.get("x-vercel-ip-city") || "",
-    channel: channelFor(parsed.data),
-    referrer: parsed.data.referrer,
+    ...trafficLocation(request),
+    channel: trafficChannel(parsed.data),
+    referrer: externalReferrer(parsed.data.referrer),
     utmSource: parsed.data.utmSource,
     utmMedium: parsed.data.utmMedium,
     utmCampaign: parsed.data.utmCampaign,
-    ipMasked: maskIp(clientIp(request)),
-    userAgent: request.headers.get("user-agent") || "",
     clientClickId: parsed.data.clientClickId,
-    ...traffic,
+    trafficType: traffic.trafficType,
+    trafficReason: traffic.trafficReason,
   };
+  const inserted = !previous && await insertStoreItem("whatsapp-clicks.json", candidate);
+  const click = inserted ? candidate : previous || await readStoreItem<WhatsAppClickRecord>("whatsapp-clicks.json", id);
+  if (!click) return NextResponse.json({ error: "Unable to record the click" }, { status: 503 });
   const event: AnalyticsEventRecord = {
     id: `evt_${click.id}`,
-    createdAt,
+    createdAt: click.createdAt,
     event: "whatsapp_click",
     path: click.path,
     label: parsed.data.label,
@@ -162,7 +108,6 @@ export async function POST(request: Request) {
     trafficReason: click.trafficReason,
   };
 
-  await appendStore("whatsapp-clicks.json", click);
-  await appendStore("analytics-events.json", event);
-  return NextResponse.json({ ok: true, trackingId: click.id, accountId: click.accountId }, { headers: { "Cache-Control": "no-store" } });
+  await insertStoreItem("analytics-events.json", event);
+  return NextResponse.json({ ok: true, trackingId: click.id, accountId: click.accountId, ...(!inserted ? { duplicate: true } : {}) }, { headers: { "Cache-Control": "no-store" } });
 }

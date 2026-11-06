@@ -365,14 +365,14 @@ const pageSeeds: ManagedPage[] = [
 
 export async function listProductCategories() {
   const items = await readStore<CmsProductCategory[]>("cms-product-categories.json", []);
-  if (items.length) return [...items].sort((a, b) => a.sortOrder - b.sortOrder);
+  if (items.length || process.env.VERCEL_ENV === "production") return [...items].sort((a, b) => a.sortOrder - b.sortOrder);
   await writeStore("cms-product-categories.json", categorySeeds);
   return categorySeeds;
 }
 
 export async function listCmsProducts() {
   const items = await readStore<CmsProduct[]>("cms-products.json", []);
-  if (items.length) {
+  if (items.length || process.env.VERCEL_ENV === "production") {
     return [...items].sort((a, b) => a.sortOrder - b.sortOrder);
   }
   await writeStore("cms-products.json", productSeeds);
@@ -381,13 +381,10 @@ export async function listCmsProducts() {
 
 export async function listCmsNews() {
   const items = await readStore<CmsNews[]>("cms-news.json", []);
-  if (items.length) {
+  if (items.length || process.env.VERCEL_ENV === "production") {
     const normalizedItems = items.map((item) => legacyBlogExclusions.has(item.slug) && (item.status !== "archived" || item.indexable)
-      ? { ...item, status: "archived" as const, indexable: false, updatedAt: new Date().toISOString() }
+      ? { ...item, status: "archived" as const, indexable: false }
       : item);
-    if (normalizedItems.some((item, index) => item !== items[index])) {
-      await writeStore("cms-news.json", normalizedItems);
-    }
     return normalizedItems.sort(
       (a, b) => new Date(b.publishAt).getTime() - new Date(a.publishAt).getTime(),
     );
@@ -420,7 +417,6 @@ export async function listCmsProductKnowledge() {
       ...getProductKnowledge(product.slug, product.title, product.categoryName),
     };
   });
-  if (seeded.length !== stored.length) await writeStore("cms-product-knowledge.json", [...stored, ...seeded.filter((item) => !bySlug.has(item.productSlug))]);
   return seeded;
 }
 
@@ -430,7 +426,7 @@ export async function listMediaFiles() {
 
 export async function listDownloadAssets() {
   const items = await readStore<DownloadAsset[]>("cms-downloads.json", []);
-  if (items.length) return [...items];
+  if (items.length || process.env.VERCEL_ENV === "production") return [...items];
   await writeStore("cms-downloads.json", downloadSeeds);
   return downloadSeeds;
 }
@@ -449,7 +445,7 @@ export async function getSiteSettings() {
     return {
       ...existing,
       analyticsExcludedIps: existing.analyticsExcludedIps || "",
-      analyticsExcludedUserAgents: existing.analyticsExcludedUserAgents || "collects,playwright,puppeteer,selenium,lighthouse",
+      analyticsExcludedUserAgents: existing.analyticsExcludedUserAgents ?? "",
       analyticsIpRetentionDays: existing.analyticsIpRetentionDays || "90",
     } as SiteSetting;
   }
@@ -474,7 +470,6 @@ export async function getSiteSettings() {
     analyticsExcludedUserAgents: process.env.ANALYTICS_EXCLUDED_USER_AGENTS || "collects,playwright,puppeteer,selenium,lighthouse",
     analyticsIpRetentionDays: "90",
   };
-  await writeStore("cms-settings.json", [seed]);
   return seed;
 }
 
@@ -490,11 +485,8 @@ export async function listAdminUsers() {
     role: configured.role,
     status: "active",
   };
-  if (!items.some((item) => item.username === seed.username)) {
-    await writeStore("admin-users.json", [seed, ...items]);
-    return [seed, ...items];
-  }
-  return items;
+  const actual = items.find((item) => item.username === configured.username);
+  return [{ ...(actual || seed), username: configured.username, displayName: configured.displayName, role: configured.role, status: "active" }];
 }
 
 export async function listAuditLogs() {
