@@ -10,7 +10,7 @@ import { useSubmissionToken } from "@/components/use-submission-token";
 type ProductInquiryFormProps = {
   productTitle?: string;
   products?: string[];
-  initial?: { product?: string; flow?: string; head?: string; application?: string; voltage?: string };
+  initial?: { product?: string; flow?: string; head?: string; application?: string; voltage?: string; message?: string };
 };
 
 export function ProductInquiryForm({ productTitle, products = [], initial }: ProductInquiryFormProps) {
@@ -63,7 +63,7 @@ export function ProductInquiryForm({ productTitle, products = [], initial }: Pro
       <label className="interior-field">Country or region <input name="country" maxLength={120} autoComplete="country-name" /></label>
       <label className="interior-field">Required flow <input name="flow" maxLength={80} defaultValue={initial?.flow} placeholder="e.g. 500 GPM" /></label>
       <label className="interior-field">Head / pressure <input name="head" maxLength={80} defaultValue={initial?.head} placeholder="e.g. 10 bar" /></label>
-      <label className="interior-field interior-form-wide">Project requirements <textarea name="message" rows={4} maxLength={5000} placeholder="Application, water source and document requirements" /></label>
+      <label className="interior-field interior-form-wide">Project requirements <textarea name="message" rows={4} maxLength={5000} defaultValue={initial?.message} placeholder="Application, water source and document requirements" /></label>
       <details className="interior-form-wide interior-form-more" open={initial?.product || initial?.application || initial?.voltage ? true : undefined}>
         <summary>Additional project details <span aria-hidden="true">+</span></summary>
         <div className="interior-form mt-3">

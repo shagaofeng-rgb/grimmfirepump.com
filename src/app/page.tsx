@@ -1,11 +1,5 @@
 import type { Metadata } from "next";
-import { Header } from "@/components/header";
-import { Hero } from "@/components/home/hero";
-import { AdvantageSection } from "@/components/home/advantage-section";
-import { ProductSection } from "@/components/home/product-section";
-import { CertificationShowcase } from "@/components/home/certification-showcase";
-import { FactoryPreviewSection } from "@/components/home/factory-preview-section";
-import { HomeCta } from "@/components/home/home-cta";
+import { FactoryHome } from "@/components/home/factory-home";
 import { HomeFooter } from "@/components/home/home-footer";
 import { StickyCta } from "@/components/sticky-cta";
 import { localizedAlternates } from "@/lib/i18n";
@@ -21,16 +15,8 @@ export const dynamic = "force-dynamic";
 
 export default function Home() {
   return (
-    <div className="home-editorial">
-      <Header />
-      <main>
-        <Hero />
-        <AdvantageSection />
-        <ProductSection featuredOnly />
-        <CertificationShowcase />
-        <FactoryPreviewSection />
-        <HomeCta />
-      </main>
+    <div className="home-editorial home-factory-reference">
+      <FactoryHome />
       <HomeFooter />
       <StickyCta />
     </div>

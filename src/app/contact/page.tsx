@@ -18,7 +18,7 @@ export default async function ContactPage({ searchParams }: { searchParams: Prom
   const [products, params] = await Promise.all([getPublicProducts(), searchParams]);
   const options = [...new Set(products.map((product) => product.title))];
   const product = products.find((item) => item.slug === params.product || item.title === params.product)?.title;
-  const initial = { product, flow: boundedQuery(params.flow, 80), head: boundedQuery(params.head, 80), application: boundedQuery(params.application, 180), voltage: boundedQuery(params.voltage, 80) };
+  const initial = { product, flow: boundedQuery(params.flow, 80), head: boundedQuery(params.head, 80), application: boundedQuery(params.application, 180), voltage: boundedQuery(params.voltage, 80), message: params.request === "pump-curves" ? "Please provide the pump performance curves for my project. Required model, flow and pressure:" : "" };
   return (
     <InteriorFrame path="/contact" breadcrumbs={[{ label: "Contact" }]}>
       <PageMast eyebrow="Engineering sales" title="Contact GRIMM PUMP" text="For quotations, pump selection and project documentation." />
