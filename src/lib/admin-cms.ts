@@ -1,5 +1,5 @@
 import { company, downloads, posts, products } from "@/data/site";
-import { createId, deleteStoreItem, readStore, upsertStore, writeStore } from "@/lib/local-store";
+import { createId, deleteStoreItem, insertStoreItem, readStore, readStoreItem, readStoreRange, upsertStore, writeStore } from "@/lib/local-store";
 import { getConfiguredAdminUser, type AdminRole } from "@/lib/admin-auth";
 import { getProductFamily, productFamilies } from "@/lib/product-taxonomy";
 import { getProductKnowledge, type ProductKnowledge } from "@/lib/product-knowledge";
@@ -506,6 +506,9 @@ export const cmsStore = {
   deleteCategory: (id: string) => deleteStoreItem<CmsProductCategory>("cms-product-categories.json", id),
   upsertProduct: (item: CmsProduct) => upsertStore("cms-products.json", item),
   deleteProduct: (id: string) => deleteStoreItem<CmsProduct>("cms-products.json", id),
+  getNews: (id: string) => readStoreItem<CmsNews>("cms-news.json", id),
+  findNewsBySlug: (slug: string) => readStoreRange<CmsNews>("cms-news.json", { match: { field: "slug", value: slug } }),
+  insertNews: (item: CmsNews) => insertStoreItem("cms-news.json", item),
   upsertNews: (item: CmsNews) => upsertStore("cms-news.json", item),
   deleteNews: (id: string) => deleteStoreItem<CmsNews>("cms-news.json", id),
   upsertBlogCategory: (item: CmsBlogCategory) => upsertStore("cms-blog-categories.json", item),

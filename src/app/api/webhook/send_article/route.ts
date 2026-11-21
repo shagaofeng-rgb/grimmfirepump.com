@@ -2,7 +2,8 @@ import { createHash, timingSafeEqual } from "node:crypto";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { cmsStore, listCmsNews, logAudit, type CmsNews } from "@/lib/admin-cms";
+import { cmsStore, isLegacyImportedBlogSlug, logAudit, type CmsNews } from "@/lib/admin-cms";
+import { toArticleContentBlocks } from "@/lib/article-content";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -15,6 +16,8 @@ const payloadSchema = z.object({
   author_id: z.string().trim().max(120).optional().default(""),
   image_url: z.string().trim().max(2_000).optional().default(""),
 });
+const minBodyLength = 20;
+const maxProbeTitleLength = 40;
 
 function response(code: 0 | 1, msg: string) {
   return NextResponse.json({ code, msg }, { status: 200 });
@@ -68,9 +71,10 @@ function categoryFor(classId: string) {
   return `External Blog ${classId.trim().slice(0, 40)}`;
 }
 
-function uniqueSlug(preferred: string, id: string, articles: CmsNews[]) {
-  const owner = articles.find((article) => article.slug === preferred);
-  return !owner || owner.id === id ? preferred : `${preferred}-${id.slice(-6)}`;
+async function uniqueSlug(preferred: string, id: string) {
+  const owners = await cmsStore.findNewsBySlug(preferred);
+  return isLegacyImportedBlogSlug(preferred) || owners.some((owner) => owner.id !== id)
+    ? `${preferred}-${id.slice(-6)}` : preferred;
 }
 
 function asRecord(value: unknown): Record<string, unknown> {
@@ -104,8 +108,19 @@ async function parsePayload(request: Request) {
   });
 }
 
-function isPublishableArticle(title: string, content: string) {
-  return title.trim().length >= 2 && plainText(content).length >= 20;
+function readableArticle(value: string) {
+  const paragraphs = value
+    .replace(/<h([1-6])\b[^>]*>/gi, (_, level: string) => Number(level) <= 2 ? "\n## " : "\n### ")
+    .replace(/<\/?(?:p|div|br|li|h[1-6])\b[^>]*>/gi, "\n")
+    .replace(/<img\b[^>]*>/gi, " ")
+    .split("\n");
+  const blocks = toArticleContentBlocks(paragraphs, Infinity);
+  return {
+    content: blocks.flatMap((block) => block.type === "image" ? [] : [
+      block.type === "heading" ? `${"#".repeat(block.level)} ${block.value}` : block.value,
+    ]).join("\n\n"),
+    summary: blocks.flatMap((block) => block.type === "paragraph" ? [block.value] : []).join(" "),
+  };
 }
 
 function revalidatePublicBlog(slug?: string) {
@@ -117,11 +132,11 @@ function revalidatePublicBlog(slug?: string) {
   if (slug) revalidatePath(`/blog/${slug}`);
 }
 
-async function recordFailure(action: string, target: string) {
+async function recordAudit(action: string, target: string, result: "success" | "failed") {
   try {
-    await logAudit({ actor: "blog_webhook", action, target: target.slice(0, 120), result: "failed" });
+    await logAudit({ actor: "blog_webhook", action, target, result });
   } catch {
-    // A logging failure must not reveal implementation details or change the plugin contract.
+    console.error("Blog webhook audit write failed", { action, target });
   }
 }
 
@@ -134,65 +149,74 @@ export async function POST(request: Request) {
   try {
     const parsed = await parsePayload(request);
     if (!parsed.success) {
-      await recordFailure("webhook_invalid_payload", "blog");
+      await recordAudit("webhook_invalid_payload", "blog", "failed");
       return response(0, "请求参数不符合要求。");
     }
     if (!validSecret(parsed.data.sign, secret)) {
-      await recordFailure("webhook_auth_failed", parsed.data.class_id);
+      await recordAudit("webhook_auth_failed", "blog", "failed");
       return response(0, "秘钥错误");
     }
 
     // Custom framework verification sends only a signed class_id (or short placeholders).
     // It never creates a record, but it also serves as an authenticated cache sync
     // point after an operator removes or withdraws a Blog entry in the database.
-    if (!isPublishableArticle(parsed.data.title, parsed.data.content)) {
+    const probeText = plainText(parsed.data.content);
+    if (parsed.data.title.length <= maxProbeTitleLength && (!parsed.data.content || (probeText.length > 0 && probeText.length < minBodyLength))) {
       revalidatePublicBlog();
       return response(1, "验证成功");
     }
 
+    const { content, summary } = readableArticle(parsed.data.content);
+    const visibleTitle = plainText(parsed.data.title);
+    if (summary.length < minBodyLength || !/\p{L}/u.test(summary) || visibleTitle.length < 2 || !/[\p{L}\p{N}]/u.test(visibleTitle)) {
+      await recordAudit("webhook_invalid_article", "blog", "failed");
+      return response(0, "文章需要包含有效标题和可阅读的正文。");
+    }
+
     const now = new Date().toISOString();
-    const content = plainText(parsed.data.content);
+    // Preserve the legacy fingerprint so a retry cannot publish an old draft as a new post.
     const fingerprint = createHash("sha256")
       .update(`${parsed.data.class_id}\\n${parsed.data.title}\\n${parsed.data.author_id}`)
       .digest("hex");
     const id = `webhook_blog_${fingerprint.slice(0, 20)}`;
-    const articles = await listCmsNews();
-    const existing = articles.find((article) => article.id === id);
-    const slug = existing?.slug || uniqueSlug(toSlug(parsed.data.title, fingerprint), id, articles);
-    // External generators may submit material for an editor to use, but they
-    // cannot create an indexable public page. Publishing remains an explicit
-    // action in the CMS after topic, originality and factual checks.
+    const slug = await uniqueSlug(toSlug(parsed.data.title, fingerprint), id);
     const item: CmsNews = {
       id,
-      createdAt: existing?.createdAt || now,
+      createdAt: now,
       updatedAt: now,
       title: parsed.data.title,
-      subtitle: content.slice(0, 180),
+      subtitle: summary.slice(0, 180),
       slug,
       category: categoryFor(parsed.data.class_id),
       tags: ["external-plugin", parsed.data.class_id].filter(Boolean),
       author: parsed.data.author_id || "External Content Partner",
       coverImage: validImage(parsed.data.image_url),
-      excerpt: content.slice(0, 220),
+      excerpt: summary.slice(0, 220),
       content,
-      status: "draft",
+      status: "published",
       featured: false,
       pinned: false,
       source: "",
-      publishAt: existing?.publishAt || now,
+      publishAt: now,
       seoTitle: parsed.data.title.slice(0, 60),
-      seoDescription: content.slice(0, 160),
+      seoDescription: summary.slice(0, 160),
       indexable: false,
     };
 
-    // The deterministic id makes transport retries update the same draft instead of duplicating it.
-    await cmsStore.upsertNews(item);
-    await logAudit({ actor: "blog_webhook", action: existing ? "update_webhook_draft" : "queue_webhook_draft", target: item.id, result: "success" });
+    if (!(await cmsStore.insertNews(item))) {
+      const existing = await cmsStore.getNews(id);
+      if (!existing) throw new Error("Blog deduplication record could not be read.");
+      if (existing.status !== "published") return response(1, "文章已存在，保留原有状态");
+      revalidatePublicBlog(existing.slug);
+      return response(1, "发布成功");
+    }
+
+    await recordAudit("publish_webhook_blog", item.id, "success");
     revalidatePublicBlog(item.slug);
-    return response(1, "文章已接收，等待审核");
-  } catch (error) {
-    console.error("Blog webhook publish failed", error);
-    await recordFailure("webhook_publish_failed", "blog");
+    return response(1, "发布成功");
+  } catch {
+    console.error("Blog webhook publish failed");
+    await recordAudit("webhook_publish_failed", "blog", "failed");
     return response(0, "发布失败，请稍后重试。");
   }
 }

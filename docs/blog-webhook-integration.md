@@ -31,9 +31,9 @@ The API always returns HTTP 200 with the plugin contract:
 ```
 
 Invalid authentication, malformed data, or storage failures return `code: 0` with a
-non-sensitive reason. A valid signed request without a substantial title and body is
-treated as a verification request and returns `{"code":1,"msg":"验证成功"}` without
-writing an article.
+non-sensitive reason. A signed verification probe without full article fields returns
+`{"code":1,"msg":"验证成功"}` without writing an article. Full submissions must also
+contain a usable title and readable body after sanitization.
 
 ## Plugin fields
 
@@ -55,9 +55,13 @@ public documentation. Configure it in the Vercel Production environment, then re
 
 ## Delivery behaviour
 
-The endpoint uses a deterministic article id based on class, title, and author. A
-provider retry updates the existing record rather than creating a duplicate. Successful
-writes record an admin audit event and invalidate the Blog and Sitemap caches. A failed
-request records a failure audit without recording the article body or secret. The provider
-remains responsible for its bounded retry schedule; the CMS does not create an unbounded
-background retry loop.
+New, valid submissions are published immediately at `/blog` and `/blog/<slug>`. They
+default to `noindex, follow` and are excluded from the Blog sitemap. An editor may
+independently enable indexing with the article's **允许收录** checkbox in `/admin/news`.
+The Monday Search Console sitemap submission schedule is unchanged.
+
+The endpoint uses a stable article ID based on class, title and author. A repeat
+delivery acknowledges the existing record without overwriting it, including any draft,
+archived post, or editorial indexing decision. First deliveries record a
+`publish_webhook_blog` audit and invalidate Blog and sitemap cache entries. The endpoint
+does not log article bodies or secrets and does not run a background retry loop.

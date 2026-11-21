@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev -p 4174",
     "build": "next build",
-    "build:vercel": "npm run news:sources:import && npm run news:sources:validate && npm run news:sources:probe && npm run audit:products && npm run test:news-sources && npm run test:news-quality && npm run test:news-schedule && npm run test:sitemap && npm run test:admin-listing && npm run test:interior && npm run test:store && npm run build",
+    "build:vercel": "npm run news:sources:import && npm run news:sources:validate && npm run news:sources:probe && npm run audit:products && npm run test:news-sources && npm run test:news-quality && npm run test:news-schedule && npm run test:sitemap && npm run test:admin-listing && npm run test:interior && npm run test:store && npm run test:blog-webhook && npm run build",
     "start": "next start -p 4174",
     "typecheck": "tsc --noEmit",
     "lint": "tsc --noEmit",
@@ -22,7 +22,8 @@
     "test:news-schedule": "node --test --experimental-strip-types tests/news-publish-schedule.test.mjs",
     "test:admin-listing": "node --test --experimental-strip-types tests/admin-listing.test.mjs",
     "test:interior": "node --test --experimental-strip-types tests/interior-presentation.test.mjs",
-    "test:store": "node --test tests/store-safety.test.mjs"
+    "test:store": "node --test tests/store-safety.test.mjs",
+    "test:blog-webhook": "node --test tests/blog-webhook.test.mjs"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",
