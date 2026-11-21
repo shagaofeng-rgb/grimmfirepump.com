@@ -85,7 +85,7 @@ test("signed probes and invalid submissions do not create public posts", async (
   });
 });
 
-test("a concurrent delivery creates one published, non-indexable Blog article", async () => {
+test("a concurrent delivery creates one published, indexable Blog article", async () => {
   await usingWebhook(async ({ submit, rows, audits, cacheOperations }) => {
     const started = Date.now();
     const results = await Promise.all(Array.from({ length: 6 }, () => submit(article)));
@@ -94,30 +94,31 @@ test("a concurrent delivery creates one published, non-indexable Blog article", 
     const [post] = rows.values();
     assert.equal(post.title, article.title);
     assert.equal(post.status, "published");
-    assert.equal(post.indexable, false);
+    assert.equal(post.indexable, true);
     assert.equal(post.author, "partner");
     assert.equal(post.coverImage, article.image_url);
     assert.match(post.content, /^## Factory documentation\n\nA project submittal/);
     assert.match(post.content, /The review team can compare/);
     assert.ok(Date.parse(post.publishAt) >= started && Date.parse(post.publishAt) <= Date.now());
     assert.deepEqual(audits.map((log) => log.action), ["publish_webhook_blog"]);
-    assert.ok(["cms-blog", "/blog", `/blog/${post.slug}`].every((operation) => cacheOperations.includes(operation)));
+    assert.ok(["cms-blog", "sitemap-data", "/blog", `/blog/${post.slug}`, "/blog-sitemap.xml", "/sitemap.xml"]
+      .every((operation) => cacheOperations.includes(operation)));
   });
 });
 
 test("existing legacy drafts, archived articles and editorial decisions remain untouched", async () => {
   await usingWebhook(async ({ submit, rows, audits }) => {
-    for (const status of ["draft", "archived", "published"]) {
-      const title = `${article.title} ${status}`;
+    for (const [status, indexable] of [["draft", false], ["archived", false], ["published", false], ["published", true]]) {
+      const title = `${article.title} ${status} ${indexable}`;
       const hash = createHash("sha256").update(["blog", title, article.author_id].join("\\n")).digest("hex");
       const id = `webhook_blog_${hash.slice(0, 20)}`;
-      const original = { id, slug: `legacy-${status}`, status, indexable: status === "published", content: "Editorial copy", publishAt: "2026-09-19T07:00:00Z" };
+      const original = { id, slug: `legacy-${status}-${indexable}`, status, indexable, content: "Editorial copy", publishAt: "2026-09-19T07:00:00Z" };
       rows.set(id, original);
       const result = await submit({ ...article, title });
       assert.deepEqual(result, { code: 1, msg: status === "published" ? "发布成功" : "文章已存在，保留原有状态" });
       assert.deepEqual(rows.get(id), original);
     }
-    assert.equal(rows.size, 3);
+    assert.equal(rows.size, 4);
     assert.deepEqual(audits, []);
   });
 });

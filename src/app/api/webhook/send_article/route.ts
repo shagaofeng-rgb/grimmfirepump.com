@@ -129,6 +129,7 @@ function revalidatePublicBlog(slug?: string) {
   revalidatePath("/blog");
   revalidatePath("/blog/[slug]", "page");
   revalidatePath("/blog-sitemap.xml");
+  revalidatePath("/sitemap.xml");
   if (slug) revalidatePath(`/blog/${slug}`);
 }
 
@@ -200,7 +201,7 @@ export async function POST(request: Request) {
       publishAt: now,
       seoTitle: parsed.data.title.slice(0, 60),
       seoDescription: summary.slice(0, 160),
-      indexable: false,
+      indexable: true,
     };
 
     if (!(await cmsStore.insertNews(item))) {

@@ -56,8 +56,8 @@ public documentation. Configure it in the Vercel Production environment, then re
 ## Delivery behaviour
 
 New, valid submissions are published immediately at `/blog` and `/blog/<slug>`. They
-default to `noindex, follow` and are excluded from the Blog sitemap. An editor may
-independently enable indexing with the article's **允许收录** checkbox in `/admin/news`.
+are indexable by default and appear in the Blog sitemap. An editor can uncheck the
+article's **允许收录** checkbox in `/admin/news` to opt out without unpublishing it.
 The Monday Search Console sitemap submission schedule is unchanged.
 
 The endpoint uses a stable article ID based on class, title and author. A repeat
