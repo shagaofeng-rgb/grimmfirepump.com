@@ -1,6 +1,7 @@
 import { isLegacyImportedBlogSlug, listCmsNews, listCmsProducts, listProductCategories, type CmsNews, type CmsProduct, type CmsProductCategory, type CmsProductParameter } from "@/lib/admin-cms";
 import { cache } from "react";
 import { unstable_cache } from "next/cache";
+import { DEFAULT_BLOG_CATEGORY } from "@/lib/blog-taxonomy";
 import { getProductDisplayName, getProductFamily } from "@/lib/product-taxonomy";
 import { buildProductNavigation, publicCategorySlug, publicProductCategory } from "@/lib/product-navigation";
 import { readStoreItem } from "@/lib/local-store";
@@ -140,7 +141,7 @@ function mapPost(item: CmsNews): PublicPost {
     canonicalUrl: `/blog/${item.slug}`,
     indexable: item.indexable,
     sourceUrl: item.source || "",
-    category: item.category || "News",
+    category: item.category || DEFAULT_BLOG_CATEGORY,
     title: item.title,
     seoTitle: item.seoTitle?.trim() || "",
     seoDescription: item.seoDescription?.trim() || "",

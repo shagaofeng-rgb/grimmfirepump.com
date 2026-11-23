@@ -56,7 +56,7 @@ export default async function BlogDetailPage({ params }: BlogDetailProps) {
     <InteriorFrame path={`/blog/${post.slug}`} breadcrumbs={[{ label: "Blog", href: "/blog" }, { label: post.title }]}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(blogSchema).replace(/</g, "\\u003c") }} />
       <ArticleReader title={post.title} label={post.category} date={post.date} text={post.text} image={post.image} content={post.content}
-        back={{ label: "Back to technical blog", href: "/blog" }}
+        back={{ label: "Back to blog", href: "/blog" }}
         source={source && <a className="interior-text-link mt-4" href={source} target="_blank" rel="noreferrer">Original website page <ExternalLink size={15} /></a>}
         after={<section className="interior-source"><h2 className="interior-subtitle">Discuss your project duty point</h2><Link className="interior-button interior-primary mt-3" href="/contact" prefetch={false}>Ask an engineer <ArrowRight size={16} /></Link></section>}
       />

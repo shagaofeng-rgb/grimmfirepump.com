@@ -1,6 +1,7 @@
 import { company, downloads, posts, products } from "@/data/site";
 import { createId, deleteStoreItem, insertStoreItem, readStore, readStoreItem, readStoreRange, upsertStore, writeStore } from "@/lib/local-store";
 import { getConfiguredAdminUser, type AdminRole } from "@/lib/admin-auth";
+import { DEFAULT_BLOG_CATEGORY } from "@/lib/blog-taxonomy";
 import { getProductFamily, productFamilies } from "@/lib/product-taxonomy";
 import { getProductKnowledge, type ProductKnowledge } from "@/lib/product-knowledge";
 
@@ -312,7 +313,7 @@ const newsSeeds: CmsNews[] = posts.map((post, index) => ({
 }));
 
 const blogCategorySeeds: CmsBlogCategory[] = [
-  { id: "blog_industry_news", createdAt: now(), updatedAt: now(), name: "Industry News", slug: "blog", sortOrder: 1, enabled: true },
+  { id: "blog_industry_news", createdAt: now(), updatedAt: now(), name: DEFAULT_BLOG_CATEGORY, slug: "blog", sortOrder: 1, enabled: true },
 ];
 
 // These records are a one-time import of the former site's news feed, not

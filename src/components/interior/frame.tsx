@@ -23,7 +23,7 @@ const resources = [
   ["Certificates", "/certificates"],
   ["Testing", "/testing"],
   ["Knowledge center", "/knowledge"],
-  ["Technical blog", "/blog"],
+  ["Blog", "/blog"],
   ["Industry news", "/news"],
   ["Fire pump selector", "/tools/fire-pump-selector"],
 ] as const;

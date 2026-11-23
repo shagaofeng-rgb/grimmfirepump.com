@@ -58,6 +58,8 @@ public documentation. Configure it in the Vercel Production environment, then re
 New, valid submissions are published immediately at `/blog` and `/blog/<slug>`. They
 are indexable by default and appear in the Blog sitemap. An editor can uncheck the
 article's **允许收录** checkbox in `/admin/news` to opt out without unpublishing it.
+The `blog` and `31` class IDs use the **Technical Articles** category. These
+submissions appear in **Blog**, not the separate **Industry News** channel at `/news`.
 The Monday Search Console sitemap submission schedule is unchanged.
 
 The endpoint uses a stable article ID based on class, title and author. A repeat

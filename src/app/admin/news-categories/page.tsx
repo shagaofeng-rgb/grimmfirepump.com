@@ -28,7 +28,7 @@ export default async function NewsCategoriesPage({ searchParams }: PageProps) {
 
   return (
     <AdminShell>
-      <AdminPageHeader eyebrow="新闻分类" title="新闻分类统计" description="按已发布和已录入文章的分类字段统计内容数量。" />
+      <AdminPageHeader eyebrow="网站内容" title="Blog 分类" description="按 Blog 文章分类字段统计内容数量。" />
       <section className="mt-8 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
         <table className="w-full text-left text-sm">
           <thead className="bg-slate-50 text-slate-600"><tr><th className="px-4 py-3 font-black">分类</th><th className="px-4 py-3 font-black">文章数量</th><th className="px-4 py-3 font-black">状态</th></tr></thead>

@@ -2,6 +2,7 @@ import { saveNews } from "@/app/admin/actions";
 import { Field, inputClass, textareaClass } from "@/components/admin/admin-widgets";
 import { EditorForm } from "@/components/admin/editor-form";
 import type { CmsNews } from "@/lib/admin-cms";
+import { DEFAULT_BLOG_CATEGORY } from "@/lib/blog-taxonomy";
 
 export function NewsForm({ news }: { news?: CmsNews }) {
   return (
@@ -12,7 +13,7 @@ export function NewsForm({ news }: { news?: CmsNews }) {
         <Field label="文章标题"><input name="title" required defaultValue={news?.title} className={inputClass} /></Field>
         <Field label="URL Slug"><input name="slug" required defaultValue={news?.slug} className={inputClass} /></Field>
         <Field label="副标题"><input name="subtitle" defaultValue={news?.subtitle} className={inputClass} /></Field>
-        <Field label="分类"><input name="category" defaultValue={news?.category || "Industry News"} className={inputClass} /></Field>
+        <Field label="分类"><input name="category" defaultValue={news?.category || DEFAULT_BLOG_CATEGORY} className={inputClass} /></Field>
         <Field label="标签，逗号分隔"><input name="tags" defaultValue={news?.tags.join(", ")} className={inputClass} /></Field>
         <Field label="作者"><input name="author" defaultValue={news?.author || "GRIMM PUMP"} className={inputClass} /></Field>
         <Field label="封面图片"><input name="coverImage" defaultValue={news?.coverImage} className={inputClass} /></Field>

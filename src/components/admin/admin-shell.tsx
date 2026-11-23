@@ -34,7 +34,7 @@ const adminNav: Array<{ label: string; href: string; icon: typeof LayoutDashboar
   { label: "产品管理", href: "/admin/products", icon: Boxes, roles: ["super_admin", "product_manager"], group: "网站内容" },
   { label: "产品分类", href: "/admin/product-categories", icon: FolderTree, roles: ["super_admin", "product_manager"], group: "网站内容" },
   { label: "产品知识库", href: "/admin/product-knowledge", icon: ScrollText, roles: ["super_admin", "product_manager"], group: "网站内容" },
-  { label: "文章管理", href: "/admin/news", icon: Newspaper, roles: ["super_admin", "content_manager"], group: "网站内容" },
+  { label: "Blog 文章", href: "/admin/news", icon: Newspaper, roles: ["super_admin", "content_manager"], group: "网站内容" },
   { label: "资讯发布", href: "/admin/news-automation", icon: ListChecks, roles: ["super_admin", "content_manager"], group: "网站内容" },
   { label: "素材库", href: "/admin/media", icon: ImageIcon, roles: ["super_admin", "content_manager", "product_manager"], group: "网站内容" },
   { label: "下载资料", href: "/admin/downloads", icon: Download, roles: ["super_admin", "content_manager", "product_manager"], group: "网站内容" },

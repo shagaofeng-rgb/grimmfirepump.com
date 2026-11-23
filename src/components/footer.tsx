@@ -67,7 +67,7 @@ export function Footer({ interior = false }: { interior?: boolean } = {}) {
                   {item}
                 </Link>
               ))}
-              {interior && column.items.includes("Industry News") && <Link href="/blog" prefetch={false} className="hover:text-white">Technical Blog</Link>}
+              {interior && column.items.includes("Industry News") && <Link href="/blog" prefetch={false} className="hover:text-white">Blog</Link>}
             </div>
           </div>
         ))}

@@ -22,6 +22,7 @@ async function compile(path) {
 
 const evaluate = await compile("../src/app/api/webhook/send_article/route.ts");
 const articleContent = (await compile("../src/lib/article-content.ts"))();
+const blogTaxonomy = (await compile("../src/lib/blog-taxonomy.ts"))();
 
 async function usingWebhook(run) {
   const sign = randomUUID();
@@ -36,6 +37,7 @@ async function usingWebhook(run) {
       revalidateTag: (tag) => cacheOperations.push(tag),
     },
     "@/lib/article-content": articleContent,
+    "@/lib/blog-taxonomy": blogTaxonomy,
     "@/lib/admin-cms": {
       isLegacyImportedBlogSlug: () => false,
       logAudit: async (log) => audits.push(log),
@@ -94,6 +96,7 @@ test("a concurrent delivery creates one published, indexable Blog article", asyn
     const [post] = rows.values();
     assert.equal(post.title, article.title);
     assert.equal(post.status, "published");
+    assert.equal(post.category, "Technical Articles");
     assert.equal(post.indexable, true);
     assert.equal(post.author, "partner");
     assert.equal(post.coverImage, article.image_url);
@@ -106,13 +109,21 @@ test("a concurrent delivery creates one published, indexable Blog article", asyn
   });
 });
 
+test("the legacy Blog ID uses the same category and custom class IDs are preserved", async () => {
+  await usingWebhook(async ({ submit, rows }) => {
+    assert.equal((await submit({ ...article, class_id: "31" })).code, 1);
+    assert.equal((await submit({ ...article, class_id: "special" })).code, 1);
+    assert.deepEqual([...rows.values()].map((post) => post.category), ["Technical Articles", "External Blog special"]);
+  });
+});
+
 test("existing legacy drafts, archived articles and editorial decisions remain untouched", async () => {
   await usingWebhook(async ({ submit, rows, audits }) => {
     for (const [status, indexable] of [["draft", false], ["archived", false], ["published", false], ["published", true]]) {
       const title = `${article.title} ${status} ${indexable}`;
       const hash = createHash("sha256").update(["blog", title, article.author_id].join("\\n")).digest("hex");
       const id = `webhook_blog_${hash.slice(0, 20)}`;
-      const original = { id, slug: `legacy-${status}-${indexable}`, status, indexable, content: "Editorial copy", publishAt: "2026-09-19T07:00:00Z" };
+      const original = { id, slug: `legacy-${status}-${indexable}`, status, indexable, category: "Original category", content: "Editorial copy", publishAt: "2026-09-19T07:00:00Z" };
       rows.set(id, original);
       const result = await submit({ ...article, title });
       assert.deepEqual(result, { code: 1, msg: status === "published" ? "发布成功" : "文章已存在，保留原有状态" });

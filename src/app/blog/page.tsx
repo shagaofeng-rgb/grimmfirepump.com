@@ -28,7 +28,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
   const [featured, ...rest] = items.map((post) => ({ ...post, label: post.category, href: `/blog/${post.slug}` }));
   return (
     <InteriorFrame path="/blog" breadcrumbs={[{ label: "Blog" }]}>
-      <PageMast eyebrow="Resources" title="Technical blog" text="Practical reading for pump system buyers and project teams." />
+      <PageMast eyebrow="Resources" title="Blog" text="Practical reading for pump system buyers and project teams." />
       <section className="interior-shell interior-band">
         {featured ? <>
           <SectionHeading title={currentPage === 1 ? "Latest articles" : "Technical articles"} />

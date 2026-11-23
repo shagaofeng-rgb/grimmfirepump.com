@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { cmsStore, isLegacyImportedBlogSlug, logAudit, type CmsNews } from "@/lib/admin-cms";
 import { toArticleContentBlocks } from "@/lib/article-content";
+import { DEFAULT_BLOG_CATEGORY } from "@/lib/blog-taxonomy";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -67,7 +68,7 @@ function validImage(value: string) {
 
 function categoryFor(classId: string) {
   const normalized = classId.trim().toLowerCase();
-  if (normalized === "31" || normalized === "blog") return "Industry News";
+  if (normalized === "31" || normalized === "blog") return DEFAULT_BLOG_CATEGORY;
   return `External Blog ${classId.trim().slice(0, 40)}`;
 }
 

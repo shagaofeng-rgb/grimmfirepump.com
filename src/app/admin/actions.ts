@@ -25,6 +25,7 @@ import {
 } from "@/lib/admin-cms";
 import { createId, deleteStoreItem, patchStoreItem, upsertStore } from "@/lib/local-store";
 import type { InquiryRecord } from "@/lib/admin-data";
+import { DEFAULT_BLOG_CATEGORY } from "@/lib/blog-taxonomy";
 import { markSitemapDirty } from "@/lib/sitemap-dirty";
 import { validTrafficExclusions } from "@/lib/traffic-context";
 import type { EditorResult } from "@/components/admin/editor-form";
@@ -307,7 +308,7 @@ export async function saveNews(_: EditorResult, formData: FormData): Promise<Edi
     title: text(formData, "title"),
     subtitle: text(formData, "subtitle"),
     slug: requestedSlug,
-    category: text(formData, "category", "Industry News"),
+    category: text(formData, "category", DEFAULT_BLOG_CATEGORY),
     tags: tags(text(formData, "tags")),
     author: text(formData, "author", "GRIMM PUMP"),
     coverImage: text(formData, "coverImage"),
