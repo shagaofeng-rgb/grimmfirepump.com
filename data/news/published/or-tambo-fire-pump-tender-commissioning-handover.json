@@ -1,0 +1,86 @@
+{
+  "id": "news_20261127_or_tambo_pump_tests",
+  "body": [
+    "## What bidders were asked to price",
+    "Airports Company South Africa set 23 November 2026 as the revised bid deadline for replacing the fire water pump stations and the booster pump station at O.R. Tambo International Airport. The 24-month procurement takes the work from design through commissioning. In a 10 November addendum, the operator specified who should test the pumps once they are installed and what evidence the contractor must hand over.",
+    "Under item 20.7.5, an independent specialist is to measure the performance of the installed pumps. The owner wants signed results and curves showing how the pumps perform at the flow and pressure called for in the design. The addendum also explains how to price that work. A provisional sum covers the independent specialist’s fees. The contractor must allow elsewhere in its price for arranging access, preparing the test, documenting the results and correcting work that falls short.",
+    "Those details matter to anyone comparing pump quotations. A price headed “testing included” can cover a factory test, a visit to site, the independent test itself or some combination of the three. Each buys the owner something different.",
+    "## The GRIMM PUMP view",
+    "We would ask for a sample of the final test record while the bids are still on the table. It can be a blank form. Can the engineer tell which pump the sheet belongs to, what flow and pressure it is supposed to deliver, where the measured values will go and who will sign? The answers tell the buyer what the supplier has actually priced and give the maintenance team a say while the scope can still change.",
+    "A factory curve and a site curve answer questions at different points in a purchase. The first shows how a pump performed on a test stand under the conditions stated on the sheet. The second records what the installed equipment delivered during commissioning. We would ask for both to carry the same equipment identifier. Months later, a technician looking up a pump by its nameplate should be able to find the two records side by side.",
+    "## How two similar offers can differ",
+    "Consider a warehouse owner comparing two bids for the same specified flow and pressure. One supplier includes a factory test and dispatches an engineer to observe commissioning. The other also books the independent specialist, arranges the measuring instruments and compiles the signed report. The first bid may still suit an owner that already has those services under contract. The buyer can compare the totals fairly once each bidder has named the person or firm responsible for each task.",
+    "We would also ask both bidders to walk through one ordinary scheduling problem. Suppose the specialist arrives on the agreed date and the installation is still being finished. Who can rebook the visit? Who pays for the return trip? How will the operator know which test record is final? A short written answer gives the buyer something concrete to compare and lets the contractor put a price against a foreseeable cost.",
+    "## What the next shift should inherit",
+    "The airport’s tender documents give the handover file a place in the price schedule alongside operator training. For a buyer preparing a similar project, we would invite a member of the maintenance team to try the file before signing for it. Give that person one equipment identifier and ask them to find the signed site curve, the date of the test and the operating instructions for that unit. If it takes a call to the installer to match them up, there is still time to fix the index.",
+    "That exercise also shows where a handover can lose its value. A later service visit may produce a different pressure reading. With the original flow, measurement location, units and instrument reference recorded together, the maintenance engineer can check whether the two readings describe comparable conditions. A lone pressure figure offers little help with that judgment. The record should give the next person enough context to decide what deserves investigation.",
+    "On the purchasing team’s comparison sheet, we would give each bidder three lines to fill in. One covers the pump at its specified duty, another covers the work to demonstrate that duty on site, and a third covers the records the owner will keep. Put a price and a name against each line. The buyer can then compare the full cost, and the incoming maintenance team knows whom to call for the signed curve."
+  ],
+  "slug": "or-tambo-fire-pump-tender-commissioning-handover",
+  "angle": "Independent testing and commissioning handover",
+  "title": "O.R. Tambo airport tender calls for independent fire pump tests",
+  "siteId": "grimm-firepump-global",
+  "status": "published_success",
+  "retries": 0,
+  "summary": "South Africa’s airport operator wants signed test results and a performance curve for each installed pump. For a buyer comparing quotes, “testing included” leaves a cost question open.",
+  "category": "Fire Pump Procurement",
+  "industry": "Airports",
+  "language": "en",
+  "scenario": "Fire water pump station replacement",
+  "seoTitle": "O.R. Tambo tender calls for independent fire pump tests",
+  "createdAt": "2026-11-27T01:30:27.000Z",
+  "indexable": true,
+  "publishAt": "2026-11-27T01:43:23.073Z",
+  "sourceUrl": "https://www.etenders.gov.za/home/Download?blobName=cefd179a-7612-4a48-a65e-98ebe819307f.pdf&downloadedFileName=Addendum+02+-+Change+2+-+10+Nov+2026.pdf",
+  "updatedAt": "2026-11-27T01:44:50.617Z",
+  "geoSummary": "ACSA set 23 November 2026 as the revised deadline for its O.R. Tambo fire pump tender. GRIMM PUMP examines how to compare commissioning costs and handover evidence.",
+  "sourceName": "Airports Company South Africa",
+  "contentHash": "6c2b527503b34b0076874ea8c0fd9e9a8699d7034c1aeb202377dc922656b41d",
+  "contentType": "news",
+  "productSlug": "edj-fire-pump-set",
+  "sourceFacts": [
+    "ACSA’s 10 November addendum moved the submission deadline for the 24-month O.R. Tambo pump station project to 23 November 2026.",
+    "Item 20.7.5 assigns the installed pump tests to an independent specialist and calls for signed results and curves for the specified duty points.",
+    "Clause 19.3 puts the specialist’s fee in a provisional sum and assigns preparation, coordination and documentation costs to the contractor’s other prices.",
+    "The revised pricing schedule lists operator training in item 11.17 and handover records under item 12."
+  ],
+  "sourceTitle": "Addendum 02 to the O.R. Tambo fire water pump station tender (ORTIA8160/2026/RFP)",
+  "sourceAuthor": "",
+  "coverImageAlt": "Red fire pump and pipework on a skid, from the GRIMM PUMP equipment library",
+  "coverImageKey": "edj-application",
+  "coverImageUrl": "/assets/applications/hero-edj.webp",
+  "promptVersion": "grimm-news-v2-editorial-review",
+  "coverImageHash": "33f081a60096e4369f4126745e4467f801e49883067f41bdcfdc776c2d63f0a1",
+  "generatedModel": "grimm-news-v2",
+  "seoDescription": "ACSA’s airport pump tender calls for independent site tests. GRIMM PUMP examines the test costs and signed records a buyer should specify at handover.",
+  "coverImageWidth": 1024,
+  "relatedProducts": [
+    {
+      "slug": "edj-fire-pump-set",
+      "score": 1,
+      "title": "EDJ Fire Pump Set"
+    }
+  ],
+  "sourceFetchedAt": "2026-11-27T01:30:27.000Z",
+  "coverImageHeight": 1024,
+  "coverImageStatus": "ready",
+  "eventFingerprint": "31656be4c81fc35ac3f1148a0f9b95069ff511868bba708e5259968a5f4844d4",
+  "coverImagePageUrl": "https://www.grimmfirepump.com/applications",
+  "sourceFingerprint": "6523e4f2d4451660271d6d173c7347cb4ed20ab8560b9779d00411ecc9b81683",
+  "sourcePublishedAt": "2026-11-10T00:00:00.000Z",
+  "imageLicenseStatus": "owned-neutral",
+  "sourceCanonicalUrl": "https://www.etenders.gov.za/home/Download?blobName=cefd179a-7612-4a48-a65e-98ebe819307f.pdf&downloadedFileName=Addendum+02+-+Change+2+-+10+Nov+2026.pdf",
+  "coverImageFetchedAt": "2026-11-27T01:30:27.000Z",
+  "coverImageSourceUrl": "/assets/applications/hero-edj.webp",
+  "editorialDisclaimer": "GRIMM PUMP prepared the commentary and the warehouse example. The cover photo comes from the GRIMM PUMP equipment library.",
+  "editorialReferences": [
+    {
+      "url": "https://www.etenders.gov.za/home/Download?blobName=cefd179a-7612-4a48-a65e-98ebe819307f.pdf&downloadedFileName=Addendum+02+-+Change+2+-+10+Nov+2026.pdf",
+      "title": "Addendum 02, 10 November 2026"
+    },
+    {
+      "url": "https://www.etenders.gov.za/home/Download?blobName=d3316b60-e24f-444e-91a5-c73ee62dc190.pdf&downloadedFileName=Contr+-+repl+of+the+fire+water+pump+stations+and+the+booster+pump+station+rev01+red+changes.pdf",
+      "title": "Revised pricing schedule and scope of work, items 11 and 12"
+    }
+  ]
+}
