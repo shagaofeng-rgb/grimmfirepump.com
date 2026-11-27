@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import { ArrowRight, Menu, Search } from "lucide-react";
 import { StickyCta } from "@/components/sticky-cta";
 import { FooterSocialLinks } from "@/components/footer";
+import { SocialAccountLink } from "@/components/social-accounts";
 import { applications, company, factoryImages, knowledgePosts, projects } from "@/data/site";
 import { certificatePreviews } from "@/data/certificate-previews";
 import { InteriorFrame, PageMast, SectionHeading } from "@/components/interior/frame";
@@ -95,9 +96,9 @@ function LocalizedHeader({ locale }: { locale: LocalizedLocale }) {
             </Link>
           ))}
         </nav>
-        <a className="button button-primary hidden min-h-[42px] px-4 text-sm sm:inline-flex" href={company.whatsappUrl} target="_blank" rel="noreferrer" data-event="whatsapp_click" data-whatsapp-account="grimm-main" data-whatsapp-placement="localized_header">
+        <SocialAccountLink platform="whatsapp" className="button button-primary hidden min-h-[42px] gap-2 px-4 text-sm sm:inline-flex" placement="localized_header">
           {content.labels.whatsapp}
-        </a>
+        </SocialAccountLink>
         <details className="relative lg:hidden">
           <summary className="grid h-11 w-11 cursor-pointer list-none place-items-center rounded-md border border-slate-200 text-[var(--navy-900)]" aria-label={`${content.localeName} navigation`}>
             <Menu size={20} />
@@ -108,9 +109,9 @@ function LocalizedHeader({ locale }: { locale: LocalizedLocale }) {
                 {content.nav[navPath]}
               </Link>
             ))}
-            <a className="button button-primary mt-2 min-h-[42px] text-sm sm:hidden" href={company.whatsappUrl} target="_blank" rel="noreferrer" data-event="whatsapp_click" data-whatsapp-account="grimm-main" data-whatsapp-placement="localized_mobile_menu">
+            <SocialAccountLink platform="whatsapp" className="button button-primary mt-2 min-h-[42px] gap-2 text-sm sm:hidden" placement="localized_mobile_menu">
               {content.labels.whatsapp}
-            </a>
+            </SocialAccountLink>
           </nav>
         </details>
       </div>
@@ -240,7 +241,7 @@ function LocalizedFooter({ locale, interior = false }: { locale: LocalizedLocale
           <p className="mt-5 max-w-xl text-sm leading-7">{content.home.text}</p>
           <p className="mt-4 text-sm leading-7">{company.legalName}</p>
           <a className="mt-2 block text-sm hover:text-white" href={`mailto:${company.email}`}>{company.email}</a>
-          {interior && <FooterSocialLinks />}
+          <FooterSocialLinks className="mt-5" />
         </div>
         <nav className="grid grid-cols-2 gap-3 text-sm font-bold" aria-label={`${content.localeName} footer navigation`}>
           {navPaths.map((path) => <Link key={path} href={localizedPath(path, locale)} className="hover:text-white">{content.nav[path]}</Link>)}
@@ -297,7 +298,9 @@ function ContactPanel({ locale, interior = false }: { locale: LocalizedLocale; i
   if (interior) return (
     <section className="interior-shell interior-band interior-split" lang={content.htmlLang} dir={content.dir}>
       <div><SectionHeading title={content.home.contactTitle} /><div className="interior-actions">
-        <a className="interior-button" href={company.whatsappUrl} target="_blank" rel="noreferrer" data-event="whatsapp_click" data-whatsapp-account="grimm-main" data-whatsapp-placement="localized_contact">{content.labels.whatsapp}</a>
+        <SocialAccountLink platform="whatsapp" className="interior-button" placement="localized_contact">
+          {content.labels.whatsapp}
+        </SocialAccountLink>
         <Link className="interior-button interior-primary" href="/contact" prefetch={false}>{content.labels.contactSales} <ArrowRight size={16} /></Link>
       </div></div>
       <dl className="interior-contact-list"><div><dt>{content.labels.email}</dt><dd><a href={`mailto:${company.email}`} dir="ltr">{company.email}</a></dd></div><div><dt>{company.legalName}</dt><dd lang="en" dir="ltr">{company.address}</dd></div></dl>
@@ -309,18 +312,18 @@ function ContactPanel({ locale, interior = false }: { locale: LocalizedLocale; i
         <p className="eyebrow mb-3">{content.pages["/contact"].eyebrow}</p>
         <h2 className="text-3xl font-black">{content.home.contactTitle}</h2>
         <div className="mt-6 grid gap-3 text-slate-200">
-          <a className="font-bold text-white" href={company.whatsappUrl} target="_blank" rel="noreferrer" data-event="whatsapp_click" data-whatsapp-account="grimm-main" data-whatsapp-placement="localized_contact">
+          <SocialAccountLink platform="whatsapp" className="inline-flex items-center gap-2 font-bold text-white" placement="localized_contact">
             {content.labels.whatsapp}: {company.phone}
-          </a>
+          </SocialAccountLink>
           <a className="font-bold text-white" href={`mailto:${company.email}`}>
             {content.labels.email}: {company.email}
           </a>
           <p>{company.address}</p>
         </div>
         <div className="mt-8 flex flex-wrap gap-4">
-          <a className="button button-primary" href={company.whatsappUrl} target="_blank" rel="noreferrer" data-event="whatsapp_click" data-whatsapp-account="grimm-main" data-whatsapp-placement="localized_contact_cta">
+          <SocialAccountLink platform="whatsapp" className="button button-primary gap-2" placement="localized_contact_cta">
             {content.labels.whatsapp}
-          </a>
+          </SocialAccountLink>
           <Link className="button button-secondary" href="/contact">
             {content.labels.contactSales}
           </Link>

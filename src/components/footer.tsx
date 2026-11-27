@@ -1,20 +1,16 @@
 import Image from "next/image";
 import Link from "next/link";
 import { company, footerColumns } from "@/data/site";
-import { FacebookIcon, WhatsAppIcon, YouTubeIcon } from "@/components/social-platform-icons";
+import { SocialAccountLink } from "@/components/social-accounts";
 
-export function FooterSocialLinks() {
+export function FooterSocialLinks({ className = "", placement = "footer_social" }: { className?: string; placement?: string } = {}) {
+  const linkClass = "grid size-11 shrink-0 place-items-center rounded-full bg-white transition-shadow hover:ring-2 hover:ring-white/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white";
+
   return (
-    <div className="mt-5 flex items-center gap-3">
-      <a className="grid h-9 w-9 place-items-center rounded-full border border-white/25 text-white transition hover:-translate-y-0.5 hover:border-white hover:bg-white hover:text-[#1877f2] focus:outline-none focus:ring-2 focus:ring-white/70" href={company.facebookUrl} target="_blank" rel="noreferrer" data-event="facebook_click" aria-label="Follow GRIMM PUMP on Facebook" title="Facebook">
-        <FacebookIcon className="h-4 w-4" />
-      </a>
-      <a className="grid h-9 w-9 place-items-center rounded-full border border-white/25 text-white transition hover:-translate-y-0.5 hover:border-white hover:bg-white hover:text-[#ff0000] focus:outline-none focus:ring-2 focus:ring-white/70" href={company.youtubeUrl} target="_blank" rel="noreferrer" data-event="youtube_click" aria-label="Watch GRIMM PUMP on YouTube" title="YouTube">
-        <YouTubeIcon className="h-4 w-4" />
-      </a>
-      <a className="grid h-9 w-9 place-items-center rounded-full border border-white/25 text-white transition hover:-translate-y-0.5 hover:border-white hover:bg-white hover:text-[#25d366] focus:outline-none focus:ring-2 focus:ring-white/70" href={company.whatsappUrl} target="_blank" rel="noreferrer" data-event="whatsapp_click" data-whatsapp-account="grimm-main" data-whatsapp-placement="footer_social" aria-label="Contact GRIMM PUMP on WhatsApp" title="WhatsApp">
-        <WhatsAppIcon className="h-4 w-4" />
-      </a>
+    <div className={`flex flex-wrap items-center gap-2.5 ${className}`}>
+      <SocialAccountLink platform="facebook" className={linkClass} iconSize={24} />
+      <SocialAccountLink platform="youtube" className={linkClass} iconSize={24} />
+      <SocialAccountLink platform="whatsapp" className={linkClass} iconSize={24} placement={placement} />
     </div>
   );
 }
@@ -56,7 +52,7 @@ export function Footer({ interior = false }: { interior?: boolean } = {}) {
             <a className="hover:text-white" href={`mailto:${company.email}`}>{company.email}</a>
             <span>{company.phone}</span>
           </div>
-          <FooterSocialLinks />
+          <FooterSocialLinks className="mt-5" />
         </div>
         {footerColumns.map((column) => (
           <div key={column.title}>

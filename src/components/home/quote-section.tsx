@@ -4,6 +4,7 @@ import { FormEvent, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { company } from "@/data/site";
+import { SocialAccountLink } from "@/components/social-accounts";
 import { getVisitorContext, trackSiteEvent } from "@/components/analytics-listener";
 import { useSubmissionToken } from "@/components/use-submission-token";
 
@@ -62,7 +63,9 @@ export function QuoteSection() {
           </div>
           <div className="mt-9 text-sm leading-7 text-slate-400">
             <a className="font-bold text-white" href={"mailto:" + company.email}>{company.email}</a><br />
-            <a className="font-bold text-white" href={company.whatsappUrl} target="_blank" rel="noreferrer" data-event="whatsapp_click" data-whatsapp-account="grimm-main" data-whatsapp-placement="home_quote">WhatsApp: {company.phone}</a>
+            <SocialAccountLink platform="whatsapp" className="inline-flex items-center gap-2 font-bold text-white" placement="home_quote">
+              WhatsApp: {company.phone}
+            </SocialAccountLink>
           </div>
         </div>
 

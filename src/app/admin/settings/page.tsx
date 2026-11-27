@@ -1,6 +1,7 @@
 import { saveSettings } from "@/app/admin/actions";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { AdminPageHeader, Field, StatusPill, inputClass, textareaClass } from "@/components/admin/admin-widgets";
+import { SocialPlatformIcon } from "@/components/social-accounts";
 import { company } from "@/data/site";
 import { getSiteSettings } from "@/lib/admin-cms";
 
@@ -19,7 +20,15 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
             {[
               ["公司名称", company.legalName], ["网站域名", company.website], ["邮箱", company.email],
               ["WhatsApp", company.phone], ["地址", company.address], ["默认语言", "English"],
-            ].map(([label, value]) => <div key={label}><dt className="font-semibold text-slate-600">{label}</dt><dd className="mt-1 break-words">{value}</dd></div>)}
+            ].map(([label, value]) => (
+              <div key={label}>
+                <dt className="flex items-center gap-2 font-semibold text-slate-600">
+                  {label === "WhatsApp" && <SocialPlatformIcon platform="whatsapp" size={18} />}
+                  {label}
+                </dt>
+                <dd className="mt-1 break-words">{value}</dd>
+              </div>
+            ))}
             <div className="flex items-center justify-between gap-3"><dt>Google Analytics 4</dt><dd><StatusPill value={gaEnabled ? "configured" : "not_configured"} /></dd></div>
           </dl>
         </section>

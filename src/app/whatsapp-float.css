@@ -4,52 +4,45 @@
 
 .whatsapp-float {
   position: fixed;
-  z-index: 60;
+  z-index: 55;
   top: 50%;
-  right: clamp(12px, 2.2vw, 34px);
+  right: max(clamp(16px, 2vw, 28px), calc(env(safe-area-inset-right, 0px) + 12px));
   display: grid;
   width: 58px;
   height: 58px;
   place-items: center;
-  color: #fff;
-  background: #08783f;
-  border: 2px solid rgba(255, 255, 255, .94);
+  background: #fff;
+  border: 2px solid #128346;
   border-radius: 50%;
-  box-shadow: 0 13px 30px rgba(8, 45, 33, .28);
+  box-shadow: 0 5px 18px rgba(8, 45, 33, .28);
   transform: translateY(-50%);
-  transition: transform .2s ease, background-color .2s ease, box-shadow .2s ease;
-  isolation: isolate;
+  transition: box-shadow .2s ease;
 }
 
 .whatsapp-float::before {
   position: absolute;
-  z-index: -1;
-  inset: -7px;
+  inset: -3px;
   content: "";
-  border: 1px solid rgba(37, 211, 102, .7);
+  border: 2px solid #25d366;
   border-radius: 50%;
   opacity: 0;
+  pointer-events: none;
 }
-
-.whatsapp-float svg { width: 30px; height: 30px; fill: currentColor; }
 
 .whatsapp-float:focus-visible {
   outline: 3px solid #0b5fff;
-  outline-offset: 3px;
+  outline-offset: 4px;
 }
 
 .whatsapp-float:hover {
-  color: #fff;
-  background: #076635;
-  box-shadow: 0 17px 36px rgba(8, 45, 33, .34);
-  transform: translateY(-50%) scale(1.06);
+  box-shadow: 0 7px 22px rgba(8, 45, 33, .38);
 }
 
 @media (max-width: 640px) {
+  .whatsapp-float { width: 48px; height: 48px; }
+  .whatsapp-float img { width: 28px; height: 28px; }
   .home-editorial .home-hero-copy { padding: 32px 20px 24px; }
   .home-editorial .home-hero-copy h1 { font-size: 40px; line-height: 1.02; letter-spacing: 0; overflow-wrap: anywhere; }
-  .home-editorial .whatsapp-float { right: 8px; width: 44px; height: 44px; }
-  .home-editorial .whatsapp-float svg { width: 24px; height: 24px; }
   .home-editorial .home-hero-actions {
     align-items: flex-start;
     flex-direction: column;
@@ -64,8 +57,8 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .whatsapp-float::before { animation: whatsapp-float-ring 2.4s ease-out 2; }
-  .whatsapp-float svg { animation: whatsapp-float-icon 2.4s ease-in-out 2; }
+  .whatsapp-float::before { animation: whatsapp-float-ring 3s ease-out infinite; }
+  .whatsapp-float:is(:hover, :focus-visible)::before { animation: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -75,13 +68,7 @@
 }
 
 @keyframes whatsapp-float-ring {
-  0%, 35% { opacity: 0; transform: scale(.88); }
-  42% { opacity: .7; }
-  78%, 100% { opacity: 0; transform: scale(1.32); }
-}
-
-@keyframes whatsapp-float-icon {
-  0%, 38%, 100% { transform: scale(1); }
-  48% { transform: scale(1.1); }
-  58% { transform: scale(.96); }
+  0% { opacity: 0; transform: scale(1); }
+  12% { opacity: .95; }
+  65%, 100% { opacity: 0; transform: scale(1.32); }
 }

@@ -229,9 +229,6 @@
 .interior-footer { --navy-950: #10232d; padding-block: 36px 26px; }
 .interior-footer > div { max-width: 1280px; gap: 22px; }
 .interior-footer > div:last-child { margin-top: 26px; padding-top: 16px; }
-.interior-site .whatsapp-float { width: 46px; height: 46px; right: 14px; background: #08783f; }
-.interior-site .whatsapp-float svg { width: 24px; height: 24px; }
-.interior-site .whatsapp-float:hover { background: #076635; }
 
 @media (max-width: 1079px) {
   .interior-desktop-nav, .interior-header-quote { display: none; }
@@ -285,7 +282,6 @@
   .interior-detail-panel { padding-block: 20px 32px; }
   .interior-detail-aside { padding-inline-start: 12px; }
   .interior-form-surface { padding: 14px; }
-  .interior-site .whatsapp-float { right: 8px; width: 42px; height: 42px; }
 }
 @media (max-width: 420px) {
   .interior-card-body { padding: 12px; }

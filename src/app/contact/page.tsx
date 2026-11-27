@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Building2, Mail, MapPin, Phone } from "lucide-react";
 import { InteriorFrame, PageMast, SectionHeading } from "@/components/interior/frame";
 import { ProductInquiryForm } from "@/components/product-inquiry-form";
-import { WhatsAppIcon } from "@/components/social-platform-icons";
+import { SocialAccountLink } from "@/components/social-accounts";
 import { company } from "@/data/site";
 import { getPublicProducts } from "@/lib/public-cms";
 import { boundedQuery } from "@/lib/catalog-presentation";
@@ -28,7 +28,14 @@ export default async function ContactPage({ searchParams }: { searchParams: Prom
           <dl className="interior-contact-list">
             <div><dt><Mail size={17} /> Email</dt><dd><a href={`mailto:${company.email}`}>{company.email}</a></dd></div>
             <div><dt><Phone size={17} /> Phone</dt><dd><a href={`tel:${company.phone.replace(/[^+\d]/g, "")}`}>{company.phone}</a></dd></div>
-            <div><dt><WhatsAppIcon className="size-[17px]" /> WhatsApp</dt><dd><a href={company.whatsappUrl} target="_blank" rel="noreferrer" data-event="whatsapp_click" data-whatsapp-account="grimm-main" data-whatsapp-placement="contact">Open WhatsApp</a></dd></div>
+            <div>
+              <dt className="ps-[25px]">WhatsApp</dt>
+              <dd>
+                <SocialAccountLink platform="whatsapp" className="inline-flex items-center gap-2" placement="contact">
+                  Open WhatsApp
+                </SocialAccountLink>
+              </dd>
+            </div>
             <div><dt><Building2 size={17} /> Company</dt><dd>{company.legalName}</dd></div>
             <div><dt><MapPin size={17} /> Address</dt><dd>{company.address}</dd></div>
           </dl>

@@ -3,9 +3,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import dynamic from "next/dynamic";
-import { ArrowRight, ChevronDown, Globe2, Menu, MessageCircle, Package, X } from "lucide-react";
+import { ArrowRight, ChevronDown, Globe2, Menu, Package, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { company, navItems } from "@/data/site";
+import { SocialAccountLink } from "@/components/social-accounts";
 import type { ProductNavigationGroup } from "@/lib/product-navigation";
 
 const ProductMegaMenu = dynamic(
@@ -124,18 +125,13 @@ export function HeaderClient({ groups }: { groups: ProductNavigationGroup[] }) {
               {languages.map((language) => <Link key={language.href} href={language.href} className="rounded px-3 py-2 text-sm hover:bg-slate-100">{language.name}</Link>)}
             </nav>
           </details>
-          <a
+          <SocialAccountLink
+            platform="whatsapp"
             className="hidden items-center gap-2 text-sm font-extrabold text-[var(--navy-800)] md:flex"
-            href={company.whatsappUrl}
-            target="_blank"
-            rel="noreferrer"
-            data-event="whatsapp_click"
-            data-whatsapp-account="grimm-main"
-            data-whatsapp-placement="header"
+            placement="header"
           >
-            <MessageCircle size={18} />
             WhatsApp
-          </a>
+          </SocialAccountLink>
           <Link className="button button-primary mobile-header-quote min-h-[42px] px-4 text-sm" href="/contact">
             Get Quote
           </Link>
